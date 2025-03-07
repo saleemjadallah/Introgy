@@ -109,7 +109,7 @@ const EventForm = ({ initialEvent, onSubmit, onCancel }: EventFormProps) => {
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full max-h-[80vh] overflow-y-auto">
       <form onSubmit={handleSubmit}>
         <CardContent className="pt-6 space-y-4">
           <div className="space-y-2">
@@ -280,7 +280,7 @@ const EventForm = ({ initialEvent, onSubmit, onCancel }: EventFormProps) => {
           </div>
         </CardContent>
         
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex justify-between sticky bottom-0 bg-card border-t py-3">
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
