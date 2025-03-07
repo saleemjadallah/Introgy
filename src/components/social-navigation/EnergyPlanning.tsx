@@ -1,13 +1,17 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { BatteryCharging, Clock, Brain, Coffee, Utensils, Moon, AlertCircle } from "lucide-react";
-import { format, addMinutes, subMinutes } from "date-fns";
 import { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BatteryCharging } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { useSocialBattery } from "@/hooks/useSocialBattery";
+import { format } from "date-fns";
+
+// Import the refactored components
+import EnergyCostDisplay from "./energy-planning/EnergyCostDisplay";
+import BatteryLevelDisplay from "./energy-planning/BatteryLevelDisplay";
+import LowEnergyWarning from "./energy-planning/LowEnergyWarning";
+import TimeScheduler from "./energy-planning/TimeScheduler";
+import RechargeActivitiesList from "./energy-planning/RechargeActivitiesList";
+import { getRechargeActivities } from "./energy-planning/rechargeActivitiesData";
 
 interface EnergyPlanningProps {
   energyCost: number;
@@ -31,37 +35,7 @@ const EnergyPlanning = ({ energyCost, eventDate, eventDuration, batteryLevel: ex
     setShowEnergyWarning(energyCost * 10 > currentBatteryLevel * 0.7);
   }, [energyCost, currentBatteryLevel]);
   
-  const rechargeActivities = [
-    {
-      name: "Meditation",
-      icon: <Brain className="h-5 w-5" />,
-      description: "Guided meditation to center your thoughts",
-      time: "10-15 minutes"
-    },
-    {
-      name: "Reading",
-      icon: <Moon className="h-5 w-5" />,
-      description: "Read something enjoyable to relax",
-      time: "20+ minutes"
-    },
-    {
-      name: "Caffeine Break",
-      icon: <Coffee className="h-5 w-5" />,
-      description: "Have tea or coffee in a quiet space",
-      time: "15 minutes"
-    },
-    {
-      name: "Light Meal",
-      icon: <Utensils className="h-5 w-5" />,
-      description: "Eat something light but energizing",
-      time: "20 minutes"
-    }
-  ];
-  
-  // Calculate the pre and post event quiet times
-  const quietTimeStart = subMinutes(eventDate, quietTimeBefore);
-  const eventEndTime = addMinutes(eventDate, eventDuration);
-  const recoveryTimeEnd = addMinutes(eventEndTime, quietTimeAfter);
+  const rechargeActivities = getRechargeActivities();
 
   // Handle planning user energy for this event
   const handleEnergyPlanning = () => {
@@ -104,106 +78,31 @@ const EnergyPlanning = ({ energyCost, eventDate, eventDuration, batteryLevel: ex
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div>
-          <div className="flex justify-between mb-1">
-            <span className="text-sm">Expected Social Energy Cost</span>
-            <span className="text-sm font-medium">{energyCost}/10</span>
-          </div>
-          <Progress value={energyCost * 10} className="h-2" />
-          <p className="mt-2 text-sm text-muted-foreground">
-            {energyCost <= 3 ? "Low energy event, should be manageable" :
-             energyCost <= 6 ? "Moderate energy event, plan for some recovery time" :
-             "High energy event, ensure you plan for significant recharge time"}
-          </p>
-        </div>
+        {/* Energy cost display component */}
+        <EnergyCostDisplay energyCost={energyCost} />
         
-        <div className="flex justify-between items-center pt-1">
-          <div className="flex items-center gap-2">
-            <span className="text-sm">Current Battery Level:</span>
-            <span className="text-sm font-medium">{currentBatteryLevel}%</span>
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleEnergyPlanning}
-            className="text-xs"
-          >
-            Apply To Battery
-          </Button>
-        </div>
+        {/* Battery level display component */}
+        <BatteryLevelDisplay 
+          batteryLevel={currentBatteryLevel} 
+          onPlanEnergy={handleEnergyPlanning} 
+        />
         
-        {showEnergyWarning && (
-          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-md p-3 flex items-start gap-2">
-            <AlertCircle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-            <div className="text-sm">
-              <p className="font-medium text-yellow-500">Low Energy Warning</p>
-              <p className="text-muted-foreground">This event may drain most of your current social battery. Consider scheduling more recharge time.</p>
-            </div>
-          </div>
-        )}
+        {/* Conditional warning component */}
+        {showEnergyWarning && <LowEnergyWarning />}
         
-        <div className="space-y-4 pt-2 border-t">
-          <h3 className="text-base font-medium flex items-center gap-2">
-            <Clock className="h-4 w-4" /> Schedule Your Recharge Time
-          </h3>
-          
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label>Quiet Time Before Event</Label>
-                <span className="text-sm">{quietTimeBefore} min</span>
-              </div>
-              <Slider 
-                value={[quietTimeBefore]} 
-                min={15} 
-                max={180}
-                step={15}
-                onValueChange={(value) => setQuietTimeBefore(value[0])}
-              />
-              <div className="text-sm text-muted-foreground">
-                Start quiet time at: {format(quietTimeStart, "h:mm a")}
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label>Recovery Time After Event</Label>
-                <span className="text-sm">{quietTimeAfter} min</span>
-              </div>
-              <Slider 
-                value={[quietTimeAfter]} 
-                min={30} 
-                max={240}
-                step={30}
-                onValueChange={(value) => setQuietTimeAfter(value[0])}
-              />
-              <div className="text-sm text-muted-foreground">
-                Event ends at approximately: {format(eventEndTime, "h:mm a")}
-                <br />
-                Recovery time until: {format(recoveryTimeEnd, "h:mm a")}
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Time scheduler component */}
+        <TimeScheduler 
+          quietTimeBefore={quietTimeBefore}
+          quietTimeAfter={quietTimeAfter}
+          eventDate={eventDate}
+          eventDuration={eventDuration}
+          onQuietTimeBeforeChange={setQuietTimeBefore}
+          onQuietTimeAfterChange={setQuietTimeAfter}
+        />
         
         <div className="space-y-4 pt-2 border-t">
           <h3 className="text-base font-medium">Recommended Recharge Activities</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {rechargeActivities.map((activity, index) => (
-              <Card key={index} className="border-muted">
-                <CardContent className="p-4 flex items-start gap-3">
-                  <div className="p-2 rounded-md bg-primary/10 text-primary">
-                    {activity.icon}
-                  </div>
-                  <div>
-                    <h4 className="font-medium">{activity.name}</h4>
-                    <p className="text-xs text-muted-foreground mt-1">{activity.description}</p>
-                    <p className="text-xs mt-1">{activity.time}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <RechargeActivitiesList activities={rechargeActivities} />
         </div>
       </CardContent>
     </Card>
