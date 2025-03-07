@@ -19,9 +19,16 @@ export function usePreparationMemo() {
         }
       });
 
-      if (response.error) throw new Error(response.error.message);
+      if (response.error) {
+        console.error("Supabase function error:", response.error);
+        throw new Error(response.error.message);
+      }
       
       const { memo } = response.data;
+      
+      if (!memo) {
+        throw new Error("No memo was generated. Please try again.");
+      }
       
       // Update event preparation with new memo
       const preparation = currentPreparation || {
@@ -51,7 +58,7 @@ export function usePreparationMemo() {
     } catch (error) {
       console.error("Error generating preparation memo:", error);
       toast.dismiss();
-      toast.error("Failed to generate preparation memo");
+      toast.error(`Failed to generate preparation memo: ${error.message}`);
       return {
         memo: null,
         updatedPreparation: currentPreparation

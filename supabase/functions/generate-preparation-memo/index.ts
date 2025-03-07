@@ -48,7 +48,7 @@ Based on this information, please create a personalized preparation memo that in
 
 Format the memo in Markdown with clear sections and concise advice. Keep it practical, supportive, and tailored to someone who values preparation and energy management for social situations.`;
 
-    // Call Claude API
+    // Call Claude API with the correct model name
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -73,7 +73,7 @@ Format the memo in Markdown with clear sections and concise advice. Keep it prac
     
     if (!response.ok) {
       console.error("Claude API error:", data);
-      throw new Error(`Claude API error: ${data.error?.message || "Unknown error"}`);
+      throw new Error(`Claude API error: ${data.error?.message || JSON.stringify(data) || "Unknown error"}`);
     }
 
     // Extract the generated memo from Claude's response
