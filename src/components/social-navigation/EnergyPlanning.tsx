@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
@@ -14,19 +13,23 @@ interface EnergyPlanningProps {
   energyCost: number;
   eventDate: Date;
   eventDuration: number;
+  batteryLevel?: number; // Added batteryLevel as an optional prop
 }
 
-const EnergyPlanning = ({ energyCost, eventDate, eventDuration }: EnergyPlanningProps) => {
+const EnergyPlanning = ({ energyCost, eventDate, eventDuration, batteryLevel: externalBatteryLevel }: EnergyPlanningProps) => {
   const [quietTimeBefore, setQuietTimeBefore] = useState(60); // minutes
   const [quietTimeAfter, setQuietTimeAfter] = useState(90); // minutes
-  const { batteryLevel, handleActivitySelect } = useSocialBattery();
+  const { batteryLevel: internalBatteryLevel, handleActivitySelect } = useSocialBattery();
   const [showEnergyWarning, setShowEnergyWarning] = useState(false);
+  
+  // Use external battery level if provided, otherwise use the one from the hook
+  const currentBatteryLevel = externalBatteryLevel !== undefined ? externalBatteryLevel : internalBatteryLevel;
   
   // Check if the user has enough energy for the event
   useEffect(() => {
     // Show warning if energy cost is higher than 70% of current battery level
-    setShowEnergyWarning(energyCost * 10 > batteryLevel * 0.7);
-  }, [energyCost, batteryLevel]);
+    setShowEnergyWarning(energyCost * 10 > currentBatteryLevel * 0.7);
+  }, [energyCost, currentBatteryLevel]);
   
   const rechargeActivities = [
     {
@@ -117,7 +120,7 @@ const EnergyPlanning = ({ energyCost, eventDate, eventDuration }: EnergyPlanning
         <div className="flex justify-between items-center pt-1">
           <div className="flex items-center gap-2">
             <span className="text-sm">Current Battery Level:</span>
-            <span className="text-sm font-medium">{batteryLevel}%</span>
+            <span className="text-sm font-medium">{currentBatteryLevel}%</span>
           </div>
           <Button 
             variant="outline" 

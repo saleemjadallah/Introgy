@@ -8,6 +8,16 @@ interface BatteryHistoryEntry {
   level: number;
 }
 
+interface SocialActivity {
+  type: "recharge" | "depletion";
+  name: string;
+  energyImpact: number;
+  date: Date;
+  duration?: number;
+  notes?: string;
+  source?: string;
+}
+
 export function useSocialBattery() {
   const [batteryLevel, setBatteryLevel] = useState(() => {
     const saved = localStorage.getItem("socialBatteryLevel");
@@ -67,10 +77,39 @@ export function useSocialBattery() {
     );
   };
 
+  // Add a new method to handle social activities
+  const addActivity = (activity: SocialActivity) => {
+    const isRecharge = activity.type === "recharge";
+    const energyChange = activity.energyImpact;
+    
+    // Create a custom activity compatible with handleActivitySelect
+    const customActivity = isRecharge 
+      ? {
+          id: Date.now(),
+          name: activity.name,
+          duration: activity.duration || 60,
+          energyGain: energyChange,
+          isCustom: true
+        } as RechargeActivity
+      : {
+          id: Date.now(),
+          name: activity.name,
+          duration: activity.duration || 60,
+          energyLoss: energyChange,
+          isCustom: true
+        } as DepletingActivity;
+    
+    // Use the existing handleActivitySelect
+    handleActivitySelect(customActivity);
+    
+    return customActivity;
+  };
+
   return {
     batteryLevel,
     batteryHistory,
     handleSliderChange,
-    handleActivitySelect
+    handleActivitySelect,
+    addActivity
   };
 }
