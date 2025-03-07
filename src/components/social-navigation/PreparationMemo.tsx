@@ -45,7 +45,7 @@ const PreparationMemo = ({ eventId, memo, onGenerate }: PreparationMemoProps) =>
             AI Preparation Memo
           </CardTitle>
           <CardDescription>
-            Detailed preparation guidance tailored to this event
+            Detailed preparation guidance tailored to this event using Hugging Face AI
           </CardDescription>
         </CardHeader>
         

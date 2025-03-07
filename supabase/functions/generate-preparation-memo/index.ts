@@ -1,8 +1,9 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { HfInference } from 'https://esm.sh/@huggingface/inference@2.3.2';
 
-const CLAUDE_API_KEY = Deno.env.get("CLAUDE_API_KEY");
+const HUGGING_FACE_API_KEY = Deno.env.get("HUGGING_FACE_API_KEY");
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,7 +23,7 @@ serve(async (req) => {
       userPreferences = {} 
     } = await req.json();
 
-    // Create a prompt for Claude based on the event information
+    // Create a prompt for the Hugging Face model based on the event information
     const prompt = `Generate a detailed preparation memo for the following social event:
 
 Event Name: ${event.name}
@@ -48,44 +49,33 @@ Based on this information, please create a personalized preparation memo that in
 
 Format the memo in Markdown with clear sections and concise advice. Keep it practical, supportive, and tailored to someone who values preparation and energy management for social situations.`;
 
-    console.log("Calling Claude API...");
+    console.log("Calling Hugging Face API...");
     
-    // Call Claude API with the correct model name and parameters
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": CLAUDE_API_KEY,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: "claude-3-sonnet-20240229",
-        max_tokens: 4000,
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ]
-      })
+    // Initialize the Hugging Face inference client
+    const hf = new HfInference(HUGGING_FACE_API_KEY);
+    
+    // Call Hugging Face API with a text generation model
+    // Using Mistral-7B which is a good balance of quality and speed
+    const response = await hf.textGeneration({
+      model: "mistralai/Mistral-7B-Instruct-v0.2",
+      inputs: prompt,
+      parameters: {
+        max_new_tokens: 2048,
+        temperature: 0.7,
+        top_p: 0.95,
+        repetition_penalty: 1.1
+      }
     });
 
-    const data = await response.json();
-    console.log("Claude API response status:", response.status);
+    console.log("Hugging Face API response received");
     
-    if (!response.ok) {
-      console.error("Claude API error:", JSON.stringify(data));
-      throw new Error(`Claude API error: ${data.error?.message || JSON.stringify(data) || "Unknown error"}`);
+    if (!response || !response.generated_text) {
+      console.error("Empty or invalid response from Hugging Face API");
+      throw new Error("Failed to generate content from Hugging Face API");
     }
 
-    // Make sure we're extracting the content correctly
-    if (!data.content || !data.content[0] || !data.content[0].text) {
-      console.error("Unexpected Claude API response structure:", JSON.stringify(data));
-      throw new Error("Unexpected response format from Claude API");
-    }
-
-    // Extract the generated memo from Claude's response
-    const memo = data.content[0].text;
+    // Extract the generated memo from Hugging Face's response
+    const memo = response.generated_text.trim();
     console.log("Memo generated successfully");
 
     return new Response(JSON.stringify({ memo }), {
