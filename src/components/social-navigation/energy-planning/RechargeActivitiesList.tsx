@@ -1,17 +1,10 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Brain, Coffee, Utensils, Moon } from "lucide-react";
-
-interface RechargeActivity {
-  name: string;
-  icon: React.ReactNode;
-  description: string;
-  time: string;
-}
+import { RechargeActivityData } from "./rechargeActivitiesData";
 
 interface RechargeActivitiesListProps {
-  activities: RechargeActivity[];
+  activities: RechargeActivityData[];
 }
 
 const RechargeActivitiesList = ({ activities }: RechargeActivitiesListProps) => {
