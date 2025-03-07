@@ -4,10 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
+import { useSocialBattery } from "@/hooks/useSocialBattery";
+import { getBatteryColor } from "@/components/social-battery/BatteryStatus";
 
 const Index = () => {
-  // Mock social battery data
-  const socialBatteryLevel = 45;
+  // Use the social battery hook instead of mock data
+  const { batteryLevel } = useSocialBattery();
 
   // Time-based greeting
   const getGreeting = () => {
@@ -37,9 +39,13 @@ const Index = () => {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">Current Level</span>
-              <span className="text-sm font-medium">{socialBatteryLevel}%</span>
+              <span className="text-sm font-medium">{batteryLevel}%</span>
             </div>
-            <Progress value={socialBatteryLevel} className="h-2" />
+            <Progress 
+              value={batteryLevel} 
+              className="h-2" 
+              indicatorClassName={getBatteryColor(batteryLevel)}
+            />
             <div className="pt-2">
               <Link to="/social-battery">
                 <Button variant="outline" size="sm" className="w-full">Update Battery</Button>
