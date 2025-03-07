@@ -1,8 +1,9 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { HfInference } from 'https://esm.sh/@huggingface/inference@2.3.2';
 
-const CLAUDE_API_KEY = Deno.env.get("CLAUDE_API_KEY");
+const HUGGING_FACE_API_KEY = Deno.env.get("HUGGING_FACE_API_KEY");
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,7 +19,7 @@ serve(async (req) => {
   try {
     const { eventType, userInterests, attendees } = await req.json();
     
-    // Create a prompt for Claude based on the event information
+    // Create a prompt for the model based on the event information
     const prompt = `Generate 10 natural conversation starters for a ${eventType} event.
     
     The user's interests include: ${userInterests || "various topics"}.
@@ -33,38 +34,34 @@ serve(async (req) => {
     
     Format as JSON array with fields: starter, explanation, followUp, category`;
 
-    // Call Claude API
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": CLAUDE_API_KEY,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: "claude-3-sonnet-20240229",
-        max_tokens: 4000,
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        temperature: 0.7
-      })
+    console.log("Calling Hugging Face API for conversation starters...");
+    
+    // Initialize the Hugging Face inference client
+    const hf = new HfInference(HUGGING_FACE_API_KEY);
+    
+    // Call Hugging Face API with a text generation model
+    const response = await hf.textGeneration({
+      model: "mistralai/Mistral-7B-Instruct-v0.2",
+      inputs: prompt,
+      parameters: {
+        max_new_tokens: 4096,
+        temperature: 0.7,
+        top_p: 0.95,
+        repetition_penalty: 1.1
+      }
     });
 
-    const data = await response.json();
+    console.log("Hugging Face API response received");
     
-    if (!response.ok) {
-      console.error("Claude API error:", data);
-      throw new Error(`Claude API error: ${data.error?.message || "Unknown error"}`);
+    if (!response || !response.generated_text) {
+      console.error("Empty or invalid response from Hugging Face API");
+      throw new Error("Failed to generate content from Hugging Face API");
     }
 
     let starters = [];
     try {
       // Try to parse JSON from the response
-      const content = data.content[0].text;
+      const content = response.generated_text.trim();
       const jsonStartIndex = content.indexOf('[');
       const jsonEndIndex = content.lastIndexOf(']') + 1;
       
@@ -76,7 +73,7 @@ serve(async (req) => {
         throw new Error("Unable to parse JSON from response");
       }
     } catch (error) {
-      console.error("Error parsing Claude response:", error);
+      console.error("Error parsing Hugging Face response:", error);
       // Create a basic set of fallback starters
       starters = [
         {

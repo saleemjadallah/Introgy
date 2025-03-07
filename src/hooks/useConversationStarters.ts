@@ -9,6 +9,8 @@ export function useConversationStarters() {
     currentPreparation: any
   ) => {
     try {
+      toast.loading("Generating conversation starters...");
+      
       // Get user interests (would come from profile in a real implementation)
       const userInterests = "technology, books, hiking, movies, quiet activities";
       
@@ -20,9 +22,29 @@ export function useConversationStarters() {
         }
       });
 
-      if (response.error) throw new Error(response.error.message);
+      toast.dismiss();
       
-      const starters: ConversationStarter[] = response.data.starters;
+      if (response.error) {
+        console.error("Supabase function error:", response.error);
+        throw new Error(response.error.message || "Failed to call conversation starters function");
+      }
+      
+      if (!response.data) {
+        console.error("Empty response data from function");
+        throw new Error("No data returned from the conversation starters function");
+      }
+      
+      const { starters, error } = response.data;
+      
+      if (error) {
+        console.error("Function returned error:", error);
+        throw new Error(error);
+      }
+      
+      if (!starters || !Array.isArray(starters)) {
+        console.error("Invalid starters in response:", response.data);
+        throw new Error("No conversation starters were generated. Please try again.");
+      }
       
       // Update event preparation with new starters
       const preparation = currentPreparation || {
@@ -45,13 +67,16 @@ export function useConversationStarters() {
         ]
       };
       
+      toast.success("Conversation starters created successfully");
+      
       return {
         starters,
         updatedPreparation
       };
     } catch (error) {
       console.error("Error generating conversation starters:", error);
-      toast.error("Failed to generate conversation starters");
+      toast.dismiss();
+      toast.error(`Failed to generate conversation starters: ${error.message}`);
       return {
         starters: [],
         updatedPreparation: currentPreparation

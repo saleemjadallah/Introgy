@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ConversationStarter } from "@/types/events";
-import { MessageSquare, Sparkles, Star, PlusCircle } from "lucide-react";
+import { MessageSquare, Sparkles, Star, PlusCircle, AlertTriangle } from "lucide-react";
 
 interface ConversationStartersProps {
   eventId: string;
@@ -16,11 +16,18 @@ interface ConversationStartersProps {
 const ConversationStarters = ({ eventId, starters, onGenerate }: ConversationStartersProps) => {
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const handleGenerate = async () => {
     setLoading(true);
-    await onGenerate();
-    setLoading(false);
+    setError(null);
+    try {
+      await onGenerate();
+    } catch (err) {
+      setError(err.message || "Failed to generate conversation starters");
+    } finally {
+      setLoading(false);
+    }
   };
   
   const filterByCategory = (category: string) => {
@@ -47,11 +54,21 @@ const ConversationStarters = ({ eventId, starters, onGenerate }: ConversationSta
             Conversation Starters
           </CardTitle>
           <CardDescription>
-            AI-generated topics to help you navigate conversations
+            AI-generated topics to help you navigate conversations using Hugging Face AI
           </CardDescription>
         </CardHeader>
         
         <CardContent className="space-y-4">
+          {error && (
+            <div className="bg-destructive/10 p-3 rounded-md mb-4 flex items-start gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium text-destructive">Error generating starters</p>
+                <p className="text-sm text-destructive/80">{error}</p>
+              </div>
+            </div>
+          )}
+          
           <div className="flex justify-between items-center">
             <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
               <TabsList className="w-full">
