@@ -24,7 +24,7 @@ const EventsTab = ({
   selectedEventId 
 }: EventsTabProps) => {
   const { addActivity } = useSocialBattery();
-  const [showAddForm, setShowAddForm] = useState(events.length === 0);
+  const [showAddForm, setShowAddForm] = useState(false);
   
   const handleAddEvent = (event: SocialEvent) => {
     const newEvent = onAddEvent(event);
@@ -48,7 +48,7 @@ const EventsTab = ({
       {showAddForm ? (
         <Card>
           <CardHeader>
-            <CardTitle>Create Your First Event</CardTitle>
+            <CardTitle>Create New Event</CardTitle>
             <CardDescription>Add details about an upcoming social event you'll attend</CardDescription>
           </CardHeader>
           <CardContent>
