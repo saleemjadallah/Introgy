@@ -7,7 +7,8 @@ import { useEvents } from "@/hooks/useEvents";
 import EventsList from "@/components/social-navigation/EventsList";
 import EventPreparation from "@/components/social-navigation/EventPreparation";
 import EventForm from "@/components/social-navigation/EventForm";
-import { Users, Calendar, MessageSquare, BookOpen } from "lucide-react";
+import { Users, Calendar, MessageSquare, BookOpen, AlertCircle } from "lucide-react";
+import { useSocialBattery } from "@/hooks/useSocialBattery";
 
 const SocialNavigation = () => {
   const { 
@@ -23,6 +24,7 @@ const SocialNavigation = () => {
     loadEventPreparation
   } = useEvents();
   
+  const { batteryLevel } = useSocialBattery();
   const [selectedTab, setSelectedTab] = useState<string>("events");
   const [showAddForm, setShowAddForm] = useState(events.length === 0);
   
@@ -97,11 +99,24 @@ const SocialNavigation = () => {
         
         <TabsContent value="preparation" className="space-y-4 mt-4">
           {activeEvent ? (
-            <EventPreparation 
-              event={activeEvent}
-              preparation={eventPreparation}
-              onGenerateConversationStarters={handleGenerateConversationStarters}
-            />
+            <>
+              {batteryLevel < 30 && (
+                <Card className="bg-red-500/10 border-red-500/20 mb-4">
+                  <CardContent className="p-4 flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-medium text-red-500">Low Social Battery</h3>
+                      <p className="text-sm text-muted-foreground">Your social battery is currently low. Consider rescheduling or ensuring you have enough recharge time.</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              <EventPreparation 
+                event={activeEvent}
+                preparation={eventPreparation}
+                onGenerateConversationStarters={handleGenerateConversationStarters}
+              />
+            </>
           ) : (
             <Card>
               <CardContent className="py-10 text-center">

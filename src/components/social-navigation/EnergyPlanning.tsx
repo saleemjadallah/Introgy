@@ -3,9 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { BatteryCharging, Clock, Brain, Coffee, Utensils, Moon } from "lucide-react";
+import { BatteryCharging, Clock, Brain, Coffee, Utensils, Moon, AlertCircle } from "lucide-react";
 import { format, addMinutes, subMinutes } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { useSocialBattery } from "@/hooks/useSocialBattery";
 
 interface EnergyPlanningProps {
   energyCost: number;
@@ -16,6 +19,14 @@ interface EnergyPlanningProps {
 const EnergyPlanning = ({ energyCost, eventDate, eventDuration }: EnergyPlanningProps) => {
   const [quietTimeBefore, setQuietTimeBefore] = useState(60); // minutes
   const [quietTimeAfter, setQuietTimeAfter] = useState(90); // minutes
+  const { batteryLevel, handleActivitySelect } = useSocialBattery();
+  const [showEnergyWarning, setShowEnergyWarning] = useState(false);
+  
+  // Check if the user has enough energy for the event
+  useEffect(() => {
+    // Show warning if energy cost is higher than 70% of current battery level
+    setShowEnergyWarning(energyCost * 10 > batteryLevel * 0.7);
+  }, [energyCost, batteryLevel]);
   
   const rechargeActivities = [
     {
@@ -49,6 +60,35 @@ const EnergyPlanning = ({ energyCost, eventDate, eventDuration }: EnergyPlanning
   const eventEndTime = addMinutes(eventDate, eventDuration);
   const recoveryTimeEnd = addMinutes(eventEndTime, quietTimeAfter);
 
+  // Handle planning user energy for this event
+  const handleEnergyPlanning = () => {
+    // Create a custom recharge activity for the quiet time before
+    const preEventRecharge = {
+      id: 9999, // A unique ID that won't conflict
+      name: "Quiet Time Before Event",
+      duration: quietTimeBefore,
+      energyGain: Math.min(25, quietTimeBefore / 3), // 1 point per 3 minutes up to 25
+      isCustom: true
+    };
+    
+    // Create a custom depleting activity for the event
+    const eventDepletion = {
+      id: 9998,
+      name: "Social Event: " + (eventDate ? format(eventDate, "MMM d") : "Upcoming"),
+      duration: eventDuration,
+      energyLoss: energyCost * 10, // Convert 1-10 scale to percentage
+      isCustom: true
+    };
+    
+    // Schedule these in the social battery
+    handleActivitySelect(preEventRecharge);
+    handleActivitySelect(eventDepletion);
+    
+    toast.success("Energy plan added to your Social Battery", {
+      description: `Your social battery will be updated with this event's energy impact.`
+    });
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -73,6 +113,31 @@ const EnergyPlanning = ({ energyCost, eventDate, eventDuration }: EnergyPlanning
              "High energy event, ensure you plan for significant recharge time"}
           </p>
         </div>
+        
+        <div className="flex justify-between items-center pt-1">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">Current Battery Level:</span>
+            <span className="text-sm font-medium">{batteryLevel}%</span>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleEnergyPlanning}
+            className="text-xs"
+          >
+            Apply To Battery
+          </Button>
+        </div>
+        
+        {showEnergyWarning && (
+          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-md p-3 flex items-start gap-2">
+            <AlertCircle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-yellow-500">Low Energy Warning</p>
+              <p className="text-muted-foreground">This event may drain most of your current social battery. Consider scheduling more recharge time.</p>
+            </div>
+          </div>
+        )}
         
         <div className="space-y-4 pt-2 border-t">
           <h3 className="text-base font-medium flex items-center gap-2">
