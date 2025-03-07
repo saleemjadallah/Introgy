@@ -9,8 +9,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 
+// Define common type for activities
+interface BaseActivity {
+  id: number;
+  name: string;
+  duration: number;
+}
+
+// Type for recharging activities
+interface RechargeActivity extends BaseActivity {
+  energyGain: number;
+}
+
+// Type for depleting activities
+interface DepletingActivity extends BaseActivity {
+  energyLoss: number;
+}
+
+// Type guard to check if an activity is a recharge activity
+const isRechargeActivity = (activity: RechargeActivity | DepletingActivity): activity is RechargeActivity => {
+  return 'energyGain' in activity;
+};
+
 // Mock data for recharge activities
-const rechargeActivities = [
+const rechargeActivities: RechargeActivity[] = [
   { id: 1, name: "Read a book", duration: 30, energyGain: 15 },
   { id: 2, name: "Take a walk alone", duration: 20, energyGain: 10 },
   { id: 3, name: "Listen to calming music", duration: 15, energyGain: 8 },
@@ -19,7 +41,7 @@ const rechargeActivities = [
 ];
 
 // Mock data for depleting activities
-const depletingActivities = [
+const depletingActivities: DepletingActivity[] = [
   { id: 1, name: "Team meeting", duration: 60, energyLoss: 20 },
   { id: 2, name: "Social gathering", duration: 120, energyLoss: 35 },
   { id: 3, name: "Phone call", duration: 15, energyLoss: 10 },
@@ -51,17 +73,28 @@ const SocialBattery = () => {
     setBatteryLevel(value[0]);
   };
 
-  const handleActivitySelect = (activity: typeof rechargeActivities[0], isRecharge: boolean) => {
+  const handleActivitySelect = (activity: RechargeActivity | DepletingActivity) => {
+    let energyChange: number;
+    let isRecharge: boolean;
+    
+    if (isRechargeActivity(activity)) {
+      energyChange = activity.energyGain;
+      isRecharge = true;
+    } else {
+      energyChange = activity.energyLoss;
+      isRecharge = false;
+    }
+    
     const newLevel = isRecharge 
-      ? Math.min(100, batteryLevel + activity.energyGain) 
-      : Math.max(0, batteryLevel - activity.energyLoss);
+      ? Math.min(100, batteryLevel + energyChange) 
+      : Math.max(0, batteryLevel - energyChange);
     
     setBatteryLevel(newLevel);
     
     toast(
       isRecharge 
-        ? `Battery recharged by ${activity.energyGain}%` 
-        : `Battery depleted by ${activity.energyLoss}%`,
+        ? `Battery recharged by ${energyChange}%` 
+        : `Battery depleted by ${energyChange}%`,
       {
         description: `${activity.name} (${activity.duration} min)`,
       }
@@ -82,8 +115,8 @@ const SocialBattery = () => {
     return "Excellent - Your social battery is fully charged";
   };
 
-  const RechargeActivity = ({ activity }: { activity: typeof rechargeActivities[0] }) => (
-    <Card className="cursor-pointer hover:bg-accent/10 transition-colors" onClick={() => handleActivitySelect(activity, true)}>
+  const RechargeActivityCard = ({ activity }: { activity: RechargeActivity }) => (
+    <Card className="cursor-pointer hover:bg-accent/10 transition-colors" onClick={() => handleActivitySelect(activity)}>
       <CardHeader className="p-3">
         <CardTitle className="text-base flex items-center gap-2">
           <PlusCircle className="h-4 w-4 text-green-500" />
@@ -101,8 +134,8 @@ const SocialBattery = () => {
     </Card>
   );
 
-  const DepletingActivity = ({ activity }: { activity: typeof depletingActivities[0] }) => (
-    <Card className="cursor-pointer hover:bg-accent/10 transition-colors" onClick={() => handleActivitySelect(activity, false)}>
+  const DepletingActivityCard = ({ activity }: { activity: DepletingActivity }) => (
+    <Card className="cursor-pointer hover:bg-accent/10 transition-colors" onClick={() => handleActivitySelect(activity)}>
       <CardHeader className="p-3">
         <CardTitle className="text-base flex items-center gap-2">
           <MinusCircle className="h-4 w-4 text-red-500" />
@@ -200,7 +233,7 @@ const SocialBattery = () => {
         <TabsContent value="recharge" className="space-y-4 mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {rechargeActivities.map(activity => (
-              <RechargeActivity key={activity.id} activity={activity} />
+              <RechargeActivityCard key={activity.id} activity={activity} />
             ))}
           </div>
         </TabsContent>
@@ -208,7 +241,7 @@ const SocialBattery = () => {
         <TabsContent value="activities" className="space-y-4 mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {depletingActivities.map(activity => (
-              <DepletingActivity key={activity.id} activity={activity} />
+              <DepletingActivityCard key={activity.id} activity={activity} />
             ))}
           </div>
         </TabsContent>
