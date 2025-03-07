@@ -11,7 +11,7 @@ import { toast } from "sonner";
 const SocialBattery = () => {
   const { batteryLevel, batteryHistory, handleSliderChange, handleActivitySelect } = useSocialBattery();
   const [selectedTab, setSelectedTab] = useState("current");
-  const showWarning = batteryLevel <= 30;
+  const showWarning = batteryLevel < 20;
 
   // Toast notification when battery level reaches critical levels
   useEffect(() => {
