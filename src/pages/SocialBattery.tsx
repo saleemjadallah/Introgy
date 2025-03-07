@@ -1,14 +1,26 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BatteryStatus } from "@/components/social-battery/BatteryStatus";
 import { BatteryHistory } from "@/components/social-battery/BatteryHistory";
 import { RechargeActivitiesList, DepletingActivitiesList } from "@/components/social-battery/ActivityLists";
 import { useSocialBattery } from "@/hooks/useSocialBattery";
+import LowBatteryWarning from "@/components/social-navigation/LowBatteryWarning";
+import { toast } from "sonner";
 
 const SocialBattery = () => {
   const { batteryLevel, batteryHistory, handleSliderChange, handleActivitySelect } = useSocialBattery();
   const [selectedTab, setSelectedTab] = useState("current");
+  const showWarning = batteryLevel <= 30;
+
+  // Toast notification when battery level reaches critical levels
+  useEffect(() => {
+    if (batteryLevel <= 20) {
+      toast.warning("Critical Battery Level", {
+        description: "Your social battery is critically low. Consider recharging soon.",
+      });
+    }
+  }, [batteryLevel]);
 
   return (
     <div className="space-y-6">
@@ -16,6 +28,8 @@ const SocialBattery = () => {
         <h2 className="text-3xl font-bold tracking-tight mb-2">Social Battery</h2>
         <p className="text-muted-foreground">Monitor and manage your social energy</p>
       </div>
+
+      {showWarning && <LowBatteryWarning />}
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
