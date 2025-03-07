@@ -1,72 +1,14 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
 import { BatteryStatus } from "@/components/social-battery/BatteryStatus";
 import { BatteryHistory } from "@/components/social-battery/BatteryHistory";
 import { RechargeActivitiesList, DepletingActivitiesList } from "@/components/social-battery/ActivityLists";
-import { RechargeActivity, DepletingActivity, isRechargeActivity } from "@/types/activity";
+import { useSocialBattery } from "@/hooks/useSocialBattery";
 
 const SocialBattery = () => {
-  const [batteryLevel, setBatteryLevel] = useState(() => {
-    const saved = localStorage.getItem("socialBatteryLevel");
-    return saved ? parseInt(saved, 10) : 70;
-  });
-  
-  const [batteryHistory, setBatteryHistory] = useState<{date: Date, level: number}[]>(() => {
-    const saved = localStorage.getItem("batteryHistory");
-    return saved ? JSON.parse(saved).map((item: any) => ({
-      ...item,
-      date: new Date(item.date)
-    })) : [];
-  });
-  
+  const { batteryLevel, batteryHistory, handleSliderChange, handleActivitySelect } = useSocialBattery();
   const [selectedTab, setSelectedTab] = useState("current");
-
-  // Save battery level to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem("socialBatteryLevel", batteryLevel.toString());
-    
-    // Add to history when battery level changes significantly
-    if (batteryHistory.length === 0 || 
-        Math.abs(batteryHistory[batteryHistory.length-1].level - batteryLevel) >= 5) {
-      const newHistory = [...batteryHistory, {date: new Date(), level: batteryLevel}];
-      setBatteryHistory(newHistory);
-      localStorage.setItem("batteryHistory", JSON.stringify(newHistory));
-    }
-  }, [batteryLevel]);
-
-  const handleSliderChange = (value: number[]) => {
-    setBatteryLevel(value[0]);
-  };
-
-  const handleActivitySelect = (activity: RechargeActivity | DepletingActivity) => {
-    let energyChange: number;
-    let isRecharge: boolean;
-    
-    if (isRechargeActivity(activity)) {
-      energyChange = activity.energyGain;
-      isRecharge = true;
-    } else {
-      energyChange = activity.energyLoss;
-      isRecharge = false;
-    }
-    
-    const newLevel = isRecharge 
-      ? Math.min(100, batteryLevel + energyChange) 
-      : Math.max(0, batteryLevel - energyChange);
-    
-    setBatteryLevel(newLevel);
-    
-    toast(
-      isRecharge 
-        ? `Battery recharged by ${energyChange}%` 
-        : `Battery depleted by ${energyChange}%`,
-      {
-        description: `${activity.name} (${activity.duration} min)`,
-      }
-    );
-  };
 
   return (
     <div className="space-y-6">
