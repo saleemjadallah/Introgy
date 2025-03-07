@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { BatteryCharging, Clock, ZZZ, Coffee, Utensils, Moon } from "lucide-react";
+import { BatteryCharging, Clock, Brain, Coffee, Utensils, Moon } from "lucide-react";
 import { format, addMinutes, subMinutes } from "date-fns";
 import { useState } from "react";
 
@@ -20,7 +20,7 @@ const EnergyPlanning = ({ energyCost, eventDate, eventDuration }: EnergyPlanning
   const rechargeActivities = [
     {
       name: "Meditation",
-      icon: <ZZZ className="h-5 w-5" />,
+      icon: <Brain className="h-5 w-5" />,
       description: "Guided meditation to center your thoughts",
       time: "10-15 minutes"
     },
