@@ -61,6 +61,7 @@ export interface EventPreparation {
     quietTime: number; // minutes before event
     quietTimeAfter: number; // minutes after event
   };
+  aiMemo?: string; // AI-generated preparation memo
   reflectionCompleted?: boolean;
   reflection?: EventReflection;
 }

@@ -3,12 +3,14 @@ import { useState, useEffect } from "react";
 import { SocialEvent, EventPreparation, ConversationStarter } from "@/types/events";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useSocialBattery } from "@/hooks/useSocialBattery";
 
 export function useEvents() {
   const [events, setEvents] = useState<SocialEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeEvent, setActiveEvent] = useState<SocialEvent | null>(null);
   const [eventPreparation, setEventPreparation] = useState<EventPreparation | null>(null);
+  const { batteryLevel } = useSocialBattery();
 
   // For now we're using localStorage but this can be expanded to use Supabase
   useEffect(() => {
@@ -135,6 +137,60 @@ export function useEvents() {
     }
   };
 
+  const generatePreparationMemo = async (eventId: string) => {
+    try {
+      if (!activeEvent) return null;
+      
+      toast.loading("Generating your preparation memo...");
+
+      const response = await supabase.functions.invoke("generate-preparation-memo", {
+        body: {
+          event: activeEvent,
+          batteryLevel
+        }
+      });
+
+      if (response.error) throw new Error(response.error.message);
+      
+      const { memo } = response.data;
+      
+      // Update event preparation with new memo
+      const preparation = eventPreparation || {
+        eventId,
+        conversationStarters: [],
+        exitStrategies: [],
+        boundaries: [],
+        energyPlan: {
+          preEventActivities: [],
+          quietTime: 30,
+          quietTimeAfter: 60
+        }
+      };
+      
+      const updatedPreparation = {
+        ...preparation,
+        aiMemo: memo
+      };
+      
+      setEventPreparation(updatedPreparation);
+      
+      // Save to localStorage
+      const savedPreparations = JSON.parse(localStorage.getItem("eventPreparations") || "{}");
+      savedPreparations[eventId] = updatedPreparation;
+      localStorage.setItem("eventPreparations", JSON.stringify(savedPreparations));
+      
+      toast.dismiss();
+      toast.success("Preparation memo created successfully");
+      
+      return memo;
+    } catch (error) {
+      console.error("Error generating preparation memo:", error);
+      toast.dismiss();
+      toast.error("Failed to generate preparation memo");
+      return null;
+    }
+  };
+
   const loadEventPreparation = (eventId: string) => {
     try {
       const savedPreparations = JSON.parse(localStorage.getItem("eventPreparations") || "{}");
@@ -164,6 +220,7 @@ export function useEvents() {
     updateEvent,
     deleteEvent,
     generateConversationStarters,
+    generatePreparationMemo,
     loadEventPreparation
   };
 }

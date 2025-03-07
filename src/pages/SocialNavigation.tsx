@@ -21,10 +21,11 @@ const SocialNavigation = () => {
     updateEvent, 
     deleteEvent, 
     generateConversationStarters,
+    generatePreparationMemo,
     loadEventPreparation
   } = useEvents();
   
-  const { batteryLevel } = useSocialBattery();
+  const { batteryLevel, addActivity } = useSocialBattery();
   const [selectedTab, setSelectedTab] = useState<string>("events");
   const [showAddForm, setShowAddForm] = useState(events.length === 0);
   
@@ -47,6 +48,11 @@ const SocialNavigation = () => {
   const handleGenerateConversationStarters = async () => {
     if (!activeEvent?.id) return;
     await generateConversationStarters(activeEvent.id);
+  };
+  
+  const handleGeneratePreparationMemo = async () => {
+    if (!activeEvent?.id) return;
+    await generatePreparationMemo(activeEvent.id);
   };
   
   return (
@@ -78,7 +84,18 @@ const SocialNavigation = () => {
               <CardContent>
                 <EventForm 
                   onSubmit={(event) => {
-                    addEvent(event);
+                    const newEvent = addEvent(event);
+                    
+                    // Create a "Future event" activity in the social battery
+                    addActivity({
+                      type: "depletion",
+                      name: `Future event: ${event.name}`,
+                      energyImpact: event.energyCost * 10,
+                      date: new Date(event.date),
+                      notes: `This event is expected to cost ${event.energyCost}/10 energy units`,
+                      source: "social-navigation"
+                    });
+                    
                     setShowAddForm(false);
                   }}
                   onCancel={() => setShowAddForm(false)}
@@ -89,7 +106,21 @@ const SocialNavigation = () => {
             <EventsList 
               events={events}
               onEventSelect={handleEventSelect}
-              onAddEvent={addEvent}
+              onAddEvent={(event) => {
+                const newEvent = addEvent(event);
+                
+                // Create a "Future event" activity in the social battery
+                addActivity({
+                  type: "depletion",
+                  name: `Future event: ${event.name}`,
+                  energyImpact: event.energyCost * 10,
+                  date: new Date(event.date),
+                  notes: `This event is expected to cost ${event.energyCost}/10 energy units`,
+                  source: "social-navigation"
+                });
+                
+                return newEvent;
+              }}
               onUpdateEvent={updateEvent}
               onDeleteEvent={deleteEvent}
               selectedEventId={activeEvent?.id}
@@ -115,6 +146,8 @@ const SocialNavigation = () => {
                 event={activeEvent}
                 preparation={eventPreparation}
                 onGenerateConversationStarters={handleGenerateConversationStarters}
+                onGeneratePreparationMemo={handleGeneratePreparationMemo}
+                batteryLevel={batteryLevel}
               />
             </>
           ) : (

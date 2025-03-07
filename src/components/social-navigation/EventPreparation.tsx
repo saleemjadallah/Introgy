@@ -6,22 +6,27 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SocialEvent, EventPreparation as EventPreparationType } from "@/types/events";
-import { Battery, Calendar, MapPin, Users, Clock, MessageSquare, DoorOpen, BatteryCharging, Bell } from "lucide-react";
+import { Battery, Calendar, MapPin, Users, Clock, MessageSquare, DoorOpen, BatteryCharging, Bell, BookOpenText } from "lucide-react";
 import ConversationStarters from "./ConversationStarters";
 import ExitStrategies from "./ExitStrategies";
 import EnergyPlanning from "./EnergyPlanning";
 import Boundaries from "./Boundaries";
+import PreparationMemo from "./PreparationMemo";
 
 interface EventPreparationProps {
   event: SocialEvent;
   preparation: EventPreparationType | null;
   onGenerateConversationStarters: () => Promise<void>;
+  onGeneratePreparationMemo: () => Promise<void>;
+  batteryLevel: number;
 }
 
 const EventPreparation = ({ 
   event, 
   preparation,
-  onGenerateConversationStarters
+  onGenerateConversationStarters,
+  onGeneratePreparationMemo,
+  batteryLevel
 }: EventPreparationProps) => {
   const [countdown, setCountdown] = useState<string>("");
   const [activeTab, setActiveTab] = useState("overview");
@@ -99,14 +104,38 @@ const EventPreparation = ({
             </div>
             <Progress value={event.energyCost * 10} className="h-2" />
           </div>
+          <div className="flex items-center gap-2 mt-2">
+            <Battery className="h-4 w-4 text-muted-foreground" />
+            <div className="flex-1">
+              <div className="flex justify-between mb-1">
+                <span className="text-sm">Current Battery</span>
+                <span className="text-sm font-medium">{batteryLevel}%</span>
+              </div>
+              <Progress 
+                value={batteryLevel} 
+                className="h-2" 
+                indicatorClassName={
+                  batteryLevel < 30 
+                    ? "bg-red-500" 
+                    : batteryLevel < 60 
+                      ? "bg-amber-500" 
+                      : "bg-green-500"
+                }
+              />
+            </div>
+          </div>
         </CardContent>
       </Card>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="w-full grid grid-cols-4">
+        <TabsList className="w-full grid grid-cols-5">
           <TabsTrigger value="overview" className="flex items-center gap-1">
             <Calendar className="h-4 w-4" />
             <span className="hidden md:inline">Overview</span>
+          </TabsTrigger>
+          <TabsTrigger value="memo" className="flex items-center gap-1">
+            <BookOpenText className="h-4 w-4" />
+            <span className="hidden md:inline">Memo</span>
           </TabsTrigger>
           <TabsTrigger value="conversation" className="flex items-center gap-1">
             <MessageSquare className="h-4 w-4" />
@@ -137,6 +166,10 @@ const EventPreparation = ({
                   <span className="text-green-500">✓</span>
                 </li>
                 <li className="flex items-center justify-between">
+                  <span>Generate AI Preparation Memo</span>
+                  <span>{preparation?.aiMemo ? "✓" : "Pending"}</span>
+                </li>
+                <li className="flex items-center justify-between">
                   <span>Explore Conversation Starters</span>
                   <span>{preparation?.conversationStarters?.length ? "✓" : "Pending"}</span>
                 </li>
@@ -165,6 +198,33 @@ const EventPreparation = ({
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
+                  <BookOpenText className="h-4 w-4" />
+                  AI Preparation Memo
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {preparation?.aiMemo 
+                    ? "Your AI-generated preparation memo is ready"
+                    : "Generate a detailed preparation guide for this event"}
+                </p>
+                <Button 
+                  onClick={() => {
+                    if (!preparation?.aiMemo) {
+                      onGeneratePreparationMemo();
+                    }
+                    setActiveTab("memo");
+                  }} 
+                  size="sm"
+                >
+                  {preparation?.aiMemo ? "View Memo" : "Generate Memo"}
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
                   <MessageSquare className="h-4 w-4" />
                   Conversation Starters
                 </CardTitle>
@@ -177,7 +237,9 @@ const EventPreparation = ({
                 </p>
                 <Button 
                   onClick={() => {
-                    onGenerateConversationStarters();
+                    if (!preparation?.conversationStarters?.length) {
+                      onGenerateConversationStarters();
+                    }
                     setActiveTab("conversation");
                   }} 
                   size="sm"
@@ -186,27 +248,15 @@ const EventPreparation = ({
                 </Button>
               </CardContent>
             </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <DoorOpen className="h-4 w-4" />
-                  Exit Strategies
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Plan how to gracefully exit conversations or the event
-                </p>
-                <Button 
-                  onClick={() => setActiveTab("exit")} 
-                  size="sm"
-                >
-                  Explore Strategies
-                </Button>
-              </CardContent>
-            </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="memo" className="mt-4">
+          <PreparationMemo 
+            eventId={event.id as string}
+            memo={preparation?.aiMemo}
+            onGenerate={onGeneratePreparationMemo}
+          />
         </TabsContent>
 
         <TabsContent value="conversation" className="mt-4">
@@ -226,6 +276,7 @@ const EventPreparation = ({
             energyCost={event.energyCost} 
             eventDate={new Date(event.date)}
             eventDuration={event.duration || 120}
+            batteryLevel={batteryLevel}
           />
           
           <Boundaries />
