@@ -13,7 +13,14 @@ const SocialBattery = () => {
     return saved ? parseInt(saved, 10) : 70;
   });
   
-  const [batteryHistory, setBatteryHistory] = useState<{date: Date, level: number}[]>([]);
+  const [batteryHistory, setBatteryHistory] = useState<{date: Date, level: number}[]>(() => {
+    const saved = localStorage.getItem("batteryHistory");
+    return saved ? JSON.parse(saved).map((item: any) => ({
+      ...item,
+      date: new Date(item.date)
+    })) : [];
+  });
+  
   const [selectedTab, setSelectedTab] = useState("current");
 
   // Save battery level to localStorage when it changes
@@ -23,7 +30,9 @@ const SocialBattery = () => {
     // Add to history when battery level changes significantly
     if (batteryHistory.length === 0 || 
         Math.abs(batteryHistory[batteryHistory.length-1].level - batteryLevel) >= 5) {
-      setBatteryHistory(prev => [...prev, {date: new Date(), level: batteryLevel}]);
+      const newHistory = [...batteryHistory, {date: new Date(), level: batteryLevel}];
+      setBatteryHistory(newHistory);
+      localStorage.setItem("batteryHistory", JSON.stringify(newHistory));
     }
   }, [batteryLevel]);
 
