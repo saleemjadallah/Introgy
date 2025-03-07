@@ -12,6 +12,11 @@ export function usePreparationMemo() {
     try {
       toast.loading("Generating your preparation memo...");
 
+      console.log("Calling generate-preparation-memo function with:", {
+        event,
+        batteryLevel
+      });
+
       const response = await supabase.functions.invoke("generate-preparation-memo", {
         body: {
           event: event,
@@ -21,12 +26,23 @@ export function usePreparationMemo() {
 
       if (response.error) {
         console.error("Supabase function error:", response.error);
-        throw new Error(response.error.message);
+        throw new Error(response.error.message || "Failed to call preparation memo function");
       }
       
-      const { memo } = response.data;
+      if (!response.data) {
+        console.error("Empty response data from function");
+        throw new Error("No data returned from the preparation memo function");
+      }
+      
+      const { memo, error } = response.data;
+      
+      if (error) {
+        console.error("Function returned error:", error);
+        throw new Error(error);
+      }
       
       if (!memo) {
+        console.error("No memo in response:", response.data);
         throw new Error("No memo was generated. Please try again.");
       }
       

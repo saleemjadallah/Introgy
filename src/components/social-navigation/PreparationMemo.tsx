@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clipboard, Check, FileText, Sparkles, BookOpenText } from "lucide-react";
+import { Clipboard, Check, FileText, Sparkles, BookOpenText, AlertTriangle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 interface PreparationMemoProps {
@@ -14,11 +14,18 @@ interface PreparationMemoProps {
 const PreparationMemo = ({ eventId, memo, onGenerate }: PreparationMemoProps) => {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const handleGenerate = async () => {
     setLoading(true);
-    await onGenerate();
-    setLoading(false);
+    setError(null);
+    try {
+      await onGenerate();
+    } catch (err) {
+      setError(err.message || "Failed to generate memo");
+    } finally {
+      setLoading(false);
+    }
   };
   
   const handleCopy = () => {
@@ -43,6 +50,16 @@ const PreparationMemo = ({ eventId, memo, onGenerate }: PreparationMemoProps) =>
         </CardHeader>
         
         <CardContent className="space-y-4">
+          {error && (
+            <div className="bg-destructive/10 p-3 rounded-md mb-4 flex items-start gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium text-destructive">Error generating memo</p>
+                <p className="text-sm text-destructive/80">{error}</p>
+              </div>
+            </div>
+          )}
+          
           {memo ? (
             <div className="prose prose-sm max-w-none dark:prose-invert">
               <div className="p-4 bg-muted/50 rounded-md">
