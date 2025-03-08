@@ -23,13 +23,13 @@ const MythDetailDialog = ({
   return (
     <DialogContent className="max-w-md max-h-[80vh] overflow-auto">
       <DialogHeader>
-        <DialogTitle className="pr-6">Myth: {selectedMyth.title}</DialogTitle>
-        <DialogDescription>
+        <DialogTitle className="pr-6 font-poppins">Myth: {selectedMyth.title}</DialogTitle>
+        <DialogDescription className="font-poppins">
           Debunking common misconceptions about introverts
         </DialogDescription>
       </DialogHeader>
       
-      <div className="space-y-4 mt-2">
+      <div className="space-y-4 mt-2 font-poppins">
         <div>
           <h4 className="font-semibold text-sm">Reality:</h4>
           <p className="text-sm mt-1">{selectedMyth.reality}</p>
