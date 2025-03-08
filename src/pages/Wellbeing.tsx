@@ -1,9 +1,18 @@
 
-import { LineChart, BookOpen, Users, Battery, Book } from "lucide-react";
+import { LineChart, BookOpen, Users, Battery, Book, ChevronDown } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import IntrovertGlossary from "@/components/wellbeing/IntrovertGlossary";
+import { 
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger 
+} from "@/components/ui/collapsible";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const Wellbeing = () => {
+  const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
+
   return (
     <div className="space-y-6">
       <div>
@@ -35,17 +44,29 @@ const Wellbeing = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <Card className="border-dashed">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Book className="h-4 w-4" />
-                    Introvert Psychology Glossary
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
+              <Collapsible
+                open={isGlossaryOpen}
+                onOpenChange={setIsGlossaryOpen}
+                className="border rounded-md"
+              >
+                <CollapsibleTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="flex items-center justify-between w-full p-3 hover:bg-accent/50"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Book className="h-4 w-4" />
+                      <span className="font-medium">Introvert Psychology Glossary</span>
+                    </div>
+                    <ChevronDown 
+                      className={`h-4 w-4 transition-transform duration-200 ${isGlossaryOpen ? "transform rotate-180" : ""}`} 
+                    />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="px-4 pb-4">
                   <IntrovertGlossary />
-                </CardContent>
-              </Card>
+                </CollapsibleContent>
+              </Collapsible>
             </div>
           </CardContent>
         </Card>
