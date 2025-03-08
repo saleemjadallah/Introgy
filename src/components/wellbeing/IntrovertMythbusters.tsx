@@ -119,6 +119,7 @@ const mythsData: Myth[] = [
     id: 14,
     title: "Introverts don't enjoy adventure or new experiences",
     reality: "Many introverts enjoy novelty and adventure but may approach it differently—researching beforehand, preferring one-on-one travel companions, or needing reflection time to process experiences.",
+    evidence: "Studies on personality traits and travel preferences across different demographics.",
     examples: "Famous introvert explorers and adventurers like Charles Darwin."
   },
   {
