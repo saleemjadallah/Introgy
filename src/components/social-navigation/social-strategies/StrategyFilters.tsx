@@ -3,7 +3,7 @@ import React from "react";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { StrategyFilters as FiltersType } from "@/types/social-strategies";
+import { StrategyFilters as FiltersType, StrategyType } from "@/types/social-strategies";
 import { Label } from "@/components/ui/label";
 
 interface StrategyFiltersProps {
@@ -12,7 +12,7 @@ interface StrategyFiltersProps {
 }
 
 const StrategyFilters = ({ filters, updateFilters }: StrategyFiltersProps) => {
-  const strategyTypes = [
+  const strategyTypes: { id: StrategyType; label: string }[] = [
     { id: "quick", label: "Quick Tactics" },
     { id: "preparation", label: "Preparation" },
     { id: "recovery", label: "Recovery" },

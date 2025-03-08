@@ -5,7 +5,7 @@ import { MessageSquare } from "lucide-react";
 import { useConversationSimulator } from "@/hooks/useConversationSimulator";
 import { useSocialBattery } from "@/hooks/useSocialBattery";
 import SimulatorTabs from "./conversation-simulator/SimulatorTabs";
-import { scenarios } from "@/data/conversationScenarios";
+import { getScenarios } from "@/data/conversationScenarios";
 
 const ConversationSimulator = () => {
   const { batteryLevel } = useSocialBattery();
