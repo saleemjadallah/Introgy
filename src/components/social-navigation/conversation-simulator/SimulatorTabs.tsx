@@ -60,59 +60,67 @@ const SimulatorTabs: React.FC<SimulatorTabsProps> = ({
         </TabsTrigger>
       </TabsList>
       
-      {activeTab === "scenarios" && (
-        <TabsContent value="scenarios" className="p-4 min-h-[400px]">
-          <ScenarioSelection 
-            onScenarioSelect={onScenarioSelect}
-            selectedScenario={activeScenario}
-            batteryLevel={batteryLevel}
-          />
-          
-          {activeScenario && (
-            <div className="mt-2 flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
-                <span className="font-medium">{activeScenario.name}</span> • 
-                <span className="ml-1">{activeScenario.difficulty}</span> • 
-                <span className="ml-1">{activeScenario.duration}</span>
-              </div>
+      {activeTab ? (
+        <>
+          {activeTab === "scenarios" && (
+            <TabsContent value="scenarios" className="p-4 min-h-[400px]">
+              <ScenarioSelection 
+                onScenarioSelect={onScenarioSelect}
+                selectedScenario={activeScenario}
+                batteryLevel={batteryLevel}
+              />
               
-              <Button 
-                onClick={onStartSimulation}
-                disabled={!canStartSimulation}
-                size="sm"
-              >
-                <Play className="h-4 w-4 mr-2" />
-                Start Simulation
-              </Button>
-            </div>
+              {activeScenario && (
+                <div className="mt-2 flex items-center justify-between">
+                  <div className="text-sm text-muted-foreground">
+                    <span className="font-medium">{activeScenario.name}</span> • 
+                    <span className="ml-1">{activeScenario.difficulty}</span> • 
+                    <span className="ml-1">{activeScenario.duration}</span>
+                  </div>
+                  
+                  <Button 
+                    onClick={onStartSimulation}
+                    disabled={!canStartSimulation}
+                    size="sm"
+                  >
+                    <Play className="h-4 w-4 mr-2" />
+                    Start Simulation
+                  </Button>
+                </div>
+              )}
+              
+              {!canStartSimulation && activeScenario && (
+                <LowBatteryWarning />
+              )}
+            </TabsContent>
           )}
           
-          {!canStartSimulation && activeScenario && (
-            <LowBatteryWarning />
+          {activeTab === "simulation" && (
+            <TabsContent value="simulation" className="p-0 min-h-[500px]">
+              <ChatInterface 
+                messages={messages}
+                onSendMessage={onSendMessage}
+                onEndSimulation={onEndSimulation}
+                scenario={activeScenario}
+                isActive={simulationInProgress}
+              />
+            </TabsContent>
           )}
-        </TabsContent>
-      )}
-      
-      {activeTab === "simulation" && (
-        <TabsContent value="simulation" className="p-0 min-h-[500px]">
-          <ChatInterface 
-            messages={messages}
-            onSendMessage={onSendMessage}
-            onEndSimulation={onEndSimulation}
-            scenario={activeScenario}
-            isActive={simulationInProgress}
-          />
-        </TabsContent>
-      )}
-      
-      {activeTab === "feedback" && (
-        <TabsContent value="feedback" className="p-4 min-h-[400px]">
-          <SimulationFeedback 
-            feedback={feedback}
-            scenario={activeScenario}
-            onReset={onReset}
-          />
-        </TabsContent>
+          
+          {activeTab === "feedback" && (
+            <TabsContent value="feedback" className="p-4 min-h-[400px]">
+              <SimulationFeedback 
+                feedback={feedback}
+                scenario={activeScenario}
+                onReset={onReset}
+              />
+            </TabsContent>
+          )}
+        </>
+      ) : (
+        <div className="p-4 text-center text-muted-foreground">
+          <p>Select a tab above to get started</p>
+        </div>
       )}
     </Tabs>
   );

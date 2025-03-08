@@ -12,7 +12,7 @@ export interface SimulationFeedback {
 }
 
 export function useConversationSimulator() {
-  const [activeTab, setActiveTab] = useState<string>("scenarios");
+  const [activeTab, setActiveTab] = useState<string>("");
   const [activeScenario, setActiveScenario] = useState<Scenario | null>(null);
   const [simulationInProgress, setSimulationInProgress] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -120,7 +120,7 @@ export function useConversationSimulator() {
     setMessages([]);
     setFeedback(null);
     setSimulationInProgress(false);
-    setActiveTab("scenarios");
+    setActiveTab("");
   };
   
   return {
