@@ -10,6 +10,9 @@ import SocialBattery from "./pages/SocialBattery";
 import SocialNavigation from "./pages/SocialNavigation";
 import ConnectionBuilder from "./pages/ConnectionBuilder";
 import Wellbeing from "./pages/Wellbeing";
+import Profile from "./pages/Profile";
+import Auth from "./pages/Auth";
+import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,7 +30,10 @@ const App = () => (
             <Route path="/social-navigation" element={<SocialNavigation />} />
             <Route path="/connection-builder" element={<ConnectionBuilder />} />
             <Route path="/wellbeing" element={<Wellbeing />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/faq" element={<FAQ />} />
           </Route>
+          <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

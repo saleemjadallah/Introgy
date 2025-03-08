@@ -1,13 +1,16 @@
 
 import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { Moon, Sun, Battery, Users, Brain, LineChart, Home } from "lucide-react";
+import { Moon, Sun, Battery, Users, Brain, LineChart, Home, Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { UserAvatar } from "@/components/profile/UserAvatar";
+import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
 
 const Layout = () => {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const location = useLocation();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   // Initialize with dark theme (introverts often prefer dark mode)
   useEffect(() => {
@@ -44,9 +47,25 @@ const Layout = () => {
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-semibold">InnerCircle</h1>
         </div>
-        <Button variant="ghost" size="icon" onClick={toggleTheme}>
-          {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={toggleTheme}>
+            {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative"
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+          >
+            <UserAvatar />
+          </Button>
+          {isProfileOpen && (
+            <ProfileDropdown 
+              isOpen={isProfileOpen}
+              onClose={() => setIsProfileOpen(false)}
+            />
+          )}
+        </div>
       </header>
 
       {/* Main content */}
@@ -59,6 +78,7 @@ const Layout = () => {
             <NavItem to="/social-navigation" icon={Users} label="Social Navigation" />
             <NavItem to="/connection-builder" icon={Brain} label="Connection Builder" />
             <NavItem to="/wellbeing" icon={LineChart} label="Wellbeing" />
+            <NavItem to="/profile" icon={User} label="My Profile" />
           </div>
         </nav>
 
@@ -79,6 +99,9 @@ const Layout = () => {
             </Link>
             <Link to="/wellbeing" className={cn("p-2 rounded-full", location.pathname === "/wellbeing" && "bg-accent")}>
               <LineChart size={24} />
+            </Link>
+            <Link to="/profile" className={cn("p-2 rounded-full", location.pathname === "/profile" && "bg-accent")}>
+              <User size={24} />
             </Link>
           </div>
         </div>
