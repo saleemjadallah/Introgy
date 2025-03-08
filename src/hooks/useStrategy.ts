@@ -11,13 +11,34 @@ export function useStrategy(strategyId: string) {
   useEffect(() => {
     const loadStrategy = () => {
       try {
+        console.log("Loading strategy with ID:", strategyId);
+        
         // Get all strategies from localStorage
-        const allStrategies = JSON.parse(localStorage.getItem("socialStrategies") || "[]");
+        const allStrategiesString = localStorage.getItem("socialStrategies");
+        
+        if (!allStrategiesString) {
+          console.error("No strategies found in localStorage");
+          setStrategy(null);
+          setRelatedStrategies([]);
+          return;
+        }
+        
+        const allStrategies = JSON.parse(allStrategiesString);
+        
+        if (!Array.isArray(allStrategies) || allStrategies.length === 0) {
+          console.error("Invalid or empty strategies array in localStorage");
+          setStrategy(null);
+          setRelatedStrategies([]);
+          return;
+        }
+        
+        console.log("Found strategies in localStorage:", allStrategies.length);
         
         // Find the selected strategy
         const found = allStrategies.find((s: Strategy) => s.id === strategyId);
         
         if (found) {
+          console.log("Found strategy:", found.title);
           setStrategy(found);
           
           // Find related strategies (same scenario type, different strategy)
@@ -34,6 +55,7 @@ export function useStrategy(strategyId: string) {
           
           setRelatedStrategies(related);
         } else {
+          console.error("Strategy not found with ID:", strategyId);
           setStrategy(null);
           setRelatedStrategies([]);
         }

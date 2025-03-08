@@ -56,12 +56,21 @@ export function useSocialStrategies() {
   useEffect(() => {
     const loadStrategies = async () => {
       try {
-        // In a real implementation, this would fetch from an API
-        // For now, we'll use the mock data
+        // Check if strategies exist in localStorage
         const savedStrategies = JSON.parse(localStorage.getItem("socialStrategies") || "null");
         
-        // If strategies exist in localStorage, use those, otherwise use mock data
-        const strategies = savedStrategies || socialStrategiesData;
+        let strategies;
+        
+        if (savedStrategies && savedStrategies.length > 0) {
+          // If strategies exist in localStorage, use those
+          strategies = savedStrategies;
+          console.log("Loaded strategies from localStorage:", strategies.length);
+        } else {
+          // Otherwise use mock data and save to localStorage
+          strategies = socialStrategiesData;
+          localStorage.setItem("socialStrategies", JSON.stringify(strategies));
+          console.log("Saved mock strategies to localStorage:", strategies.length);
+        }
         
         setState((prevState) => ({
           ...prevState,
@@ -70,8 +79,10 @@ export function useSocialStrategies() {
         }));
       } catch (error) {
         console.error("Error loading strategies:", error);
+        // If there's an error, still try to use the mock data
         setState((prevState) => ({
           ...prevState,
+          strategies: socialStrategiesData,
           loading: false,
         }));
       }

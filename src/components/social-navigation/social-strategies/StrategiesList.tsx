@@ -20,12 +20,16 @@ const StrategiesList = ({
   toggleFavorite 
 }: StrategiesListProps) => {
   // Filter strategies based on search query
-  const filteredStrategies = strategies.filter(
-    (strategy) =>
-      strategy.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      strategy.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      strategy.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredStrategies = searchQuery.trim() !== '' 
+    ? strategies.filter(
+        (strategy) =>
+          strategy.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          strategy.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          strategy.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+    : strategies;
+
+  console.log("StrategiesList - Filtered strategies:", filteredStrategies.length);
 
   if (filteredStrategies.length === 0) {
     return (
@@ -57,6 +61,7 @@ const StrategiesList = ({
         <Card
           key={strategy.id}
           className="border hover:border-primary/50 transition-colors"
+          id={strategy.id}
         >
           <CardContent className="p-4">
             <div className="flex justify-between items-start gap-2">
@@ -106,7 +111,10 @@ const StrategiesList = ({
               variant="outline"
               size="sm"
               className="w-full"
-              onClick={() => onStrategySelect(strategy.id)}
+              onClick={() => {
+                console.log("Selecting strategy:", strategy.id);
+                onStrategySelect(strategy.id);
+              }}
             >
               View Strategy
             </Button>
