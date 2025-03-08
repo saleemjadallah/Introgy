@@ -128,7 +128,7 @@ const ConversationSimulator = () => {
   
   return (
     <Card className="w-full">
-      <CardHeader>
+      <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
           <MessageSquare className="h-5 w-5" />
           Conversation Simulator
@@ -166,10 +166,17 @@ const ConversationSimulator = () => {
             />
             
             {activeScenario && (
-              <div className="mt-4 flex justify-end">
+              <div className="mt-2 flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">
+                  <span className="font-medium">{activeScenario.name}</span> • 
+                  <span className="ml-1">{activeScenario.difficulty}</span> • 
+                  <span className="ml-1">{activeScenario.duration}</span>
+                </div>
+                
                 <Button 
                   onClick={handleStartSimulation}
                   disabled={!canStartSimulation}
+                  size="sm"
                 >
                   <Play className="h-4 w-4 mr-2" />
                   Start Simulation
@@ -178,11 +185,11 @@ const ConversationSimulator = () => {
             )}
             
             {!canStartSimulation && activeScenario && (
-              <div className="mt-4 bg-yellow-500/10 p-3 rounded-md text-sm text-yellow-600 dark:text-yellow-400 flex items-start gap-2">
-                <Brain className="h-5 w-5 flex-shrink-0 mt-0.5" />
+              <div className="mt-2 bg-yellow-500/10 p-2 rounded-md text-xs text-yellow-600 dark:text-yellow-400 flex items-start gap-2">
+                <Brain className="h-4 w-4 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-medium">Your social battery is too low</p>
-                  <p>Conversations require at least 15% battery. Take some time to recharge before practicing.</p>
+                  <p>Conversations require at least 15% battery. Take some time to recharge.</p>
                 </div>
               </div>
             )}
