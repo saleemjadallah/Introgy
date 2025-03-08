@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MoonStar, Moon, MoonOff } from "lucide-react";
+import { MoonStar, Moon, CloudMoon } from "lucide-react";
 import { useSocialBattery } from "@/hooks/useSocialBattery";
 
 export type SleepQuality = "good" | "medium" | "bad";
@@ -67,7 +67,7 @@ export function SleepQualityDialog() {
     {
       value: "bad",
       label: "Poor Sleep",
-      icon: <MoonOff className="h-10 w-10 text-red-500" />,
+      icon: <CloudMoon className="h-10 w-10 text-red-500" />,
       description: "Restless or insufficient",
       effect: "-5% battery"
     }
