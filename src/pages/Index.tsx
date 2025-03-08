@@ -1,11 +1,10 @@
-
 import { Battery, Brain, Users, LineChart } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import { useSocialBattery } from "@/hooks/useSocialBattery";
-import { getBatteryColor } from "@/components/social-battery/BatteryStatus";
+import { getBatteryColor } from "@/hooks/social-battery/batteryUtils";
 
 const Index = () => {
   // Use the social battery hook instead of mock data
