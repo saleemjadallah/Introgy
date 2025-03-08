@@ -59,84 +59,67 @@ const SimulatorTabs: React.FC<SimulatorTabsProps> = ({
         </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="scenarios" className="p-4 min-h-[400px]">
-        <ScenarioSelectionTab 
-          onScenarioSelect={onScenarioSelect}
-          selectedScenario={activeScenario}
-          batteryLevel={batteryLevel}
-          canStartSimulation={canStartSimulation}
-          onStartSimulation={onStartSimulation}
-        />
-      </TabsContent>
+      {activeTab === "scenarios" && (
+        <TabsContent value="scenarios" className="p-4 min-h-[400px]">
+          <ScenarioSelection 
+            onScenarioSelect={onScenarioSelect}
+            selectedScenario={selectedScenario}
+            batteryLevel={batteryLevel}
+          />
+          
+          {selectedScenario && (
+            <div className="mt-2 flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                <span className="font-medium">{selectedScenario.name}</span> • 
+                <span className="ml-1">{selectedScenario.difficulty}</span> • 
+                <span className="ml-1">{selectedScenario.duration}</span>
+              </div>
+              
+              <Button 
+                onClick={onStartSimulation}
+                disabled={!canStartSimulation}
+                size="sm"
+              >
+                <Play className="h-4 w-4 mr-2" />
+                Start Simulation
+              </Button>
+            </div>
+          )}
+          
+          {!canStartSimulation && selectedScenario && (
+            <LowBatteryWarning />
+          )}
+        </TabsContent>
+      )}
       
-      <TabsContent value="simulation" className="p-0 min-h-[500px]">
-        <ChatInterface 
-          messages={messages}
-          onSendMessage={onSendMessage}
-          onEndSimulation={onEndSimulation}
-          scenario={activeScenario}
-          isActive={simulationInProgress}
-        />
-      </TabsContent>
+      {activeTab === "simulation" && (
+        <TabsContent value="simulation" className="p-0 min-h-[500px]">
+          <ChatInterface 
+            messages={messages}
+            onSendMessage={onSendMessage}
+            onEndSimulation={onEndSimulation}
+            scenario={activeScenario}
+            isActive={simulationInProgress}
+          />
+        </TabsContent>
+      )}
       
-      <TabsContent value="feedback" className="p-4 min-h-[400px]">
-        <SimulationFeedback 
-          feedback={feedback}
-          scenario={activeScenario}
-          onReset={onReset}
-        />
-      </TabsContent>
+      {activeTab === "feedback" && (
+        <TabsContent value="feedback" className="p-4 min-h-[400px]">
+          <SimulationFeedback 
+            feedback={feedback}
+            scenario={activeScenario}
+            onReset={onReset}
+          />
+        </TabsContent>
+      )}
     </Tabs>
   );
 };
 
-// Separate component for the scenario selection tab content
-const ScenarioSelectionTab: React.FC<{
-  onScenarioSelect: (scenario: Scenario) => void;
-  selectedScenario: Scenario | null;
-  batteryLevel: number;
-  canStartSimulation: boolean;
-  onStartSimulation: () => void;
-}> = ({ 
-  onScenarioSelect, 
-  selectedScenario, 
-  batteryLevel, 
-  canStartSimulation,
-  onStartSimulation 
-}) => {
-  return (
-    <>
-      <ScenarioSelection 
-        onScenarioSelect={onScenarioSelect}
-        selectedScenario={selectedScenario}
-        batteryLevel={batteryLevel}
-      />
-      
-      {selectedScenario && (
-        <div className="mt-2 flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
-            <span className="font-medium">{selectedScenario.name}</span> • 
-            <span className="ml-1">{selectedScenario.difficulty}</span> • 
-            <span className="ml-1">{selectedScenario.duration}</span>
-          </div>
-          
-          <Button 
-            onClick={onStartSimulation}
-            disabled={!canStartSimulation}
-            size="sm"
-          >
-            <Play className="h-4 w-4 mr-2" />
-            Start Simulation
-          </Button>
-        </div>
-      )}
-      
-      {!canStartSimulation && selectedScenario && (
-        <LowBatteryWarning />
-      )}
-    </>
-  );
-};
+// Add missing imports
+import { Button } from "@/components/ui/button";
+import { Brain } from "lucide-react";
 
 // Low battery warning component
 const LowBatteryWarning = () => (
@@ -148,9 +131,5 @@ const LowBatteryWarning = () => (
     </div>
   </div>
 );
-
-// Add missing import
-import { Button } from "@/components/ui/button";
-import { Brain } from "lucide-react";
 
 export default SimulatorTabs;
