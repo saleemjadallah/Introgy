@@ -1,8 +1,9 @@
 
-import { LineChart, BookOpen, Users, Battery, Book, ChevronDown, AlertCircle } from "lucide-react";
+import { LineChart, BookOpen, Users, Battery, Book, ChevronDown, AlertCircle, User } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import IntrovertGlossary from "@/components/wellbeing/IntrovertGlossary";
 import IntrovertMythbusters from "@/components/wellbeing/IntrovertMythbusters";
+import FamousIntrovertsGallery from "@/components/wellbeing/FamousIntrovertsGallery";
 import { 
   Collapsible,
   CollapsibleContent,
@@ -14,6 +15,7 @@ import { Button } from "@/components/ui/button";
 const Wellbeing = () => {
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
   const [isMythbustersOpen, setIsMythbustersOpen] = useState(false);
+  const [isIntrovertsGalleryOpen, setIsIntrovertsGalleryOpen] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -91,6 +93,30 @@ const Wellbeing = () => {
                 </CollapsibleTrigger>
                 <CollapsibleContent className="px-4 pb-4">
                   <IntrovertMythbusters />
+                </CollapsibleContent>
+              </Collapsible>
+              
+              <Collapsible
+                open={isIntrovertsGalleryOpen}
+                onOpenChange={setIsIntrovertsGalleryOpen}
+                className="border rounded-md"
+              >
+                <CollapsibleTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="flex items-center justify-between w-full p-3 hover:bg-accent/50"
+                  >
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      <span className="font-medium">Famous Introverts Gallery</span>
+                    </div>
+                    <ChevronDown 
+                      className={`h-4 w-4 transition-transform duration-200 ${isIntrovertsGalleryOpen ? "transform rotate-180" : ""}`} 
+                    />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="px-4 pb-4">
+                  <FamousIntrovertsGallery />
                 </CollapsibleContent>
               </Collapsible>
             </div>
