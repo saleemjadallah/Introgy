@@ -7,6 +7,8 @@ import ScenarioSelection from "./ScenarioSelection";
 import ChatInterface from "./ChatInterface";
 import SimulationFeedback from "./SimulationFeedback";
 import { SimulationFeedback as SimulationFeedbackType } from "@/hooks/useConversationSimulator";
+import { Button } from "@/components/ui/button";
+import { Brain } from "lucide-react";
 
 interface SimulatorTabsProps {
   activeTab: string;
@@ -63,16 +65,16 @@ const SimulatorTabs: React.FC<SimulatorTabsProps> = ({
         <TabsContent value="scenarios" className="p-4 min-h-[400px]">
           <ScenarioSelection 
             onScenarioSelect={onScenarioSelect}
-            selectedScenario={selectedScenario}
+            selectedScenario={activeScenario}
             batteryLevel={batteryLevel}
           />
           
-          {selectedScenario && (
+          {activeScenario && (
             <div className="mt-2 flex items-center justify-between">
               <div className="text-sm text-muted-foreground">
-                <span className="font-medium">{selectedScenario.name}</span> • 
-                <span className="ml-1">{selectedScenario.difficulty}</span> • 
-                <span className="ml-1">{selectedScenario.duration}</span>
+                <span className="font-medium">{activeScenario.name}</span> • 
+                <span className="ml-1">{activeScenario.difficulty}</span> • 
+                <span className="ml-1">{activeScenario.duration}</span>
               </div>
               
               <Button 
@@ -86,7 +88,7 @@ const SimulatorTabs: React.FC<SimulatorTabsProps> = ({
             </div>
           )}
           
-          {!canStartSimulation && selectedScenario && (
+          {!canStartSimulation && activeScenario && (
             <LowBatteryWarning />
           )}
         </TabsContent>
@@ -116,10 +118,6 @@ const SimulatorTabs: React.FC<SimulatorTabsProps> = ({
     </Tabs>
   );
 };
-
-// Add missing imports
-import { Button } from "@/components/ui/button";
-import { Brain } from "lucide-react";
 
 // Low battery warning component
 const LowBatteryWarning = () => (
