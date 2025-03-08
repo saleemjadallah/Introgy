@@ -9,6 +9,7 @@ import LowBatteryWarning from "@/components/social-navigation/LowBatteryWarning"
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { BatteryCharging } from "lucide-react";
+import { SleepQualityDialog } from "@/components/social-battery/SleepQualityDialog";
 
 const SocialBattery = () => {
   const { batteryLevel, batteryHistory, handleSliderChange, handleActivitySelect } = useSocialBattery();
@@ -61,6 +62,7 @@ const SocialBattery = () => {
       </div>
 
       {showWarning && <LowBatteryWarning />}
+      <SleepQualityDialog />
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3">

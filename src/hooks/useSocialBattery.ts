@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { RechargeActivity, DepletingActivity, isRechargeActivity } from "@/types/activity";
 import { format, isYesterday, isAfter, isBefore, startOfDay, endOfDay, set } from "date-fns";
 import { SocialEvent } from "@/types/events";
+import type { SleepQuality } from "@/components/social-battery/SleepQualityDialog";
 
 interface BatteryHistoryEntry {
   date: Date;
@@ -50,6 +51,13 @@ const getStoredEvents = (): SocialEvent[] => {
     console.error("Error loading events:", error);
   }
   return [];
+};
+
+// Sleep quality battery adjustments
+const SLEEP_QUALITY_ADJUSTMENTS = {
+  good: 50,   // +50% for good sleep
+  medium: 10, // +10% for medium sleep
+  bad: -5,    // -5% for bad sleep
 };
 
 export function useSocialBattery() {
@@ -201,11 +209,59 @@ export function useSocialBattery() {
     return customActivity;
   };
 
+  // Add a new method to handle sleep quality recording
+  const recordSleepQuality = (quality: SleepQuality) => {
+    const adjustment = SLEEP_QUALITY_ADJUSTMENTS[quality];
+    const sleepActivityName = `${quality.charAt(0).toUpperCase() + quality.slice(1)} Sleep`;
+    
+    // Apply the adjustment to the battery level
+    const newLevel = Math.max(0, Math.min(100, batteryLevel + adjustment));
+    setBatteryLevel(newLevel);
+    
+    // Create a sleep quality activity for the history
+    const sleepActivity = {
+      id: Date.now(),
+      name: sleepActivityName,
+      duration: 480, // 8 hours in minutes
+      energyGain: adjustment,
+      isCustom: true
+    } as RechargeActivity;
+    
+    // Add to battery history
+    const newHistoryEntry = {
+      date: new Date(),
+      level: newLevel
+    };
+    setBatteryHistory(prev => [...prev, newHistoryEntry]);
+    localStorage.setItem("batteryHistory", JSON.stringify([...batteryHistory, newHistoryEntry]));
+    
+    // Show toast notification
+    if (adjustment > 0) {
+      toast.success(`Battery recharged by ${adjustment}%`, {
+        description: `${sleepActivityName} has restored your social energy`,
+      });
+    } else {
+      toast.warning(`Battery reduced by ${Math.abs(adjustment)}%`, {
+        description: `${sleepActivityName} has depleted your social energy`,
+      });
+    }
+    
+    // Record the sleep quality in local storage for analytics or future reference
+    const sleepHistory = JSON.parse(localStorage.getItem("sleepQualityHistory") || "[]");
+    sleepHistory.push({
+      date: new Date().toISOString(),
+      quality,
+      batteryAdjustment: adjustment
+    });
+    localStorage.setItem("sleepQualityHistory", JSON.stringify(sleepHistory));
+  };
+
   return {
     batteryLevel,
     batteryHistory,
     handleSliderChange,
     handleActivitySelect,
-    addActivity
+    addActivity,
+    recordSleepQuality
   };
 }
