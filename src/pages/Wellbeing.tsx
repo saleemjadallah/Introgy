@@ -1,6 +1,7 @@
 
-import { LineChart, BookOpen, Users, Battery } from "lucide-react";
+import { LineChart, BookOpen, Users, Battery, Book } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import IntrovertGlossary from "@/components/wellbeing/IntrovertGlossary";
 
 const Wellbeing = () => {
   return (
@@ -33,7 +34,19 @@ const Wellbeing = () => {
             <CardDescription>Learn about introvert psychology</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">Coming soon in the next update!</p>
+            <div className="space-y-4">
+              <Card className="border-dashed">
+                <CardHeader className="py-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Book className="h-4 w-4" />
+                    Introvert Psychology Glossary
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <IntrovertGlossary />
+                </CardContent>
+              </Card>
+            </div>
           </CardContent>
         </Card>
 
