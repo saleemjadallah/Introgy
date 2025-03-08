@@ -1,14 +1,13 @@
 
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Play, Award } from "lucide-react";
+import { Settings, Play, Award, Brain } from "lucide-react";
 import { Scenario, Message } from "@/types/conversation";
 import ScenarioSelection from "./ScenarioSelection";
 import ChatInterface from "./ChatInterface";
 import SimulationFeedback from "./SimulationFeedback";
 import { SimulationFeedback as SimulationFeedbackType } from "@/hooks/useConversationSimulator";
 import { Button } from "@/components/ui/button";
-import { Brain } from "lucide-react";
 
 interface SimulatorTabsProps {
   activeTab: string;
