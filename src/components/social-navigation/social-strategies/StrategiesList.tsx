@@ -24,7 +24,7 @@ const StrategiesList = ({
   console.log("StrategiesList - Filtered strategies:", filteredStrategies.length);
 
   if (filteredStrategies.length === 0) {
-    return <EmptyStrategiesList />;
+    return <EmptyStrategiesList isSearching={searchQuery.length > 0} />;
   }
 
   return (

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import StrategiesList from "./social-strategies/StrategiesList";
 import StrategyFilters from "./social-strategies/StrategyFilters";
 import StrategyDetail from "./social-strategies/StrategyDetail";
+import EmptyStrategiesList from "./social-strategies/list/EmptyStrategiesList";
 import { useSocialStrategies } from "@/hooks/useSocialStrategies";
 
 const SocialStrategies = () => {
