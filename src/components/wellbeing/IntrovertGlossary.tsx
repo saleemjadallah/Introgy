@@ -3,6 +3,18 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { Info } from "lucide-react";
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger, 
+} from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface GlossaryTerm {
   term: string;
@@ -71,6 +83,7 @@ const glossaryData: GlossaryTerm[] = [
 
 const IntrovertGlossary = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [openPopoverId, setOpenPopoverId] = useState<string | null>(null);
   
   // Get unique letters for jump links
   const uniqueLetters = Array.from(new Set(glossaryData.map(item => item.letter))).sort();
@@ -119,29 +132,55 @@ const IntrovertGlossary = () => {
         ))}
       </div>
 
-      <ScrollArea className="h-[400px] pr-4">
-        <div className="space-y-6">
-          {Object.entries(groupedTerms).sort(([a], [b]) => a.localeCompare(b)).map(([letter, terms]) => (
-            <div key={letter} id={`letter-${letter}`}>
-              <h3 className="text-xl font-bold mb-2 sticky top-0 bg-background py-1">{letter}</h3>
-              <div className="space-y-3">
-                {terms.map((term, idx) => (
-                  <div key={idx} className="space-y-1">
-                    <h4 className="font-medium">{term.term}</h4>
-                    <p className="text-sm text-muted-foreground">{term.definition}</p>
-                  </div>
-                ))}
+      <TooltipProvider>
+        <ScrollArea className="h-[400px] pr-4">
+          <div className="space-y-6">
+            {Object.entries(groupedTerms).sort(([a], [b]) => a.localeCompare(b)).map(([letter, terms]) => (
+              <div key={letter} id={`letter-${letter}`}>
+                <h3 className="text-xl font-bold mb-2 sticky top-0 bg-background py-1">{letter}</h3>
+                <div className="space-y-1.5">
+                  {terms.map((term, idx) => {
+                    const termId = `${letter}-${idx}`;
+                    return (
+                      <div key={idx} className="flex items-center">
+                        <Popover open={openPopoverId === termId} onOpenChange={(open) => {
+                          setOpenPopoverId(open ? termId : null);
+                        }}>
+                          <PopoverTrigger asChild>
+                            <button className="text-sm font-medium hover:text-primary flex items-center gap-1.5 py-0.5">
+                              {term.term}
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="text-xs">Click to view definition</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="max-w-sm">
+                            <div className="space-y-2">
+                              <h4 className="font-semibold">{term.term}</h4>
+                              <p className="text-sm text-muted-foreground">{term.definition}</p>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
-          
-          {filteredTerms.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              No terms match your search.
-            </div>
-          )}
-        </div>
-      </ScrollArea>
+            ))}
+            
+            {filteredTerms.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                No terms match your search.
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </TooltipProvider>
     </div>
   );
 };
