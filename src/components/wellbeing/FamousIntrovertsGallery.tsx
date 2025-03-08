@@ -1,25 +1,38 @@
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { BookOpen, ExternalLink, Search, X } from "lucide-react";
+import { BookOpen, ExternalLink, Search, X, Filter } from "lucide-react";
 import { famousIntrovertsData } from "./famousIntroverts/introvertsData";
 import type { FamousIntrovert } from "./famousIntroverts/introvertsData";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const FamousIntrovertsGallery = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIntrovert, setSelectedIntrovert] = useState<FamousIntrovert | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string>("all");
 
-  // Filter introverts based on search
-  const filteredIntroverts = famousIntrovertsData.filter(person => 
-    person.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    person.profession.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    person.contributions.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Get unique categories
+  const categories = useMemo(() => {
+    const uniqueCategories = Array.from(new Set(famousIntrovertsData.map(person => person.category)));
+    return uniqueCategories.sort();
+  }, []);
+
+  // Filter introverts based on search and category
+  const filteredIntroverts = useMemo(() => {
+    return famousIntrovertsData.filter(person => 
+      (activeCategory === "all" || person.category === activeCategory) &&
+      (
+        person.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        person.profession.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        person.contributions.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [searchTerm, activeCategory]);
 
   const handleCardClick = (introvert: FamousIntrovert) => {
     setSelectedIntrovert(introvert);
@@ -44,37 +57,54 @@ const FamousIntrovertsGallery = () => {
         <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
       </div>
 
-      <ScrollArea className="h-[400px]">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pr-4">
-          {filteredIntroverts.map((person) => (
-            <Card 
-              key={person.id}
-              className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => handleCardClick(person)}
-            >
-              <div className="aspect-[3/2] relative overflow-hidden">
-                <img 
-                  src={person.imageUrl} 
-                  alt={person.name}
-                  className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
-                  <div className="p-3 text-white">
-                    <h3 className="font-semibold">{person.name}</h3>
-                    <p className="text-sm text-white/80">{person.profession}</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
-          
-          {filteredIntroverts.length === 0 && (
-            <div className="col-span-full text-center py-8 text-muted-foreground">
-              No introverts match your search.
-            </div>
-          )}
+      <Tabs defaultValue="all" value={activeCategory} onValueChange={setActiveCategory}>
+        <div className="flex items-center gap-2 mb-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Filter by field:</span>
         </div>
-      </ScrollArea>
+        <TabsList className="flex flex-wrap h-auto mb-4">
+          <TabsTrigger value="all" className="mb-1">All Fields</TabsTrigger>
+          {categories.map(category => (
+            <TabsTrigger key={category} value={category} className="mb-1">
+              {category}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        <TabsContent value={activeCategory} className="mt-0">
+          <ScrollArea className="h-[400px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pr-4">
+              {filteredIntroverts.map((person) => (
+                <Card 
+                  key={person.id}
+                  className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => handleCardClick(person)}
+                >
+                  <div className="aspect-[3/2] relative overflow-hidden">
+                    <img 
+                      src={person.imageUrl} 
+                      alt={person.name}
+                      className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+                      <div className="p-3 text-white">
+                        <h3 className="font-semibold">{person.name}</h3>
+                        <p className="text-sm text-white/80">{person.profession}</p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+              
+              {filteredIntroverts.length === 0 && (
+                <div className="col-span-full text-center py-8 text-muted-foreground">
+                  No introverts match your search.
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </TabsContent>
+      </Tabs>
 
       {/* Introvert Detail Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -95,6 +125,10 @@ const FamousIntrovertsGallery = () => {
                     alt={selectedIntrovert.name}
                     className="w-full h-full object-cover"
                   />
+                </div>
+                
+                <div className="inline-block bg-primary/10 text-primary text-xs font-medium rounded-full px-2.5 py-1">
+                  {selectedIntrovert.category}
                 </div>
                 
                 <div>
