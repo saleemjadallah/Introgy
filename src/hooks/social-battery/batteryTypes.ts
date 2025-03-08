@@ -15,6 +15,7 @@ export interface SocialActivity {
   duration?: number;
   notes?: string;
   source?: string;
+  description?: string;
 }
 
 export interface UseSocialBatteryReturn {

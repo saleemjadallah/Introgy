@@ -15,6 +15,9 @@ export const RechargeActivityCard = ({ activity, onSelect }: { activity: Recharg
         <PlusCircle className="h-4 w-4 text-green-500" />
         {activity.name}
       </CardTitle>
+      {activity.description && (
+        <CardDescription className="text-xs mt-1">{activity.description}</CardDescription>
+      )}
     </CardHeader>
     <CardFooter className="p-3 pt-0 flex justify-between text-sm text-muted-foreground">
       <span className="flex items-center gap-1">
@@ -34,6 +37,9 @@ export const DepletingActivityCard = ({ activity, onSelect }: { activity: Deplet
         <MinusCircle className="h-4 w-4 text-red-500" />
         {activity.name}
       </CardTitle>
+      {activity.description && (
+        <CardDescription className="text-xs mt-1">{activity.description}</CardDescription>
+      )}
     </CardHeader>
     <CardFooter className="p-3 pt-0 flex justify-between text-sm text-muted-foreground">
       <span className="flex items-center gap-1">

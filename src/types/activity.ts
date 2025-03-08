@@ -38,6 +38,22 @@ export const depletingActivities: DepletingActivity[] = [
   { id: 3, name: "Phone call", duration: 15, energyLoss: 10 },
   { id: 4, name: "Video conference", duration: 45, energyLoss: 25 },
   { id: 5, name: "Shopping in crowded store", duration: 30, energyLoss: 15 },
+  // New depleting activities
+  { id: 6, name: "Networking event", duration: 90, energyLoss: 40, description: "High energy cost due to meeting many new people" },
+  { id: 7, name: "Public speaking", duration: 30, energyLoss: 45, description: "Short duration but intense energy drain" },
+  { id: 8, name: "Family reunion", duration: 180, energyLoss: 50, description: "Extended social interaction with multiple conversations" },
+  { id: 9, name: "Job interview", duration: 60, energyLoss: 30, description: "High stakes social evaluation" },
+  { id: 10, name: "Group brainstorming session", duration: 60, energyLoss: 25, description: "Requires active participation and thinking on the spot" },
+  { id: 11, name: "Dinner party", duration: 150, energyLoss: 35, description: "Extended social small talk and interaction" },
+  { id: 12, name: "Crowded concert/event", duration: 120, energyLoss: 30, description: "Sensory overload plus social interaction" },
+  { id: 13, name: "Parent-teacher meeting", duration: 30, energyLoss: 20, description: "Formal social interaction" },
+  { id: 14, name: "Small talk with neighbor", duration: 15, energyLoss: 15, description: "Brief but unplanned interaction" },
+  { id: 15, name: "Large restaurant with friends", duration: 90, energyLoss: 25, description: "Managing conversation in noisy environment" },
+  { id: 16, name: "Customer service interaction", duration: 20, energyLoss: 15, description: "Explaining needs to strangers" },
+  { id: 17, name: "Social media engagement", duration: 30, energyLoss: 10, description: "Digital social interaction" },
+  { id: 18, name: "Birthday party (as guest)", duration: 120, energyLoss: 30, description: "Social obligation with varied interactions" },
+  { id: 19, name: "Birthday party (as focus)", duration: 180, energyLoss: 50, description: "Being center of attention" },
+  { id: 20, name: "Open office workday", duration: 480, energyLoss: 40, description: "Long-duration ambient social exposure" },
 ];
 
 // Storage keys
