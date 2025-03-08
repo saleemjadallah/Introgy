@@ -1,7 +1,8 @@
 
-import { LineChart, BookOpen, Users, Battery, Book, ChevronDown } from "lucide-react";
+import { LineChart, BookOpen, Users, Battery, Book, ChevronDown, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import IntrovertGlossary from "@/components/wellbeing/IntrovertGlossary";
+import IntrovertMythbusters from "@/components/wellbeing/IntrovertMythbusters";
 import { 
   Collapsible,
   CollapsibleContent,
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
 
 const Wellbeing = () => {
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
+  const [isMythbustersOpen, setIsMythbustersOpen] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -65,6 +67,30 @@ const Wellbeing = () => {
                 </CollapsibleTrigger>
                 <CollapsibleContent className="px-4 pb-4">
                   <IntrovertGlossary />
+                </CollapsibleContent>
+              </Collapsible>
+              
+              <Collapsible
+                open={isMythbustersOpen}
+                onOpenChange={setIsMythbustersOpen}
+                className="border rounded-md"
+              >
+                <CollapsibleTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="flex items-center justify-between w-full p-3 hover:bg-accent/50"
+                  >
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4" />
+                      <span className="font-medium">Introverts Mythbusters</span>
+                    </div>
+                    <ChevronDown 
+                      className={`h-4 w-4 transition-transform duration-200 ${isMythbustersOpen ? "transform rotate-180" : ""}`} 
+                    />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="px-4 pb-4">
+                  <IntrovertMythbusters />
                 </CollapsibleContent>
               </Collapsible>
             </div>
