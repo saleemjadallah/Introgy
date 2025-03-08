@@ -5,6 +5,7 @@ export interface BaseActivity {
   name: string;
   duration: number;
   isCustom?: boolean;
+  description?: string; // Add optional description field
 }
 
 // Type for recharging activities
