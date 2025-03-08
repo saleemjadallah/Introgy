@@ -25,6 +25,9 @@ const ConversationSimulator = () => {
   const handleStartSimulation = () => {
     if (!activeScenario) return;
     
+    // Reset feedback when starting a new simulation
+    setFeedback(null);
+    
     setMessages([
       {
         id: "system-1",
