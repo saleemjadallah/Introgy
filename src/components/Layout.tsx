@@ -8,11 +8,11 @@ import { UserAvatar } from "@/components/profile/UserAvatar";
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
 
 const Layout = () => {
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  // Initialize with dark theme (introverts often prefer dark mode)
+  // Initialize with light theme (changed from dark)
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);

@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 
 const SettingsSection = () => {
   const [preferences, setPreferences] = useState({
-    darkMode: true,
+    darkMode: false,
     notifications: true,
     emailUpdates: false,
     dataCollection: true,
