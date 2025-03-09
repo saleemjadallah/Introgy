@@ -15,6 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { X, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { v4 as uuidv4 } from "uuid";
 
 interface WisdomSubmissionFormProps {
   onSubmit: (wisdom: WisdomItem) => void;
@@ -56,7 +57,7 @@ const WisdomSubmissionForm = ({ onSubmit }: WisdomSubmissionFormProps) => {
     if (!isFormValid()) return;
 
     const newWisdom: WisdomItem = {
-      id: `wisdom-${Date.now()}`,
+      id: uuidv4(),
       content: formState.content,
       category: formState.category,
       situation: formState.situation,
