@@ -1,6 +1,7 @@
 
 import { BadgeData, badgesData } from "@/data/badgesData";
 import { toast } from "sonner";
+import { BadgeState } from "@/components/badges/Badge";
 
 // Function to check if a badge should be awarded
 export const checkBadgeEligibility = (
@@ -39,7 +40,7 @@ export const checkBadgeEligibility = (
       updatedBadge.maxProgress !== undefined &&
       updatedBadge.progress >= updatedBadge.maxProgress
     ) {
-      updatedBadge.state = "achieved";
+      updatedBadge.state = "achieved" as BadgeState;
       updatedBadge.earnedDate = new Date();
       
       // Notify the user
@@ -100,7 +101,7 @@ export const earnBadge = (badgeId: string, userId: string = "guest"): boolean =>
   if (badge && badge.state !== "achieved" && badge.state !== "mastered") {
     const updatedBadge = { 
       ...badge, 
-      state: "achieved", 
+      state: "achieved" as BadgeState, 
       earnedDate: new Date() 
     };
     

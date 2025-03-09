@@ -9,7 +9,7 @@ import {
   BatteryCharging,
   ClipboardCheck,
   Scale,
-  Toolbox,
+  Wrench, // Replaced Toolbox with Wrench
   MessageSquare,
   DoorOpen,
   LifeBuoy,
@@ -18,7 +18,7 @@ import {
   Footprints,
   Circle,
   Compass,
-  Seedling,
+  Leaf, // Replaced Seedling with Leaf
   Flag,
   Home,
   AppWindow,
@@ -188,7 +188,7 @@ export const badgesData: BadgeData[] = [
     "Recovery Specialist",
     "Utilize 10 different recharge activities to restore your energy.",
     "energy-management",
-    React.createElement(Toolbox, { className: "h-8 w-8" }),
+    React.createElement(Wrench, { className: "h-8 w-8" }), // Changed from Toolbox to Wrench
     { type: "diverse_recharge", requiredCount: 10 },
     "locked"
   ),
@@ -285,7 +285,7 @@ export const badgesData: BadgeData[] = [
     "Growth Mindset",
     "Track your progress in social development for a full month.",
     "growth",
-    React.createElement(Seedling, { className: "h-8 w-8" }),
+    React.createElement(Leaf, { className: "h-8 w-8" }), // Changed from Seedling to Leaf
     { type: "track_progress", requiredDuration: 30 },
     "locked"
   ),
