@@ -69,13 +69,16 @@ const CommunityWisdom = () => {
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="browse" className="w-full">
+      <Tabs defaultValue="contribute" className="w-full">
         <TabsList className="w-full grid grid-cols-4">
+          <TabsTrigger value="contribute">Contribute</TabsTrigger>
           <TabsTrigger value="browse">Browse</TabsTrigger>
           <TabsTrigger value="saved">Saved</TabsTrigger>
-          <TabsTrigger value="contribute">Contribute</TabsTrigger>
           <TabsTrigger value="about">About</TabsTrigger>
         </TabsList>
+        <TabsContent value="contribute" className="space-y-4 mt-6">
+          <WisdomSubmissionForm onSubmit={handleSubmitWisdom} />
+        </TabsContent>
         <TabsContent value="browse" className="space-y-4 mt-6">
           <WisdomLibrary 
             wisdomItems={wisdomItems}
@@ -93,9 +96,6 @@ const CommunityWisdom = () => {
             onMarkHelpful={markWisdomAsHelpful}
             filterSaved={true}
           />
-        </TabsContent>
-        <TabsContent value="contribute" className="space-y-4 mt-6">
-          <WisdomSubmissionForm onSubmit={handleSubmitWisdom} />
         </TabsContent>
         <TabsContent value="about" className="space-y-4 mt-6">
           <div className="prose max-w-none dark:prose-invert">
