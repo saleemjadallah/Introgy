@@ -152,7 +152,18 @@ const Wellbeing = () => {
               <CardDescription>Anonymous sharing of introvert strategies</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">Coming soon in the next update!</p>
+              <div className="flex flex-col items-center gap-4">
+                <p className="text-muted-foreground">
+                  Now available! Share and discover strategies from fellow introverts.
+                </p>
+                <Button 
+                  onClick={() => setActiveSection('wisdom')}
+                  className="gap-2"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  Explore Community Wisdom
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
