@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,7 +16,6 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Form state
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -33,7 +31,6 @@ const Auth = () => {
   });
   
   useEffect(() => {
-    // Update the mode when the search param changes
     const newMode = searchParams.get("mode") === "signin" ? "signin" : "signup";
     setMode(newMode);
   }, [searchParams]);
@@ -42,7 +39,6 @@ const Auth = () => {
     let isValid = true;
     const newErrors = { ...errors };
     
-    // Email validation
     if (!formData.email) {
       newErrors.email = "Email is required";
       isValid = false;
@@ -53,7 +49,6 @@ const Auth = () => {
       newErrors.email = "";
     }
     
-    // Password validation
     if (!formData.password) {
       newErrors.password = "Password is required";
       isValid = false;
@@ -64,7 +59,6 @@ const Auth = () => {
       newErrors.password = "";
     }
     
-    // Additional validations for signup mode
     if (mode === "signup") {
       if (!formData.displayName) {
         newErrors.displayName = "Display name is required";
@@ -100,38 +94,35 @@ const Auth = () => {
       return;
     }
     
-    // Simulate authentication
     if (mode === "signin") {
-      // Sign in logic would go here in a real app
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
         duration: 3000,
       });
+      
+      navigate("/profile");
     } else {
-      // Sign up logic would go here in a real app
       toast({
         title: "Account created!",
         description: "Your account has been created successfully.",
         duration: 3000,
       });
+      
+      sessionStorage.setItem("newSignup", "true");
+      
+      navigate("/onboarding");
     }
-    
-    // Redirect to profile page after successful authentication
-    navigate("/profile");
   };
   
-  // Password strength calculation
   const calculatePasswordStrength = (password: string): number => {
     if (!password) return 0;
     
     let strength = 0;
     
-    // Length check
     if (password.length >= 8) strength += 1;
     if (password.length >= 12) strength += 1;
     
-    // Character variety checks
     if (/[A-Z]/.test(password)) strength += 1;
     if (/[a-z]/.test(password)) strength += 1;
     if (/[0-9]/.test(password)) strength += 1;

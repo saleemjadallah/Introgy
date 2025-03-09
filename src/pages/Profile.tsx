@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { 
   Tabs, 
@@ -38,7 +38,6 @@ const Profile = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   
-  // User profile data (would come from auth provider in a real app)
   const [userData, setUserData] = useState({
     displayName: "Guest User",
     email: "guest@example.com",
@@ -53,7 +52,26 @@ const Profile = () => {
       dataCollection: true,
     }
   });
-  
+
+  const [introvertPreferences, setIntrovertPreferences] = useState<{
+    energyDrains: string[];
+    energyGains: string[];
+    communicationStyle: string;
+    socialGoals: string;
+  }>({
+    energyDrains: ["Large groups", "Small talk", "Unexpected calls", "Loud environments"],
+    energyGains: ["Reading", "Nature walks", "Deep conversations", "Creative projects"],
+    communicationStyle: "Thoughtful written communication with time to process",
+    socialGoals: "Building deeper connections with fewer people"
+  });
+
+  useEffect(() => {
+    const savedPreferences = localStorage.getItem("introvertPreferences");
+    if (savedPreferences) {
+      setIntrovertPreferences(JSON.parse(savedPreferences));
+    }
+  }, []);
+
   const handleSaveProfile = () => {
     setIsEditing(false);
     toast({
@@ -62,11 +80,9 @@ const Profile = () => {
       duration: 3000,
     });
     
-    // Demo: Trigger badge for profile completion
     earnBadge("inner-observer");
   };
-  
-  // Placeholder badges for the achievements section (now we'll use the real badge system)
+
   const faqItems = [
     {
       question: "What is a Social Battery and how does tracking work?",
@@ -89,7 +105,7 @@ const Profile = () => {
       answer: "Badges are achievements that recognize your personal growth journey as an introvert. You earn them by using app features, developing your social skills, managing your energy, and reaching important milestones. Each badge has specific criteria, and you can track your progress in the Badges section of your profile."
     }
   ];
-  
+
   const handleEarnDemo = () => {
     earnBadge("reflection-master");
     earnBadge("feature-explorer");
@@ -99,7 +115,7 @@ const Profile = () => {
       duration: 3000,
     });
   };
-  
+
   if (!isAuthenticated) {
     return (
       <div className="max-w-md mx-auto mt-8 p-4">
@@ -129,7 +145,7 @@ const Profile = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="container max-w-4xl mx-auto py-6">
       <Tabs defaultValue="profile" value={activeTab} onValueChange={setActiveTab}>
@@ -155,7 +171,6 @@ const Profile = () => {
           </TabsTrigger>
         </TabsList>
         
-        {/* Profile Tab */}
         <TabsContent value="profile" className="space-y-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -271,48 +286,49 @@ const Profile = () => {
                 <div className="space-y-2">
                   <Label>Energy Drains</Label>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline">Large groups</Badge>
-                    <Badge variant="outline">Small talk</Badge>
-                    <Badge variant="outline">Unexpected calls</Badge>
-                    <Badge variant="outline">Loud environments</Badge>
+                    {introvertPreferences.energyDrains.map(item => (
+                      <Badge key={item} variant="outline">{item}</Badge>
+                    ))}
                   </div>
                 </div>
                 
                 <div className="space-y-2">
                   <Label>Energy Gains</Label>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline">Reading</Badge>
-                    <Badge variant="outline">Nature walks</Badge>
-                    <Badge variant="outline">Deep conversations</Badge>
-                    <Badge variant="outline">Creative projects</Badge>
+                    {introvertPreferences.energyGains.map(item => (
+                      <Badge key={item} variant="outline">{item}</Badge>
+                    ))}
                   </div>
                 </div>
                 
                 <div className="space-y-2">
                   <Label>Communication Style</Label>
                   <div className="text-muted-foreground">
-                    Prefers thoughtful written communication with time to process
+                    {introvertPreferences.communicationStyle}
                   </div>
                 </div>
                 
                 <div className="space-y-2">
                   <Label>Social Goals</Label>
                   <div className="text-muted-foreground">
-                    Building deeper connections with fewer people
+                    {introvertPreferences.socialGoals}
                   </div>
                 </div>
               </div>
               
               {isEditing && (
-                <Button variant="outline" size="sm">
-                  Retake Introvert Assessment
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => navigate("/onboarding")}
+                >
+                  Update Introvert Preferences
                 </Button>
               )}
             </CardContent>
           </Card>
         </TabsContent>
         
-        {/* Settings Tab */}
         <TabsContent value="settings" className="space-y-6">
           <Card>
             <CardHeader>
@@ -428,7 +444,6 @@ const Profile = () => {
           </Card>
         </TabsContent>
         
-        {/* Badges Tab - Now using our new BadgesDisplay component */}
         <TabsContent value="badges" className="space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div>
@@ -438,7 +453,6 @@ const Profile = () => {
               </p>
             </div>
             
-            {/* Demo button to earn badges (for testing only) */}
             <Button variant="outline" size="sm" onClick={handleEarnDemo} className="gap-1">
               <Trophy size={14} />
               Demo: Earn Badges
@@ -448,7 +462,6 @@ const Profile = () => {
           <BadgesDisplay />
         </TabsContent>
         
-        {/* Help & FAQ Tab */}
         <TabsContent value="help" className="space-y-6">
           <Card>
             <CardHeader>
