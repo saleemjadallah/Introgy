@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import BadgeGrid from "./BadgeGrid";
 import { BadgeCategory } from "./Badge";
 import { getBadgesByCategory, getRecentlyEarnedBadges, getBadgesInProgress } from "@/data/badgesData";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useMediaQuery } from "@/hooks/use-mobile";
 
 interface BadgesDisplayProps {
   userId?: string;
@@ -12,6 +14,7 @@ interface BadgesDisplayProps {
 
 const BadgesDisplay = ({ userId = "guest" }: BadgesDisplayProps) => {
   const [selectedCategory, setSelectedCategory] = useState<BadgeCategory | "recent" | "in-progress">("recent");
+  const isMobile = useMediaQuery("(max-width: 640px)");
   
   // Helper to get the correct badges based on selected category
   const getBadges = () => {
@@ -28,11 +31,11 @@ const BadgesDisplay = ({ userId = "guest" }: BadgesDisplayProps) => {
   const getCategoryName = (category: BadgeCategory | "recent" | "in-progress"): string => {
     switch (category) {
       case "self-awareness": return "Self-Awareness";
-      case "energy-management": return "Energy Management";
+      case "energy-management": return "Energy";
       case "social-skill": return "Social Skills";
-      case "growth": return "Growth & Comfort Zone";
-      case "app-engagement": return "App Engagement";
-      case "special": return "Special Achievements";
+      case "growth": return "Growth";
+      case "app-engagement": return "App Usage";
+      case "special": return "Special";
       case "recent": return "Recently Earned";
       case "in-progress": return "In Progress";
       default: return category;
@@ -40,31 +43,33 @@ const BadgesDisplay = ({ userId = "guest" }: BadgesDisplayProps) => {
   };
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Badges & Achievements</CardTitle>
-        <CardDescription>
-          Track your personal growth journey as an introvert with these meaningful milestones
+    <Card className="border-none shadow-none sm:border sm:shadow">
+      <CardHeader className="px-2 pt-2 pb-1 sm:px-6 sm:pt-6 sm:pb-2">
+        <CardTitle className="text-xl">Badges & Achievements</CardTitle>
+        <CardDescription className="text-sm">
+          Track your personal growth journey as an introvert
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-1 sm:px-6">
         <Tabs 
           value={selectedCategory} 
           onValueChange={(value) => setSelectedCategory(value as BadgeCategory | "recent" | "in-progress")}
           className="space-y-4"
         >
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
-            <TabsTrigger value="recent">Recent</TabsTrigger>
-            <TabsTrigger value="in-progress">In Progress</TabsTrigger>
-            <TabsTrigger value="self-awareness">Self-Awareness</TabsTrigger>
-            <TabsTrigger value="energy-management">Energy</TabsTrigger>
-            <TabsTrigger value="social-skill">Social Skills</TabsTrigger>
-            <TabsTrigger value="growth">Growth</TabsTrigger>
-            <TabsTrigger value="app-engagement">App Usage</TabsTrigger>
-            <TabsTrigger value="special">Special</TabsTrigger>
-          </TabsList>
+          <ScrollArea className="w-full pb-2" type="scroll">
+            <TabsList className={`inline-flex w-auto min-w-full space-x-1 p-1 ${isMobile ? 'h-10' : ''}`}>
+              <TabsTrigger value="recent" className="text-xs sm:text-sm px-2 sm:px-3">Recent</TabsTrigger>
+              <TabsTrigger value="in-progress" className="text-xs sm:text-sm px-2 sm:px-3">In Progress</TabsTrigger>
+              <TabsTrigger value="self-awareness" className="text-xs sm:text-sm px-2 sm:px-3">Self-Awareness</TabsTrigger>
+              <TabsTrigger value="energy-management" className="text-xs sm:text-sm px-2 sm:px-3">Energy</TabsTrigger>
+              <TabsTrigger value="social-skill" className="text-xs sm:text-sm px-2 sm:px-3">Social Skills</TabsTrigger>
+              <TabsTrigger value="growth" className="text-xs sm:text-sm px-2 sm:px-3">Growth</TabsTrigger>
+              <TabsTrigger value="app-engagement" className="text-xs sm:text-sm px-2 sm:px-3">App Usage</TabsTrigger>
+              <TabsTrigger value="special" className="text-xs sm:text-sm px-2 sm:px-3">Special</TabsTrigger>
+            </TabsList>
+          </ScrollArea>
           
-          <TabsContent value={selectedCategory} className="mt-4">
+          <TabsContent value={selectedCategory} className="mt-2 focus-visible:outline-none focus-visible:ring-0">
             <BadgeGrid 
               badges={getBadges()} 
               title={getCategoryName(selectedCategory)}

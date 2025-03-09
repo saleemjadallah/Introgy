@@ -21,14 +21,15 @@ const BadgeGrid = ({
       {title && <h3 className="text-lg font-medium">{title}</h3>}
       
       {badges.length > 0 ? (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 p-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 p-1">
           {badges.map((badge) => (
-            <div key={badge.id} className="flex flex-col items-center gap-2">
-              <Badge
-                {...badge}
-                onClick={() => setSelectedBadge(badge)}
-              />
-              <span className="text-xs text-center line-clamp-1">{badge.name}</span>
+            <div 
+              key={badge.id} 
+              className="flex flex-col items-center gap-1 p-2 hover:bg-accent/30 rounded-lg transition-colors"
+              onClick={() => setSelectedBadge(badge)}
+            >
+              <Badge {...badge} />
+              <span className="text-xs text-center line-clamp-1 mt-1">{badge.name}</span>
             </div>
           ))}
         </div>
