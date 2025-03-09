@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import IntrovertQuestionnaire, { IntrovertPreferences } from "@/components/profile/IntrovertQuestionnaire";
+import IntrovertQuestionnaire, { IntrovertPreferences } from "@/components/profile/questionnaire/IntrovertQuestionnaire";
 import { useToast } from "@/hooks/use-toast";
 import { earnBadge } from "@/services/badgeService";
 
