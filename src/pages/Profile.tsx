@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { 
@@ -17,6 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { UserAvatar } from "@/components/profile/UserAvatar";
 import { useToast } from "@/hooks/use-toast";
+import BadgesDisplay from "@/components/badges/BadgesDisplay";
+import { earnBadge } from "@/services/badgeService";
 import { 
   User, 
   Settings, 
@@ -26,7 +27,8 @@ import {
   ChevronDown, 
   Edit, 
   Save, 
-  X 
+  X,
+  Trophy
 } from "lucide-react";
 
 const Profile = () => {
@@ -59,18 +61,12 @@ const Profile = () => {
       description: "Your profile has been successfully updated.",
       duration: 3000,
     });
+    
+    // Demo: Trigger badge for profile completion
+    earnBadge("inner-observer");
   };
   
-  // Placeholder badges for the achievements section
-  const badges = [
-    { id: 1, name: "Self-Aware", description: "Completed your introvert profile", icon: "🧠", achieved: true },
-    { id: 2, name: "Energy Master", description: "Tracked your social battery for 7 consecutive days", icon: "⚡", achieved: true },
-    { id: 3, name: "Boundary Setter", description: "Created your first boundary plan", icon: "🛡️", achieved: false },
-    { id: 4, name: "Deep Connector", description: "Used conversation starters in 5 different scenarios", icon: "🔄", achieved: false },
-    { id: 5, name: "Growth Mindset", description: "Tried 3 different social strategies", icon: "🌱", achieved: true },
-  ];
-  
-  // FAQ items for the help section
+  // Placeholder badges for the achievements section (now we'll use the real badge system)
   const faqItems = [
     {
       question: "What is a Social Battery and how does tracking work?",
@@ -87,8 +83,22 @@ const Profile = () => {
     {
       question: "Can I use InnerCircle without creating an account?",
       answer: "Yes, you can use basic features without an account. However, creating an account allows us to save your preferences, history, and personalized settings across devices. Your data remains private and secure."
+    },
+    {
+      question: "What are badges and how do I earn them?",
+      answer: "Badges are achievements that recognize your personal growth journey as an introvert. You earn them by using app features, developing your social skills, managing your energy, and reaching important milestones. Each badge has specific criteria, and you can track your progress in the Badges section of your profile."
     }
   ];
+  
+  const handleEarnDemo = () => {
+    earnBadge("reflection-master");
+    earnBadge("feature-explorer");
+    toast({
+      title: "Demo Mode",
+      description: "Earned some badges for demonstration purposes.",
+      duration: 3000,
+    });
+  };
   
   if (!isAuthenticated) {
     return (
@@ -103,9 +113,9 @@ const Profile = () => {
           <CardFooter className="flex flex-col gap-2">
             <Button 
               className="w-full" 
-              onClick={() => navigate("/auth?mode=signin")}
+              onClick={() => setIsAuthenticated(true)}
             >
-              Sign In
+              Sign In (Demo)
             </Button>
             <Button 
               variant="outline" 
@@ -418,53 +428,24 @@ const Profile = () => {
           </Card>
         </TabsContent>
         
-        {/* Badges Tab */}
-        <TabsContent value="badges" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Badges & Achievements</CardTitle>
-              <CardDescription>
+        {/* Badges Tab - Now using our new BadgesDisplay component */}
+        <TabsContent value="badges" className="space-y-4">
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h2 className="text-2xl font-medium">Your Achievements</h2>
+              <p className="text-muted-foreground">
                 Track your personal growth journey as an introvert
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {badges.map((badge) => (
-                  <div 
-                    key={badge.id}
-                    className={`p-4 border rounded-lg flex items-center gap-3 ${
-                      badge.achieved ? 'bg-primary/5 border-primary/20' : 'bg-muted/30 border-muted'
-                    }`}
-                  >
-                    <div className={`text-2xl ${!badge.achieved && 'opacity-40'}`}>
-                      {badge.icon}
-                    </div>
-                    <div>
-                      <h4 className={`font-medium ${!badge.achieved && 'text-muted-foreground'}`}>
-                        {badge.name}
-                        {badge.achieved && (
-                          <Badge variant="default" className="ml-2 text-xs">Earned</Badge>
-                        )}
-                        {!badge.achieved && (
-                          <Badge variant="outline" className="ml-2 text-xs">In Progress</Badge>
-                        )}
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        {badge.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="mt-6 text-center">
-                <p className="text-sm text-muted-foreground mb-3">
-                  Complete more actions in the app to earn additional badges
-                </p>
-                <Button variant="outline">View All Achievements</Button>
-              </div>
-            </CardContent>
-          </Card>
+              </p>
+            </div>
+            
+            {/* Demo button to earn badges (for testing only) */}
+            <Button variant="outline" size="sm" onClick={handleEarnDemo} className="gap-1">
+              <Trophy size={14} />
+              Demo: Earn Badges
+            </Button>
+          </div>
+          
+          <BadgesDisplay />
         </TabsContent>
         
         {/* Help & FAQ Tab */}

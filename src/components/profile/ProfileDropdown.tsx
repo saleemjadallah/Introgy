@@ -17,6 +17,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { getRecentlyEarnedBadges } from "@/data/badgesData";
 
 interface ProfileDropdownProps {
   isOpen: boolean;
@@ -31,6 +33,10 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
   const [notifications, setNotifications] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  
+  // Get recently earned badges
+  const recentBadges = getRecentlyEarnedBadges(7); // badges earned in the last 7 days
+  const hasNewBadges = recentBadges.length > 0;
   
   useEffect(() => {
     // Handle click outside to close dropdown
@@ -80,11 +86,13 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
               Sign in to track your social battery and access personalized features
             </p>
             <div className="space-y-2">
-              <Link to="/auth?mode=signin" className="block w-full">
-                <Button variant="default" className="w-full">
-                  Sign In
-                </Button>
-              </Link>
+              <Button 
+                variant="default" 
+                className="w-full"
+                onClick={() => setIsAuthenticated(true)}
+              >
+                Sign In (Demo)
+              </Button>
               <Link to="/auth?mode=signup" className="block w-full">
                 <Button variant="outline" className="w-full">
                   Create Account
@@ -127,17 +135,24 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
               <span>My Profile</span>
             </Link>
             
-            <Link to="/profile/badges" className="flex items-center gap-2 p-2 text-sm hover:bg-accent rounded-md">
-              <Award size={18} />
-              <span>Badges & Achievements</span>
+            <Link to="/profile?tab=badges" className="flex items-center justify-between p-2 text-sm hover:bg-accent rounded-md">
+              <div className="flex items-center gap-2">
+                <Award size={18} />
+                <span>Badges & Achievements</span>
+              </div>
+              {hasNewBadges && (
+                <Badge variant="default" className="text-xs">
+                  {recentBadges.length} new
+                </Badge>
+              )}
             </Link>
             
-            <Link to="/profile/settings" className="flex items-center gap-2 p-2 text-sm hover:bg-accent rounded-md">
+            <Link to="/profile?tab=settings" className="flex items-center gap-2 p-2 text-sm hover:bg-accent rounded-md">
               <Settings size={18} />
               <span>Settings</span>
             </Link>
             
-            <Link to="/profile/privacy" className="flex items-center gap-2 p-2 text-sm hover:bg-accent rounded-md">
+            <Link to="/profile?tab=privacy" className="flex items-center gap-2 p-2 text-sm hover:bg-accent rounded-md">
               <Shield size={18} />
               <span>Privacy & Data</span>
             </Link>
