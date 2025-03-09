@@ -6,7 +6,7 @@ import BadgeGrid from "./BadgeGrid";
 import { BadgeCategory } from "./Badge";
 import { getBadgesByCategory, getRecentlyEarnedBadges, getBadgesInProgress } from "@/data/badgesData";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useMediaQuery } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface BadgesDisplayProps {
   userId?: string;
@@ -14,7 +14,7 @@ interface BadgesDisplayProps {
 
 const BadgesDisplay = ({ userId = "guest" }: BadgesDisplayProps) => {
   const [selectedCategory, setSelectedCategory] = useState<BadgeCategory | "recent" | "in-progress">("recent");
-  const isMobile = useMediaQuery("(max-width: 640px)");
+  const isMobile = useIsMobile();
   
   // Helper to get the correct badges based on selected category
   const getBadges = () => {
