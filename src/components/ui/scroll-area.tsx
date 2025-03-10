@@ -28,16 +28,20 @@ const MobileScrollArea = React.forwardRef<
 ))
 MobileScrollArea.displayName = "MobileScrollArea"
 
+// Define our extended type for the ScrollArea component
+type RadixScrollAreaType = "auto" | "always" | "scroll" | "hover"
+type ScrollAreaType = RadixScrollAreaType | "native"
+
 // Enhanced ScrollArea component with better touch support
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & { 
     orientation?: "horizontal" | "vertical",
-    type?: "auto" | "always" | "scroll" | "hover" | "native"
+    type?: ScrollAreaType
   }
 >(({ className, children, orientation = "vertical", type = "auto", ...props }, ref) => {
-  // If native scrolling is requested, use the MobileScrollArea
-  if (type === "native") {
+  // Use type assertion to check for "native" type
+  if (type === "native" as ScrollAreaType) {
     return (
       <MobileScrollArea 
         ref={ref as any} 
@@ -50,11 +54,15 @@ const ScrollArea = React.forwardRef<
     )
   }
 
+  // For other types, use type assertion to pass only valid Radix ScrollArea types
+  const validType = type as RadixScrollAreaType
+
   // Otherwise use the Radix UI ScrollArea with enhanced touch support
   return (
     <ScrollAreaPrimitive.Root
       ref={ref}
       className={cn("relative", className)}
+      type={validType}
       {...props}
     >
       <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -18,7 +17,6 @@ const IntrovertMythbusters = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [savedMyths, setSavedMyths] = useState<number[]>([]);
   
-  // Filter myths based on search
   const filteredMyths = mythsData.filter(myth => 
     myth.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
     myth.reality.toLowerCase().includes(searchTerm.toLowerCase())
@@ -68,7 +66,7 @@ const IntrovertMythbusters = () => {
       <TooltipProvider>
         <ScrollArea 
           className="h-[400px] pr-4" 
-          type="native" 
+          type="scroll" 
           orientation="vertical"
         >
           <div className="space-y-2">
