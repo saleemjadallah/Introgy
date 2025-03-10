@@ -51,18 +51,36 @@ export const RelationshipNurturing = () => {
       </div>
       
       <Tabs defaultValue="insights" onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-4 mb-4">
-          <TabsTrigger value="insights" className="relative">
-            Insights
+        <TabsList className="grid grid-cols-4 mb-4 overflow-x-auto">
+          <TabsTrigger value="insights" className="relative px-1 sm:px-3">
+            <span className="hidden sm:inline">Insights</span>
+            <span className="sm:hidden">
+              <MessageCircle className="h-4 w-4" />
+            </span>
             {newInsightsCount > 0 && (
               <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0">
                 {newInsightsCount}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="suggestions">Connection Planner</TabsTrigger>
-          <TabsTrigger value="starters">Conversation Starters</TabsTrigger>
-          <TabsTrigger value="health">Relationship Health</TabsTrigger>
+          <TabsTrigger value="suggestions" className="px-1 sm:px-3">
+            <span className="hidden sm:inline">Connection Planner</span>
+            <span className="sm:hidden">
+              <Calendar className="h-4 w-4" />
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="starters" className="px-1 sm:px-3">
+            <span className="hidden sm:inline">Conversation Starters</span>
+            <span className="sm:hidden">
+              <MessageCircle className="h-4 w-4" strokeWidth={1} />
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="health" className="px-1 sm:px-3">
+            <span className="hidden sm:inline">Relationship Health</span>
+            <span className="sm:hidden">
+              <Heart className="h-4 w-4" />
+            </span>
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="insights" className="space-y-4">
@@ -123,12 +141,13 @@ const InsightsTab = ({ insights, onMarkAllRead, onTakeAction, onDismiss }) => {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-xl font-medium">AI-Generated Relationship Insights</h3>
+      <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+        <h3 className="text-lg sm:text-xl font-medium">AI-Generated Insights</h3>
         <Button 
           variant="outline" 
           size="sm"
           onClick={onMarkAllRead}
+          className="w-full sm:w-auto"
         >
           Mark All as Read
         </Button>
@@ -142,32 +161,33 @@ const InsightsTab = ({ insights, onMarkAllRead, onTakeAction, onDismiss }) => {
         ) : (
           insights.map((insight) => (
             <Card key={insight.id} className={insight.isNew ? "border-blue-300" : ""}>
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
+              <CardHeader className="pb-2 px-3 sm:px-6">
+                <div className="flex flex-wrap justify-between items-start gap-2">
                   <div className="flex items-center space-x-2">
-                    <div className={`p-2 rounded-full ${getSeverityColor(insight.severity)}`}>
+                    <div className={`p-1.5 sm:p-2 rounded-full ${getSeverityColor(insight.severity)}`}>
                       {getTypeIcon(insight.type)}
                     </div>
                     <div>
-                      <CardTitle className="text-base">{insight.title}</CardTitle>
+                      <CardTitle className="text-sm sm:text-base">{insight.title}</CardTitle>
                       <CardDescription className="text-xs">
                         {insight.relationshipName} • {format(new Date(insight.dateGenerated), 'MMM d')}
                       </CardDescription>
                     </div>
                   </div>
-                  {insight.isNew && <Badge>New</Badge>}
+                  {insight.isNew && <Badge className="ml-auto">New</Badge>}
                 </div>
               </CardHeader>
-              <CardContent className="pb-2">
-                <p className="text-sm">{insight.description}</p>
-                <p className="text-sm font-medium mt-2">Recommendation:</p>
-                <p className="text-sm">{insight.recommendation}</p>
+              <CardContent className="pb-2 px-3 sm:px-6">
+                <p className="text-xs sm:text-sm">{insight.description}</p>
+                <p className="text-xs sm:text-sm font-medium mt-2">Recommendation:</p>
+                <p className="text-xs sm:text-sm">{insight.recommendation}</p>
               </CardContent>
-              <CardFooter className="pt-0 flex justify-end">
+              <CardFooter className="pt-0 px-3 sm:px-6 flex flex-wrap justify-end gap-2">
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={() => onDismiss(insight.id)}
+                  className="w-full sm:w-auto"
                 >
                   Dismiss
                 </Button>
@@ -175,6 +195,7 @@ const InsightsTab = ({ insights, onMarkAllRead, onTakeAction, onDismiss }) => {
                   variant="ghost" 
                   size="sm"
                   onClick={() => onTakeAction(insight.id)}
+                  className="w-full sm:w-auto"
                 >
                   Take Action
                 </Button>
@@ -198,9 +219,9 @@ const SuggestionsTab = ({ suggestions, onSchedule, onSkip }) => {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-xl font-medium">Suggested Connections</h3>
-        <Button variant="outline" size="sm">Add Custom Connection</Button>
+      <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+        <h3 className="text-lg sm:text-xl font-medium">Suggested Connections</h3>
+        <Button variant="outline" size="sm" className="w-full sm:w-auto">Add Custom</Button>
       </div>
       
       <div className="space-y-3">
@@ -211,29 +232,29 @@ const SuggestionsTab = ({ suggestions, onSchedule, onSkip }) => {
         ) : (
           suggestions.sort((a, b) => a.priority - b.priority).map((suggestion) => (
             <Card key={suggestion.id}>
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-center">
+              <CardHeader className="pb-2 px-3 sm:px-6">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
                   <div className="flex items-center space-x-3">
-                    <Avatar className="h-10 w-10">
-                      <div className="bg-slate-200 h-10 w-10 rounded-full flex items-center justify-center">
+                    <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
+                      <div className="bg-slate-200 h-8 w-8 sm:h-10 sm:w-10 rounded-full flex items-center justify-center">
                         {suggestion.relationshipName.charAt(0)}
                       </div>
                     </Avatar>
                     <div>
-                      <CardTitle className="text-base">{suggestion.relationshipName}</CardTitle>
+                      <CardTitle className="text-sm sm:text-base">{suggestion.relationshipName}</CardTitle>
                       <CardDescription className="text-xs flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
                         {formatSuggestedDate(suggestion.suggestedDate)} at {suggestion.suggestedTime}
                       </CardDescription>
                     </div>
                   </div>
-                  <Badge variant={suggestion.priority <= 2 ? "outline" : "default"}>
+                  <Badge variant={suggestion.priority <= 2 ? "outline" : "default"} className="self-start sm:self-center">
                     Priority {suggestion.priority}
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent className="pb-2">
-                <div className="flex items-center gap-2 text-sm mb-2">
+              <CardContent className="pb-2 px-3 sm:px-6">
+                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm mb-2">
                   <Badge variant="secondary">
                     {suggestion.interactionType.charAt(0).toUpperCase() + suggestion.interactionType.slice(1)}
                   </Badge>
@@ -242,20 +263,22 @@ const SuggestionsTab = ({ suggestions, onSchedule, onSkip }) => {
                     Energy: {suggestion.energyLevelRequired}/10
                   </Badge>
                 </div>
-                <p className="text-sm text-muted-foreground">{suggestion.reasonForSuggestion}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">{suggestion.reasonForSuggestion}</p>
               </CardContent>
-              <CardFooter className="pt-0 flex justify-end">
+              <CardFooter className="pt-0 px-3 sm:px-6 flex flex-wrap justify-end gap-2">
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={() => onSkip(suggestion.id)}
+                  className="flex-1 sm:flex-none"
                 >
                   Skip
                 </Button>
-                <Button variant="outline" size="sm">Reschedule</Button>
+                <Button variant="outline" size="sm" className="flex-1 sm:flex-none">Reschedule</Button>
                 <Button 
                   size="sm"
                   onClick={() => onSchedule(suggestion.id)}
+                  className="flex-1 sm:flex-none"
                 >
                   Schedule
                 </Button>
@@ -287,12 +310,12 @@ const StartersTab = ({ starters, relationships, onGenerateMore, onCopy }) => {
   
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-xl font-medium">AI-Generated Conversation Starters</h3>
-        <div className="space-x-2">
+      <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+        <h3 className="text-lg sm:text-xl font-medium">Conversation Starters</h3>
+        <div className="w-full sm:w-auto">
           {relationships.length > 0 && (
             <select 
-              className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
+              className="w-full sm:w-auto h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
               onChange={(e) => e.target.value && onGenerateMore(e.target.value)}
               defaultValue=""
             >
@@ -321,31 +344,31 @@ const StartersTab = ({ starters, relationships, onGenerateMore, onCopy }) => {
                 <h4 className="font-medium">For {relationshipName}</h4>
                 {relationshipStarters.map((starter) => (
                   <Card key={starter.id}>
-                    <CardHeader className="pb-2">
-                      <div className="flex justify-between items-start">
+                    <CardHeader className="pb-2 px-3 sm:px-6">
+                      <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
                         <div>
-                          <CardTitle className="text-base">{starter.topic}</CardTitle>
+                          <CardTitle className="text-sm sm:text-base">{starter.topic}</CardTitle>
                           <CardDescription className="text-xs">
                             Confidence: {Math.round(starter.confidenceScore * 100)}%
                           </CardDescription>
                         </div>
-                        <Badge variant="outline">{starter.source.replace(/_/g, ' ')}</Badge>
+                        <Badge variant="outline" className="self-start">{starter.source.replace(/_/g, ' ')}</Badge>
                       </div>
                     </CardHeader>
-                    <CardContent className="pb-2">
-                      <p className="text-sm italic">"{starter.starter}"</p>
+                    <CardContent className="pb-2 px-3 sm:px-6">
+                      <p className="text-xs sm:text-sm italic">"{starter.starter}"</p>
                       <p className="text-xs text-muted-foreground mt-1">{starter.context}</p>
                     </CardContent>
-                    <CardFooter className="pt-0 flex justify-end">
+                    <CardFooter className="pt-0 px-3 sm:px-6 flex justify-end gap-2">
                       <Button 
                         variant="outline" 
                         size="sm"
                         onClick={() => onCopy(starter.starter)}
-                        className="flex items-center gap-1"
+                        className="flex-1 sm:flex-none flex items-center gap-1"
                       >
                         <Copy className="h-3 w-3" /> Copy
                       </Button>
-                      <Button size="sm">Use</Button>
+                      <Button size="sm" className="flex-1 sm:flex-none">Use</Button>
                     </CardFooter>
                   </Card>
                 ))}
@@ -378,8 +401,8 @@ const HealthTab = ({ healthData }) => {
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-xl font-medium">Relationship Health Assessment</h3>
-        <p className="text-sm text-muted-foreground">AI analysis of your relationship health based on interaction patterns</p>
+        <h3 className="text-lg sm:text-xl font-medium">Relationship Health</h3>
+        <p className="text-xs sm:text-sm text-muted-foreground">AI analysis of relationship health based on interaction patterns</p>
       </div>
       
       <div className="space-y-4">
@@ -390,39 +413,39 @@ const HealthTab = ({ healthData }) => {
         ) : (
           healthData.map((health) => (
             <Card key={health.relationshipId}>
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 px-3 sm:px-6">
                 <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-3">
-                    <div className={`text-2xl font-bold ${getScoreColor(health.overallScore)}`}>
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className={`text-xl sm:text-2xl font-bold ${getScoreColor(health.overallScore)}`}>
                       {health.overallScore}
                     </div>
                     <div>
-                      <CardTitle className="text-base">{health.relationshipName}</CardTitle>
-                      <CardDescription className="text-xs flex items-center gap-1">
+                      <CardTitle className="text-sm sm:text-base">{health.relationshipName}</CardTitle>
+                      <CardDescription className="text-xs flex flex-wrap items-center gap-1">
                         <span className={`flex items-center ${getTrendColor(health.trend)}`}>
                           {health.trend === 'improving' && '↗ Improving'}
                           {health.trend === 'declining' && '↘ Declining'}
                           {health.trend === 'stable' && '→ Stable'}
                         </span>
-                        <span>• Last updated: {format(new Date(health.lastAssessment), 'MMM d')}</span>
+                        <span>• Updated: {format(new Date(health.lastAssessment), 'MMM d')}</span>
                       </CardDescription>
                     </div>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="pb-2">
-                <div className="grid grid-cols-3 gap-2 mb-3">
-                  <div className="text-center p-2 bg-slate-50 rounded-md">
+              <CardContent className="pb-2 px-3 sm:px-6">
+                <div className="grid grid-cols-3 gap-1 sm:gap-2 mb-3">
+                  <div className="text-center p-1 sm:p-2 bg-slate-50 rounded-md">
                     <div className="text-xs text-muted-foreground">Frequency</div>
-                    <div className={`font-medium ${getScoreColor(health.frequency)}`}>{health.frequency}</div>
+                    <div className={`text-xs sm:text-sm font-medium ${getScoreColor(health.frequency)}`}>{health.frequency}</div>
                   </div>
-                  <div className="text-center p-2 bg-slate-50 rounded-md">
+                  <div className="text-center p-1 sm:p-2 bg-slate-50 rounded-md">
                     <div className="text-xs text-muted-foreground">Quality</div>
-                    <div className={`font-medium ${getScoreColor(health.quality)}`}>{health.quality}</div>
+                    <div className={`text-xs sm:text-sm font-medium ${getScoreColor(health.quality)}`}>{health.quality}</div>
                   </div>
-                  <div className="text-center p-2 bg-slate-50 rounded-md">
+                  <div className="text-center p-1 sm:p-2 bg-slate-50 rounded-md">
                     <div className="text-xs text-muted-foreground">Reciprocity</div>
-                    <div className={`font-medium ${getScoreColor(health.reciprocity)}`}>{health.reciprocity}</div>
+                    <div className={`text-xs sm:text-sm font-medium ${getScoreColor(health.reciprocity)}`}>{health.reciprocity}</div>
                   </div>
                 </div>
                 
@@ -430,18 +453,21 @@ const HealthTab = ({ healthData }) => {
                   <div className="mt-2">
                     <p className="text-xs font-medium mb-1">Suggestions for improvement:</p>
                     <ul className="text-xs text-muted-foreground">
-                      {health.suggestions.map((suggestion, i) => (
+                      {health.suggestions.slice(0, 2).map((suggestion, i) => (
                         <li key={i} className="flex items-start gap-1 mb-1">
                           <span>•</span>
                           <span>{suggestion}</span>
                         </li>
                       ))}
+                      {health.suggestions.length > 2 && (
+                        <li className="text-xs text-muted-foreground italic">+{health.suggestions.length - 2} more suggestions</li>
+                      )}
                     </ul>
                   </div>
                 )}
               </CardContent>
-              <CardFooter className="pt-0 flex justify-end">
-                <Button variant="ghost" size="sm" className="flex items-center gap-1">
+              <CardFooter className="pt-0 px-3 sm:px-6 flex justify-end">
+                <Button variant="ghost" size="sm" className="w-full sm:w-auto flex items-center justify-center gap-1">
                   View Details <ChevronRight className="h-3 w-3" />
                 </Button>
               </CardFooter>
