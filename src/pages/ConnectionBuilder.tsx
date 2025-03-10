@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import CommunicationPreferences from "@/components/connection-builder/CommunicationPreferences";
 import RelationshipInventory from "@/components/connection-builder/relationship-inventory/RelationshipInventory";
+import RelationshipNurturing from "@/components/connection-builder/RelationshipNurturing";
 
 const ConnectionBuilder = () => {
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
@@ -15,6 +16,8 @@ const ConnectionBuilder = () => {
         return <CommunicationPreferences />;
       case 'relationship-inventory':
         return <RelationshipInventory />;
+      case 'intelligent-nurturing':
+        return <RelationshipNurturing />;
       default:
         return renderFeatureCards();
     }
@@ -45,7 +48,7 @@ const ConnectionBuilder = () => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm">
+        <Card className={`shadow-sm ${activeFeature === 'intelligent-nurturing' ? 'border-primary' : ''}`}>
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
               <Bot className="h-5 w-5 flex-shrink-0" />
@@ -54,7 +57,16 @@ const ConnectionBuilder = () => {
             <CardDescription className="text-sm mt-1.5">Smart relationship maintenance recommendations</CardDescription>
           </CardHeader>
           <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-4">
-            <p className="text-sm text-muted-foreground">Coming soon in the next update!</p>
+            <p className="text-sm text-muted-foreground">
+              Get AI-powered suggestions for maintaining healthy relationships with personalized insights.
+            </p>
+            <Button 
+              onClick={() => setActiveFeature('intelligent-nurturing')}
+              className="w-full py-5 sm:py-2 text-base sm:text-sm mt-2"
+              size="lg"
+            >
+              Open Assistant
+            </Button>
           </CardContent>
         </Card>
 
