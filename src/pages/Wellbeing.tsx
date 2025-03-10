@@ -11,51 +11,60 @@ import { Button } from "@/components/ui/button";
 import CommunityWisdom from "@/components/wellbeing/community-wisdom/CommunityWisdom";
 import MindfulnessExercises from "@/components/wellbeing/mindfulness/MindfulnessExercises";
 import EducationCenter from "@/components/wellbeing/education/EducationCenter";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Wellbeing = () => {
   const [activeSection, setActiveSection] = useState<'overview' | 'education' | 'wisdom' | 'mindfulness'>('overview');
+  const isMobile = useIsMobile();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 w-full max-w-full">
       <div>
         <h2 className="text-3xl font-bold tracking-tight mb-2">Wellbeing Center</h2>
         <p className="text-muted-foreground">Resources to support your introvert wellbeing</p>
       </div>
 
-      <div className="flex overflow-x-auto pb-2 gap-2">
-        <Button 
-          variant={activeSection === 'overview' ? 'default' : 'outline'} 
-          onClick={() => setActiveSection('overview')}
-        >
-          <LineChart className="h-4 w-4 mr-2" />
-          Overview
-        </Button>
-        <Button 
-          variant={activeSection === 'education' ? 'default' : 'outline'} 
-          onClick={() => setActiveSection('education')}
-        >
-          <BookOpen className="h-4 w-4 mr-2" />
-          Education Center
-        </Button>
-        <Button 
-          variant={activeSection === 'mindfulness' ? 'default' : 'outline'} 
-          onClick={() => setActiveSection('mindfulness')}
-        >
-          <MountainSnow className="h-4 w-4 mr-2" />
-          Mindfulness Exercises
-        </Button>
-        <Button 
-          variant={activeSection === 'wisdom' ? 'default' : 'outline'} 
-          onClick={() => setActiveSection('wisdom')}
-        >
-          <MessageSquare className="h-4 w-4 mr-2" />
-          Community Wisdom
-        </Button>
-      </div>
+      <ScrollArea className="w-full pb-2" orientation="horizontal">
+        <div className="flex min-w-max gap-2">
+          <Button 
+            variant={activeSection === 'overview' ? 'default' : 'outline'} 
+            onClick={() => setActiveSection('overview')}
+            className="flex-shrink-0"
+          >
+            <LineChart className="h-4 w-4 mr-2" />
+            Overview
+          </Button>
+          <Button 
+            variant={activeSection === 'education' ? 'default' : 'outline'} 
+            onClick={() => setActiveSection('education')}
+            className="flex-shrink-0"
+          >
+            <BookOpen className="h-4 w-4 mr-2" />
+            Education Center
+          </Button>
+          <Button 
+            variant={activeSection === 'mindfulness' ? 'default' : 'outline'} 
+            onClick={() => setActiveSection('mindfulness')}
+            className="flex-shrink-0"
+          >
+            <MountainSnow className="h-4 w-4 mr-2" />
+            Mindfulness Exercises
+          </Button>
+          <Button 
+            variant={activeSection === 'wisdom' ? 'default' : 'outline'} 
+            onClick={() => setActiveSection('wisdom')}
+            className="flex-shrink-0"
+          >
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Community Wisdom
+          </Button>
+        </div>
+      </ScrollArea>
 
       {activeSection === 'overview' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card>
+        <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2'} gap-4 w-full max-w-full`}>
+          <Card className="w-full">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5" />
@@ -79,7 +88,7 @@ const Wellbeing = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="w-full">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MountainSnow className="h-5 w-5" />
@@ -103,7 +112,7 @@ const Wellbeing = () => {
             </CardContent>
           </Card>
 
-          <Card className="md:col-span-2">
+          <Card className={`w-full ${isMobile ? '' : 'md:col-span-2'}`}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />

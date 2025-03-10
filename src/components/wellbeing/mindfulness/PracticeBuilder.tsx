@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import PracticeForm from "./builder/PracticeForm";
 import GeneratedPracticeView from "./builder/GeneratedPracticeView";
 import { usePracticeBuilder } from "./builder/usePracticeBuilder";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const PracticeBuilder = () => {
   const {
@@ -29,16 +30,18 @@ const PracticeBuilder = () => {
     updateGoalStatement
   } = usePracticeBuilder();
   
+  const isMobile = useIsMobile();
+  
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-4 w-full max-w-full">
+      <Card className="w-full max-w-full overflow-hidden">
         <CardHeader>
           <CardTitle>Intelligent Practice Builder</CardTitle>
           <CardDescription>
             Create a personalized mindfulness practice tailored to your needs
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4">
           {!generatedPractice ? (
             <PracticeForm 
               practiceRequest={practiceRequest}
@@ -60,16 +63,17 @@ const PracticeBuilder = () => {
             />
           )}
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className={`flex ${isMobile ? 'flex-col gap-2' : 'justify-between'}`}>
           {generatedPractice ? (
             <>
               <Button 
                 variant="outline" 
                 onClick={resetForm}
+                className={isMobile ? 'w-full' : ''}
               >
                 Create Another
               </Button>
-              <Button>
+              <Button className={isMobile ? 'w-full' : ''}>
                 Save to My Practices
               </Button>
             </>

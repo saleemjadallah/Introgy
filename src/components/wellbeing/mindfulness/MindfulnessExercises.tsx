@@ -7,6 +7,7 @@ import RecommendedTab from "./tabs/RecommendedTab";
 import HistoryTab from "./tabs/HistoryTab";
 import PracticeBuilder from "./PracticeBuilder";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const MindfulnessExercises = () => {
   const { 
@@ -19,21 +20,24 @@ const MindfulnessExercises = () => {
   
   const { batteryLevel } = useSocialBattery();
   const timeOfDay = getTimeOfDay();
+  const isMobile = useIsMobile();
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 w-full max-w-full overflow-hidden">
       <ScrollArea className="w-full">
         <Tabs defaultValue="discover" className="w-full">
           <div className="sticky top-0 bg-background z-10 pb-2">
-            <TabsList className="w-full mb-4 overflow-x-auto flex flex-nowrap">
-              <TabsTrigger value="discover" className="flex-shrink-0">Discover</TabsTrigger>
-              <TabsTrigger value="recommended" className="flex-shrink-0">Recommended</TabsTrigger>
-              <TabsTrigger value="builder" className="flex-shrink-0">Practice Builder</TabsTrigger>
-              <TabsTrigger value="history" className="flex-shrink-0">History</TabsTrigger>
-            </TabsList>
+            <ScrollArea className="pb-2" orientation="horizontal">
+              <TabsList className={`${isMobile ? 'w-auto min-w-full' : 'w-full'} mb-4 flex flex-nowrap`}>
+                <TabsTrigger value="discover" className="flex-shrink-0">Discover</TabsTrigger>
+                <TabsTrigger value="recommended" className="flex-shrink-0">Recommended</TabsTrigger>
+                <TabsTrigger value="builder" className="flex-shrink-0">Practice Builder</TabsTrigger>
+                <TabsTrigger value="history" className="flex-shrink-0">History</TabsTrigger>
+              </TabsList>
+            </ScrollArea>
           </div>
           
-          <TabsContent value="discover">
+          <TabsContent value="discover" className="w-full max-w-full px-0">
             <DiscoverTab 
               selectedPractice={selectedPractice}
               selectedPracticeId={selectedPractice?.id}
@@ -43,7 +47,7 @@ const MindfulnessExercises = () => {
             />
           </TabsContent>
           
-          <TabsContent value="recommended">
+          <TabsContent value="recommended" className="w-full max-w-full px-0">
             <RecommendedTab 
               batteryLevel={batteryLevel}
               timeOfDay={timeOfDay}
@@ -52,13 +56,13 @@ const MindfulnessExercises = () => {
             />
           </TabsContent>
           
-          <TabsContent value="builder">
-            <div className="mt-6">
+          <TabsContent value="builder" className="w-full max-w-full px-0">
+            <div className="mt-4">
               <PracticeBuilder />
             </div>
           </TabsContent>
           
-          <TabsContent value="history">
+          <TabsContent value="history" className="w-full max-w-full px-0">
             <HistoryTab 
               completedPractices={completedPractices}
               onSelectPractice={handleSelectPractice}

@@ -1,3 +1,4 @@
+
 import { 
   MountainSnow, 
   Sunrise, 
@@ -9,6 +10,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getRecommendedPractices, getPracticeById } from "@/data/mindfulness";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PracticeRecommendationsProps {
   batteryLevel: number;
@@ -24,6 +26,7 @@ const PracticeRecommendations = ({
   onSelectPractice
 }: PracticeRecommendationsProps) => {
   const recommendations = getRecommendedPractices(batteryLevel, timeOfDay, completedPractices);
+  const isMobile = useIsMobile();
   
   const getTimeIcon = () => {
     switch (timeOfDay) {
@@ -58,9 +61,9 @@ const PracticeRecommendations = ({
   };
   
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4">
-        <Card className="flex-1">
+    <div className="space-y-4 w-full max-w-full">
+      <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-4`}>
+        <Card className="flex-1 w-full">
           <CardHeader className="pb-2">
             <CardDescription>Current Battery Level</CardDescription>
             <CardTitle className="flex items-center gap-2">
@@ -69,7 +72,7 @@ const PracticeRecommendations = ({
           </CardHeader>
         </Card>
         
-        <Card className="flex-1">
+        <Card className="flex-1 w-full">
           <CardHeader className="pb-2">
             <CardDescription>Time of Day</CardDescription>
             <CardTitle className="flex items-center gap-2">
@@ -79,7 +82,7 @@ const PracticeRecommendations = ({
         </Card>
       </div>
       
-      <Card>
+      <Card className="w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MountainSnow size={20} /> Recommended Practices
@@ -98,13 +101,13 @@ const PracticeRecommendations = ({
                   onClick={() => onSelectPractice(practice.id)}
                 >
                   <div className="flex justify-between items-start">
-                    <div>
+                    <div className="w-[85%]">
                       <h3 className="font-medium">{practice.title}</h3>
                       <p className="text-sm text-muted-foreground">{practice.category}</p>
                       <p className="text-xs mt-1">{practice.duration} min • {practice.subcategory}</p>
                       <p className="text-sm mt-2">{practice.description}</p>
                     </div>
-                    <Button variant="ghost" size="icon" className="mt-1">
+                    <Button variant="ghost" size="icon" className="mt-1 shrink-0">
                       <ArrowRight size={16} />
                     </Button>
                   </div>
