@@ -25,7 +25,11 @@ const Wellbeing = () => {
       </div>
 
       <div className="w-full">
-        <ScrollArea className="w-full" type="scroll" orientation="horizontal">
+        <ScrollArea 
+          className="w-full" 
+          type="native" 
+          orientation="horizontal"
+        >
           <div className="flex gap-2 pb-3 px-1 whitespace-nowrap">
             <Button 
               variant={activeSection === 'overview' ? 'default' : 'outline'} 

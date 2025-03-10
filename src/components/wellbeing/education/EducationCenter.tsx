@@ -16,7 +16,11 @@ const EducationCenter = () => {
       <Tabs defaultValue="glossary" className="w-full">
         {isMobile ? (
           <div className="w-full pb-2">
-            <ScrollArea className="w-full" type="scroll" orientation="horizontal">
+            <ScrollArea 
+              className="w-full" 
+              type="native" 
+              orientation="horizontal"
+            >
               <TabsList className="inline-flex">
                 <TabsTrigger value="glossary" className="whitespace-nowrap">
                   <Book className="h-4 w-4 mr-2" />

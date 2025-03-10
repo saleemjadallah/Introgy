@@ -26,16 +26,18 @@ const MindfulnessExercises = () => {
     <div className="space-y-4 w-full max-w-full">
         <Tabs defaultValue="discover" className="w-full">
           <div className="sticky top-0 bg-background z-10 pb-2">
-            <div className="relative w-full">
-              <ScrollArea className="pb-2 w-full" type="scroll">
-                <div className="flex pr-4">
-                  <TabsList className="flex-nowrap mb-4">
-                    <TabsTrigger value="discover" className="flex-shrink-0">Discover</TabsTrigger>
-                    <TabsTrigger value="recommended" className="flex-shrink-0">Recommended</TabsTrigger>
-                    <TabsTrigger value="builder" className="flex-shrink-0">Practice Builder</TabsTrigger>
-                    <TabsTrigger value="history" className="flex-shrink-0">History</TabsTrigger>
-                  </TabsList>
-                </div>
+            <div className="w-full">
+              <ScrollArea 
+                className="pb-2 w-full" 
+                type="native" 
+                orientation="horizontal"
+              >
+                <TabsList className="flex-nowrap mb-4">
+                  <TabsTrigger value="discover" className="flex-shrink-0">Discover</TabsTrigger>
+                  <TabsTrigger value="recommended" className="flex-shrink-0">Recommended</TabsTrigger>
+                  <TabsTrigger value="builder" className="flex-shrink-0">Practice Builder</TabsTrigger>
+                  <TabsTrigger value="history" className="flex-shrink-0">History</TabsTrigger>
+                </TabsList>
               </ScrollArea>
             </div>
           </div>

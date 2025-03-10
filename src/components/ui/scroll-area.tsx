@@ -3,22 +3,68 @@ import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
 
 import { cn } from "@/lib/utils"
 
-const ScrollArea = React.forwardRef<
-  React.ElementRef<typeof ScrollAreaPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
-  <ScrollAreaPrimitive.Root
+// Define MobileScrollArea that uses native scrolling for touch devices
+const MobileScrollArea = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { orientation?: "horizontal" | "vertical" }
+>(({ className, children, orientation = "vertical", ...props }, ref) => (
+  <div
     ref={ref}
-    className={cn("relative overflow-hidden", className)}
+    className={cn(
+      "overflow-auto overscroll-contain webkit-overflow-scrolling-touch",
+      orientation === "horizontal" && "overflow-x-auto overflow-y-hidden",
+      orientation === "vertical" && "overflow-y-auto overflow-x-hidden",
+      className
+    )}
     {...props}
   >
-    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
+    <div className={cn(
+      orientation === "horizontal" && "inline-flex",
+      orientation === "vertical" && "flex flex-col",
+    )}>
       {children}
-    </ScrollAreaPrimitive.Viewport>
-    <ScrollBar />
-    <ScrollAreaPrimitive.Corner />
-  </ScrollAreaPrimitive.Root>
+    </div>
+  </div>
 ))
+MobileScrollArea.displayName = "MobileScrollArea"
+
+// Enhanced ScrollArea component with better touch support
+const ScrollArea = React.forwardRef<
+  React.ElementRef<typeof ScrollAreaPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & { 
+    orientation?: "horizontal" | "vertical",
+    type?: "auto" | "always" | "scroll" | "hover" | "native"
+  }
+>(({ className, children, orientation = "vertical", type = "auto", ...props }, ref) => {
+  // If native scrolling is requested, use the MobileScrollArea
+  if (type === "native") {
+    return (
+      <MobileScrollArea 
+        ref={ref as any} 
+        className={className} 
+        orientation={orientation}
+        {...props as any}
+      >
+        {children}
+      </MobileScrollArea>
+    )
+  }
+
+  // Otherwise use the Radix UI ScrollArea with enhanced touch support
+  return (
+    <ScrollAreaPrimitive.Root
+      ref={ref}
+      className={cn("relative", className)}
+      {...props}
+    >
+      <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
+        {children}
+      </ScrollAreaPrimitive.Viewport>
+      <ScrollBar orientation={orientation} />
+      <ScrollAreaPrimitive.Corner />
+    </ScrollAreaPrimitive.Root>
+  )
+})
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName
 
 const ScrollBar = React.forwardRef<
@@ -29,7 +75,7 @@ const ScrollBar = React.forwardRef<
     ref={ref}
     orientation={orientation}
     className={cn(
-      "flex touch-none select-none transition-colors",
+      "flex select-none transition-colors",
       orientation === "vertical" &&
         "h-full w-2.5 border-l border-l-transparent p-[1px]",
       orientation === "horizontal" &&
@@ -43,4 +89,4 @@ const ScrollBar = React.forwardRef<
 ))
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName
 
-export { ScrollArea, ScrollBar }
+export { ScrollArea, ScrollBar, MobileScrollArea }

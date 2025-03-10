@@ -66,7 +66,11 @@ const IntrovertMythbusters = () => {
       </div>
 
       <TooltipProvider>
-        <ScrollArea className="h-[400px] pr-4">
+        <ScrollArea 
+          className="h-[400px] pr-4" 
+          type="native" 
+          orientation="vertical"
+        >
           <div className="space-y-2">
             {filteredMyths.map((myth) => (
               <MythItem
