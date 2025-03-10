@@ -1,3 +1,4 @@
+
 // Time range for preferred interaction times
 export interface TimeRange {
   start: string;        // HH:MM format
@@ -138,4 +139,75 @@ export interface NurturingStats {
   healthyRelationships: number;
   needsAttentionCount: number;
   upcomingEvents: number;
+}
+
+// Relationship insight type
+export interface RelationshipInsight {
+  id: string;
+  relationshipId: string;
+  relationshipName: string;
+  title: string;
+  description: string;
+  recommendation: string;
+  type: 'connection_gap' | 'interaction_pattern' | 'energy_impact' | 'conversation_suggestion' | 'relationship_health' | 'other';
+  severity: 'low' | 'medium' | 'high';
+  dateGenerated: string;
+  isNew: boolean;
+}
+
+// Relationship health assessment
+export interface RelationshipHealth {
+  relationshipId: string;
+  relationshipName: string;
+  overallScore: number;        // 0-100 
+  frequency: number;           // 0-100
+  quality: number;             // 0-100
+  reciprocity: number;         // 0-100
+  trend: 'improving' | 'declining' | 'stable';
+  lastAssessment: string;      // Date
+  suggestions: string[];
+}
+
+// Connection suggestion
+export interface ConnectionSuggestion {
+  id: string;
+  relationshipId: string;
+  relationshipName: string;
+  suggested: boolean;         // AI suggested vs manually added
+  suggestedDate: string;
+  suggestedTime: string;
+  interactionType: InteractionType;
+  reasonForSuggestion: string;
+  energyLevelRequired: number; // 1-10
+  priority: number;           // 1-5 (1 is highest)
+  expectedResponse: 'fast' | 'medium' | 'slow' | 'delayed' | 'uncertain';
+}
+
+// Intelligent conversation starter
+export interface IntelligentConversationStarter {
+  id: string;
+  relationshipId: string;
+  topic: string;
+  starter: string;           // The actual conversation starter
+  context: string;           // Why this starter was generated
+  confidenceScore: number;   // 0-1
+  source: 'interest' | 'previous_conversation' | 'past_conversation' | 'life_event' | 'current_event' | 'shared_experience';
+}
+
+// Message template
+export interface MessageTemplate {
+  id: string;
+  name: string;
+  category: string;
+  context: 'check_in' | 'life_event' | 'follow_up' | 'celebration' | 'reconnect';
+  template: string;
+  personalizable: boolean;
+  tone: 'casual' | 'warm' | 'professional';
+  energyRequired: number;  // 1-10
+  
+  // These fields are kept for backward compatibility
+  title?: string;
+  body?: string;
+  appropriate_for?: string[];
+  energy_required?: number;
 }

@@ -17,11 +17,24 @@ import { useToast } from '@/hooks/use-toast';
 import { useSocialBattery } from '@/hooks/useSocialBattery';
 import { addDays, format, isAfter, isBefore, parseISO, subDays } from 'date-fns';
 
-// Mock data (would normally come from API/backend)
+// Import mock data with explicit types
 import { 
   mockRelationships,
   mockScheduler,
-  generateSuggestedInteractions,
+  generateSuggestedInteractions
+} from '@/data/relationshipNurturingData';
+
+// Import types that match the implementation
+import type {
+  RelationshipInsight as SourceRelationshipInsight,
+  MessageTemplate as SourceMessageTemplate,
+  IntelligentConversationStarter as SourceIntelligentConversationStarter,
+  ConnectionSuggestion as SourceConnectionSuggestion,
+  RelationshipHealth as SourceRelationshipHealth
+} from '@/data/relationshipNurturingData';
+
+// Import mock data
+import {
   mockRelationshipInsights,
   mockMessageTemplates,
   mockConnectionSuggestions,
@@ -73,12 +86,22 @@ export function useRelationshipNurturing() {
         const todaysInteractions = interactions.filter(i => i.scheduledDate === today);
         setTodayInteractions(todaysInteractions);
 
-        // Load Intelligent Nurturing Assistant data
-        setInsights(mockRelationshipInsights);
-        setRelationshipHealth(mockRelationshipHealth);
-        setConnectionSuggestions(mockConnectionSuggestions);
-        setConversationStarters(mockIntelligentConversationStarters);
-        setMessageTemplates(mockMessageTemplates);
+        // Load Intelligent Nurturing Assistant data - convert types to ensure compatibility
+        setInsights(mockRelationshipInsights as unknown as RelationshipInsight[]);
+        setRelationshipHealth(mockRelationshipHealth as unknown as RelationshipHealth[]);
+        setConnectionSuggestions(mockConnectionSuggestions as unknown as ConnectionSuggestion[]);
+        setConversationStarters(mockIntelligentConversationStarters as unknown as IntelligentConversationStarter[]);
+        
+        // Convert message templates to match expected format
+        const convertedTemplates = mockMessageTemplates.map(template => ({
+          ...template,
+          title: template.name, // Map name to title
+          body: template.template, // Map template to body
+          appropriate_for: [template.category], // Use category as appropriate_for
+          energy_required: template.energyRequired // Map energyRequired to energy_required
+        }));
+        
+        setMessageTemplates(convertedTemplates as unknown as MessageTemplate[]);
 
         // Calculate stats
         calculateStats(interactions, relationshipsData);

@@ -4,7 +4,12 @@ import {
   Relationship, 
   ScheduledInteraction,
   InteractionType,
-  ConversationTopic
+  ConversationTopic,
+  RelationshipInsight,
+  MessageTemplate,
+  IntelligentConversationStarter,
+  ConnectionSuggestion,
+  RelationshipHealth
 } from '@/types/relationship-nurturing';
 import { addDays, format, subDays } from 'date-fns';
 
@@ -397,72 +402,6 @@ const generateMessagePrompt = (relationship: Relationship): string => {
   }
 };
 
-// Intelligent Nurturing Assistant mock data
-// AI-generated insights about relationship health
-export interface RelationshipInsight {
-  id: string;
-  relationshipId: string;
-  relationshipName: string;
-  type: 'connection_gap' | 'interaction_pattern' | 'energy_impact' | 'conversation_suggestion' | 'relationship_health';
-  title: string;
-  description: string;
-  recommendation: string;
-  severity: 'low' | 'medium' | 'high';
-  dateGenerated: string;
-  isNew: boolean;
-}
-
-// AI-generated message templates for different relationship contexts
-export interface MessageTemplate {
-  id: string;
-  name: string;
-  category: string;
-  context: 'check_in' | 'life_event' | 'follow_up' | 'celebration' | 'reconnect';
-  template: string;
-  personalizable: boolean;
-  tone: 'casual' | 'warm' | 'professional';
-  energyRequired: number; // 1-10
-}
-
-// AI-generated conversation starters based on relationship context
-export interface IntelligentConversationStarter {
-  id: string;
-  relationshipId: string;
-  topic: string;
-  starter: string;
-  context: string;
-  confidenceScore: number; // 0-1
-  source: 'interest' | 'past_conversation' | 'life_event' | 'current_event' | 'shared_experience';
-}
-
-// AI-suggested optimal time to connect
-export interface ConnectionSuggestion {
-  id: string;
-  relationshipId: string;
-  relationshipName: string;
-  suggested: boolean;
-  suggestedDate: string;
-  suggestedTime: string;
-  interactionType: 'message' | 'call' | 'meet' | 'video' | 'email';
-  reasonForSuggestion: string;
-  energyLevelRequired: number; // 1-10
-  priority: number; // 1-5
-  expectedResponse: 'fast' | 'delayed' | 'uncertain';
-}
-
-// Relationship health score
-export interface RelationshipHealth {
-  relationshipId: string;
-  relationshipName: string;
-  overallScore: number; // 0-100
-  frequency: number; // 0-100
-  quality: number; // 0-100
-  reciprocity: number; // 0-100
-  lastAssessment: string;
-  trend: 'improving' | 'stable' | 'declining';
-  suggestions: string[];
-}
-
 // Mock relationship insights
 export const mockRelationshipInsights: RelationshipInsight[] = [
   {
@@ -534,7 +473,7 @@ export const mockMessageTemplates: MessageTemplate[] = [
     name: 'Casual Check-in',
     category: 'close friends',
     context: 'check_in',
-    template: 'Hey {name}, it's been a while! How have you been? Would love to hear what's new in your world.',
+    template: 'Hey {name}, it\'s been a while! How have you been? Would love to hear what\'s new in your world.',
     personalizable: true,
     tone: 'casual',
     energyRequired: 2
@@ -544,7 +483,7 @@ export const mockMessageTemplates: MessageTemplate[] = [
     name: 'Life Event Follow-up',
     category: 'family',
     context: 'life_event',
-    template: 'Hi {name}, I've been thinking about your {event}. How are things going with that? I'm here if you want to talk about it.',
+    template: 'Hi {name}, I\'ve been thinking about your {event}. How are things going with that? I\'m here if you want to talk about it.',
     personalizable: true,
     tone: 'warm',
     energyRequired: 3
@@ -554,7 +493,7 @@ export const mockMessageTemplates: MessageTemplate[] = [
     name: 'Professional Reconnect',
     category: 'work contacts',
     context: 'reconnect',
-    template: 'Hello {name}, I hope you've been well. I was thinking about our last conversation about {topic} and wondered if you'd like to catch up sometime.',
+    template: 'Hello {name}, I hope you\'ve been well. I was thinking about our last conversation about {topic} and wondered if you\'d like to catch up sometime.',
     personalizable: true,
     tone: 'professional',
     energyRequired: 4
@@ -564,7 +503,7 @@ export const mockMessageTemplates: MessageTemplate[] = [
     name: 'Birthday Wish',
     category: 'all',
     context: 'celebration',
-    template: 'Happy Birthday, {name}! 🎉 Hope your day is filled with joy and that the year ahead brings you everything you're hoping for.',
+    template: 'Happy Birthday, {name}! 🎉 Hope your day is filled with joy and that the year ahead brings you everything you\'re hoping for.',
     personalizable: false,
     tone: 'warm',
     energyRequired: 2
@@ -574,7 +513,7 @@ export const mockMessageTemplates: MessageTemplate[] = [
     name: 'Post-Meeting Follow-up',
     category: 'all',
     context: 'follow_up',
-    template: 'It was great to see you yesterday, {name}! I really enjoyed our conversation about {topic}. Let's do it again soon!',
+    template: 'It was great to see you yesterday, {name}! I really enjoyed our conversation about {topic}. Let\'s do it again soon!',
     personalizable: true,
     tone: 'casual',
     energyRequired: 2
@@ -605,7 +544,7 @@ export const mockIntelligentConversationStarters: IntelligentConversationStarter
     id: uuidv4(),
     relationshipId: mockRelationships[1].id,
     topic: 'Watercolor painting progress',
-    starter: 'How's your watercolor class going? Have you created any new pieces you're particularly proud of?',
+    starter: 'How\'s your watercolor class going? Have you created any new pieces you\'re particularly proud of?',
     context: 'Based on recent activity mentioned in conversation',
     confidenceScore: 0.89,
     source: 'past_conversation'
@@ -623,7 +562,7 @@ export const mockIntelligentConversationStarters: IntelligentConversationStarter
     id: uuidv4(),
     relationshipId: mockRelationships[3].id,
     topic: 'New apartment',
-    starter: 'How's the move to your new place going? Found any good local spots in the neighborhood yet?',
+    starter: 'How\'s the move to your new place going? Found any good local spots in the neighborhood yet?',
     context: 'Based on upcoming life event',
     confidenceScore: 0.95,
     source: 'life_event'
@@ -944,6 +883,8 @@ const determineEnergyCost = (relationship: Relationship, interactionType: Intera
     typeCost = 4;  // higher energy
   } else if (interactionType === 'meet') {
     typeCost = 5;  // highest energy
+  } else {
+    typeCost = 2;  // default for 'other'
   }
   
   // Calculate final cost (1-10 scale)
