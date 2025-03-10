@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Brain, Users, MessageCircle, Heart, Archive, Robot, Tool, LineChart, MessageSquareMore } from "lucide-react";
+import { Brain, Users, MessageCircle, Heart, Archive, Bot, Wrench, LineChart, MessageSquareMore } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import CommunicationPreferences from "@/components/connection-builder/CommunicationPreferences";
@@ -48,7 +48,7 @@ const ConnectionBuilder = () => {
         <Card className="shadow-sm">
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <Robot className="h-5 w-5 flex-shrink-0" />
+              <Bot className="h-5 w-5 flex-shrink-0" />
               <span>Intelligent Nurturing Assistant</span>
             </CardTitle>
             <CardDescription className="text-sm mt-1.5">Smart relationship maintenance recommendations</CardDescription>
@@ -61,7 +61,7 @@ const ConnectionBuilder = () => {
         <Card className="shadow-sm">
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <Tool className="h-5 w-5 flex-shrink-0" />
+              <Wrench className="h-5 w-5 flex-shrink-0" />
               <span>Meaningful Interaction Tools</span>
             </CardTitle>
             <CardDescription className="text-sm mt-1.5">Resources for deeper connections</CardDescription>
