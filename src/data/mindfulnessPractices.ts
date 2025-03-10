@@ -1,5 +1,4 @@
-
-import { MindfulnessPractice } from "@/types/mindfulness";
+import { MindfulnessPractice, PracticeFilterOptions } from "@/types/mindfulness";
 import { v4 as uuidv4 } from "uuid";
 
 // Social Recovery Meditations
@@ -143,7 +142,7 @@ Gently return your awareness to the room, carrying this sense of protected space
     description: "A mental technique for maintaining your energy in group settings.",
     script: `Begin by sitting comfortably with your spine relatively straight. [pause]
 
-Take three deep breaths, feeling your body become more grounded with each exhale. [pause]
+Take three deep breaths, feeling your body becoming more grounded with each exhale. [pause]
 
 Bring to mind a social situation where you often feel your energy being depleted. [pause]
 
@@ -641,7 +640,6 @@ export const getRecommendedPractices = (batteryLevel: number, timeOfDay: 'mornin
   return recommendations.slice(0, 3);
 };
 
-// Function to record a completed practice (client-side simulation)
 export const recordCompletedPractice = (
   practiceId: string, 
   effectivenessRating: number, 
