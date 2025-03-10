@@ -3,6 +3,41 @@ import { useState, useEffect } from "react";
 import { SocialEvent } from "@/types/events";
 import { toast } from "sonner";
 
+// Helper function to compare if an event's date/time has been reached
+function compareEventStartTime(eventDate: Date, currentDate: Date): boolean {
+  // Extract date components
+  const eventYear = eventDate.getFullYear();
+  const eventMonth = eventDate.getMonth();
+  const eventDay = eventDate.getDate();
+  const eventHours = eventDate.getHours();
+  const eventMinutes = eventDate.getMinutes();
+  
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
+  const currentDay = currentDate.getDate();
+  const currentHours = currentDate.getHours();
+  const currentMinutes = currentDate.getMinutes();
+  
+  // Compare year, month, day
+  if (eventYear < currentYear) return true;
+  if (eventYear > currentYear) return false;
+  
+  // Same year
+  if (eventMonth < currentMonth) return true;
+  if (eventMonth > currentMonth) return false;
+  
+  // Same year, same month
+  if (eventDay < currentDay) return true;
+  if (eventDay > currentDay) return false;
+  
+  // Same year, same month, same day - compare hours
+  if (eventHours < currentHours) return true;
+  if (eventHours > currentHours) return false;
+  
+  // Same hour - compare minutes
+  return eventMinutes <= currentMinutes;
+}
+
 export function useEventsList() {
   const [events, setEvents] = useState<SocialEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,7 +82,9 @@ export function useEventsList() {
     // If in the future, mark as not depleted (will be handled by useScheduledEvents)
     const now = new Date();
     const eventDate = new Date(event.date);
-    const isPastEvent = eventDate < now;
+    
+    // Check if event has already started (year, month, day, hour, minute comparison)
+    const isPastEvent = compareEventStartTime(eventDate, now);
     
     const newEvent = {
       ...event,
@@ -75,7 +112,7 @@ export function useEventsList() {
         
         // If the event's new date is in the future, it hasn't depleted energy yet
         // If it's in the past, mark it as already depleted 
-        updatedEvent.energyDepleted = eventDate < now;
+        updatedEvent.energyDepleted = compareEventStartTime(eventDate, now);
       }
     }
     

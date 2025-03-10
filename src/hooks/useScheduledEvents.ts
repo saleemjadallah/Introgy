@@ -3,6 +3,41 @@ import { SocialEvent } from "@/types/events";
 import { toast } from "sonner";
 import { BatteryHistoryEntry } from "./social-battery/batteryTypes";
 
+// Helper function to compare if an event's date/time has been reached
+function compareEventStartTime(eventDate: Date, currentDate: Date): boolean {
+  // Extract date components
+  const eventYear = eventDate.getFullYear();
+  const eventMonth = eventDate.getMonth();
+  const eventDay = eventDate.getDate();
+  const eventHours = eventDate.getHours();
+  const eventMinutes = eventDate.getMinutes();
+  
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
+  const currentDay = currentDate.getDate();
+  const currentHours = currentDate.getHours();
+  const currentMinutes = currentDate.getMinutes();
+  
+  // Compare year, month, day
+  if (eventYear < currentYear) return true;
+  if (eventYear > currentYear) return false;
+  
+  // Same year
+  if (eventMonth < currentMonth) return true;
+  if (eventMonth > currentMonth) return false;
+  
+  // Same year, same month
+  if (eventDay < currentDay) return true;
+  if (eventDay > currentDay) return false;
+  
+  // Same year, same month, same day - compare hours
+  if (eventHours < currentHours) return true;
+  if (eventHours > currentHours) return false;
+  
+  // Same hour - compare minutes
+  return eventMinutes <= currentMinutes;
+}
+
 export function useScheduledEvents(
   batteryLevel: number,
   setBatteryLevel: (level: number) => void,
@@ -48,6 +83,9 @@ export function useScheduledEvents(
     let totalDepletedEnergy = 0;
     let deplatedEvents: string[] = [];
     
+    // Flag to track if we need to reset any incorrectly depleted future events
+    let needToFixIncorrectlyDepletedEvents = false;
+    
     // Get fresh events data from localStorage
     try {
       const savedEvents = localStorage.getItem("socialEvents");
@@ -60,8 +98,23 @@ export function useScheduledEvents(
         parsedEvents.forEach((event: SocialEvent) => {
           const eventDate = new Date(event.date);
           
-          // Check if event has started and hasn't already depleted energy
-          if (eventDate <= now && !event.energyDepleted) {
+          // Check if event has started (compare year, month, day, hours, minutes)
+          const isEventStarted = compareEventStartTime(eventDate, now);
+          
+          // Check if there are any events incorrectly marked as depleted
+          if (!isEventStarted && event.energyDepleted) {
+            // This is a future event incorrectly marked as depleted - fix it
+            console.log(`Fixing incorrectly depleted future event: ${event.name}`);
+            const updatedEvent: SocialEvent = {
+              ...event,
+              energyDepleted: false // Reset to not depleted since it's in the future
+            };
+            updateEvent(updatedEvent);
+            needToFixIncorrectlyDepletedEvents = true;
+          }
+          
+          // Only deplete battery for events that have started but haven't been depleted yet
+          if (isEventStarted && !event.energyDepleted) {
             // Mark event as energy depleted
             const updatedEvent: SocialEvent = {
               ...event,
@@ -74,6 +127,13 @@ export function useScheduledEvents(
             deplatedEvents.push(event.name);
           }
         });
+        
+        // Notify about fixed events
+        if (needToFixIncorrectlyDepletedEvents) {
+          toast(`Fixed event energy settings`, {
+            description: `Future events will now only deplete battery at their scheduled time.`,
+          });
+        }
         
         // Update battery level if any events depleted energy
         if (batteryUpdated) {
@@ -90,11 +150,11 @@ export function useScheduledEvents(
           
           if (deplatedEvents.length === 1) {
             toast(`Energy depleted for event: ${deplatedEvents[0]}`, {
-              description: `Your social battery decreased by ${totalDepletedEnergy}%`,
+              description: `Your social battery decreased by ${totalDepletedEnergy}% as the scheduled time arrived.`,
             });
           } else if (deplatedEvents.length > 1) {
             toast(`Energy depleted for ${deplatedEvents.length} events`, {
-              description: `Your social battery decreased by ${totalDepletedEnergy}%`,
+              description: `Your social battery decreased by ${totalDepletedEnergy}% as the scheduled times arrived.`,
             });
           }
         }
@@ -108,10 +168,11 @@ export function useScheduledEvents(
     // Initial check when component mounts
     checkScheduledEvents();
     
-    // Set up interval to check every minute
+    // Set up interval to check every 30 seconds
     intervalRef.current = window.setInterval(() => {
+      console.log("Checking scheduled events...");
       checkScheduledEvents();
-    }, 60000); // Check every minute
+    }, 30000); // Check every 30 seconds for more responsive updates
     
     // Clean up interval on unmount
     return () => {
