@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MindfulnessCategoryList from "./MindfulnessCategoryList";
 import MindfulnessPlayer from "./MindfulnessPlayer";
 import PracticeRecommendations from "./PracticeRecommendations";
+import PracticeBuilder from "./PracticeBuilder";
 import { MindfulnessPractice } from "@/types/mindfulness";
 import { getPractices, getPracticeById } from "@/data/mindfulness";
 
@@ -76,9 +77,10 @@ const MindfulnessExercises = () => {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="discover" className="w-full">
-        <TabsList className="w-full grid grid-cols-3">
+        <TabsList className="w-full grid grid-cols-4">
           <TabsTrigger value="discover">Discover</TabsTrigger>
           <TabsTrigger value="recommended">Recommended</TabsTrigger>
+          <TabsTrigger value="builder">Practice Builder</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>
         
@@ -117,6 +119,12 @@ const MindfulnessExercises = () => {
               completedPractices={completedPractices}
               onSelectPractice={handleSelectPractice}
             />
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="builder">
+          <div className="mt-6">
+            <PracticeBuilder />
           </div>
         </TabsContent>
         
