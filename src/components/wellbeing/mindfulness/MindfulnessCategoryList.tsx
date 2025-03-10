@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Heart, 
@@ -17,7 +16,7 @@ import {
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { MindfulnessCategory } from "@/types/mindfulness";
-import { getPractices } from "@/data/mindfulnessPractices";
+import { getPractices } from "@/data/mindfulness";
 
 interface MindfulnessCategoryListProps {
   onSelectPractice: (id: string) => void;
