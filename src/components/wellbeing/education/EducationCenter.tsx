@@ -5,25 +5,48 @@ import IntrovertGlossary from "@/components/wellbeing/IntrovertGlossary";
 import IntrovertMythbusters from "@/components/wellbeing/IntrovertMythbusters";
 import FamousIntrovertsGallery from "@/components/wellbeing/FamousIntrovertsGallery";
 import { Book, AlertCircle, User } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const EducationCenter = () => {
+  const isMobile = useIsMobile();
+
   return (
     <div className="space-y-6">
       <Tabs defaultValue="glossary" className="w-full">
-        <TabsList className="w-full grid grid-cols-3">
-          <TabsTrigger value="glossary">
-            <Book className="h-4 w-4 mr-2" />
-            Psychology Glossary
-          </TabsTrigger>
-          <TabsTrigger value="mythbusters">
-            <AlertCircle className="h-4 w-4 mr-2" />
-            Mythbusters
-          </TabsTrigger>
-          <TabsTrigger value="famous">
-            <User className="h-4 w-4 mr-2" />
-            Famous Introverts
-          </TabsTrigger>
-        </TabsList>
+        {isMobile ? (
+          <ScrollArea className="w-full">
+            <TabsList className="inline-flex w-auto px-4 py-2">
+              <TabsTrigger value="glossary" className="whitespace-nowrap">
+                <Book className="h-4 w-4 mr-2" />
+                Psychology Glossary
+              </TabsTrigger>
+              <TabsTrigger value="mythbusters" className="whitespace-nowrap">
+                <AlertCircle className="h-4 w-4 mr-2" />
+                Mythbusters
+              </TabsTrigger>
+              <TabsTrigger value="famous" className="whitespace-nowrap">
+                <User className="h-4 w-4 mr-2" />
+                Famous Introverts
+              </TabsTrigger>
+            </TabsList>
+          </ScrollArea>
+        ) : (
+          <TabsList className="w-full grid grid-cols-3">
+            <TabsTrigger value="glossary">
+              <Book className="h-4 w-4 mr-2" />
+              Psychology Glossary
+            </TabsTrigger>
+            <TabsTrigger value="mythbusters">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              Mythbusters
+            </TabsTrigger>
+            <TabsTrigger value="famous">
+              <User className="h-4 w-4 mr-2" />
+              Famous Introverts
+            </TabsTrigger>
+          </TabsList>
+        )}
         
         <TabsContent value="glossary">
           <div className="mt-6">
