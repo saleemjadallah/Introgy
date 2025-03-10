@@ -398,6 +398,15 @@ const generateMessagePrompt = (relationship: Relationship): string => {
 };
 
 // Intelligent Nurturing Assistant mock data
+// Import interfaces from types
+import { 
+  RelationshipInsight,
+  MessageTemplate,
+  IntelligentConversationStarter,
+  ConnectionSuggestion,
+  RelationshipHealth 
+} from '@/types/relationship-nurturing';
+
 // AI-generated insights about relationship health
 export interface RelationshipInsight {
   id: string;
@@ -944,6 +953,8 @@ const determineEnergyCost = (relationship: Relationship, interactionType: Intera
     typeCost = 4;  // higher energy
   } else if (interactionType === 'meet') {
     typeCost = 5;  // highest energy
+  } else {
+    typeCost = 2;  // default for 'other'
   }
   
   // Calculate final cost (1-10 scale)

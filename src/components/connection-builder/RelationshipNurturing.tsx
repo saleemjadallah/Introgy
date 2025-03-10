@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useRelationshipNurturing } from '@/hooks/useRelationshipNurturing';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -204,7 +205,7 @@ const SuggestionsTab = ({ suggestions, onSchedule, onSkip }) => {
       </div>
       
       <div className="space-y-3">
-        {suggestions.length === 0 ? (
+        {!suggestions || suggestions.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground">No connection suggestions available at this time.</p>
           </div>
@@ -272,6 +273,8 @@ const SuggestionsTab = ({ suggestions, onSchedule, onSkip }) => {
 const StartersTab = ({ starters, relationships, onGenerateMore, onCopy }) => {
   // Group starters by relationship
   const getRelationshipGroups = () => {
+    if (!starters || starters.length === 0) return {};
+    
     const groups = {};
     starters.forEach(starter => {
       const relationshipId = starter.relationshipId;
@@ -290,7 +293,7 @@ const StartersTab = ({ starters, relationships, onGenerateMore, onCopy }) => {
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-xl font-medium">AI-Generated Conversation Starters</h3>
         <div className="space-x-2">
-          {relationships.length > 0 && (
+          {relationships && relationships.length > 0 && (
             <select 
               className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm"
               onChange={(e) => e.target.value && onGenerateMore(e.target.value)}
@@ -383,7 +386,7 @@ const HealthTab = ({ healthData }) => {
       </div>
       
       <div className="space-y-4">
-        {healthData.length === 0 ? (
+        {!healthData || healthData.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground">No relationship health data available at this time.</p>
           </div>
@@ -426,7 +429,7 @@ const HealthTab = ({ healthData }) => {
                   </div>
                 </div>
                 
-                {health.suggestions.length > 0 && (
+                {health.suggestions && health.suggestions.length > 0 && (
                   <div className="mt-2">
                     <p className="text-xs font-medium mb-1">Suggestions for improvement:</p>
                     <ul className="text-xs text-muted-foreground">
