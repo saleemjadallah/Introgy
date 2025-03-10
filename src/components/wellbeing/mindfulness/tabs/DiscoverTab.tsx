@@ -25,11 +25,13 @@ const DiscoverTab = ({
   return (
     <div className={`grid grid-cols-1 ${isMobile ? '' : 'lg:grid-cols-3'} gap-4 mt-4 w-full max-w-full`}>
       <div className={`${isMobile ? 'mb-4' : 'lg:col-span-1'} max-h-[calc(100vh-250px)]`}>
-        <ScrollArea className="h-full pr-4">
-          <MindfulnessCategoryList 
-            onSelectPractice={onSelectPractice}
-            selectedPracticeId={selectedPracticeId}
-          />
+        <ScrollArea className="h-full pr-4 w-full">
+          <div className="pr-2">
+            <MindfulnessCategoryList 
+              onSelectPractice={onSelectPractice}
+              selectedPracticeId={selectedPracticeId}
+            />
+          </div>
         </ScrollArea>
       </div>
       

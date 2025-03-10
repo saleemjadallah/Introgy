@@ -26,7 +26,7 @@ const Wellbeing = () => {
       </div>
 
       <ScrollArea className="w-full pb-2">
-        <div className="flex min-w-max gap-2">
+        <div className="flex min-w-max gap-2 pb-3 px-1">
           <Button 
             variant={activeSection === 'overview' ? 'default' : 'outline'} 
             onClick={() => setActiveSection('overview')}
