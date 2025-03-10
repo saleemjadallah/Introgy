@@ -4,7 +4,12 @@ import {
   Relationship, 
   ScheduledInteraction,
   InteractionType,
-  ConversationTopic
+  ConversationTopic,
+  RelationshipInsight,
+  MessageTemplate,
+  IntelligentConversationStarter,
+  ConnectionSuggestion,
+  RelationshipHealth
 } from '@/types/relationship-nurturing';
 import { addDays, format, subDays } from 'date-fns';
 
@@ -396,81 +401,6 @@ const generateMessagePrompt = (relationship: Relationship): string => {
     return `It's been a while since we last connected. How have you been? Would love to catch up soon.`;
   }
 };
-
-// Intelligent Nurturing Assistant mock data
-// Import interfaces from types
-import { 
-  RelationshipInsight,
-  MessageTemplate,
-  IntelligentConversationStarter,
-  ConnectionSuggestion,
-  RelationshipHealth 
-} from '@/types/relationship-nurturing';
-
-// AI-generated insights about relationship health
-export interface RelationshipInsight {
-  id: string;
-  relationshipId: string;
-  relationshipName: string;
-  type: 'connection_gap' | 'interaction_pattern' | 'energy_impact' | 'conversation_suggestion' | 'relationship_health';
-  title: string;
-  description: string;
-  recommendation: string;
-  severity: 'low' | 'medium' | 'high';
-  dateGenerated: string;
-  isNew: boolean;
-}
-
-// AI-generated message templates for different relationship contexts
-export interface MessageTemplate {
-  id: string;
-  name: string;
-  category: string;
-  context: 'check_in' | 'life_event' | 'follow_up' | 'celebration' | 'reconnect';
-  template: string;
-  personalizable: boolean;
-  tone: 'casual' | 'warm' | 'professional';
-  energyRequired: number; // 1-10
-}
-
-// AI-generated conversation starters based on relationship context
-export interface IntelligentConversationStarter {
-  id: string;
-  relationshipId: string;
-  topic: string;
-  starter: string;
-  context: string;
-  confidenceScore: number; // 0-1
-  source: 'interest' | 'past_conversation' | 'life_event' | 'current_event' | 'shared_experience';
-}
-
-// AI-suggested optimal time to connect
-export interface ConnectionSuggestion {
-  id: string;
-  relationshipId: string;
-  relationshipName: string;
-  suggested: boolean;
-  suggestedDate: string;
-  suggestedTime: string;
-  interactionType: 'message' | 'call' | 'meet' | 'video' | 'email';
-  reasonForSuggestion: string;
-  energyLevelRequired: number; // 1-10
-  priority: number; // 1-5
-  expectedResponse: 'fast' | 'delayed' | 'uncertain';
-}
-
-// Relationship health score
-export interface RelationshipHealth {
-  relationshipId: string;
-  relationshipName: string;
-  overallScore: number; // 0-100
-  frequency: number; // 0-100
-  quality: number; // 0-100
-  reciprocity: number; // 0-100
-  lastAssessment: string;
-  trend: 'improving' | 'stable' | 'declining';
-  suggestions: string[];
-}
 
 // Mock relationship insights
 export const mockRelationshipInsights: RelationshipInsight[] = [
