@@ -48,18 +48,11 @@ const EventForm = ({ initialEvent, onSubmit, onCancel }: EventFormProps) => {
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (!selectedDate) return;
     
-    // Create a new Date object to avoid reference issues
-    const newDate = new Date(selectedDate);
-    setDate(newDate);
+    // selectedDate already has the proper hours and minutes from DateTimeSelectors component
+    setDate(selectedDate);
     
-    // Preserve the time from the existing selection
-    const hours = event.date ? new Date(event.date).getHours() : new Date().getHours();
-    const minutes = event.date ? new Date(event.date).getMinutes() : new Date().getMinutes();
-    
-    newDate.setHours(hours);
-    newDate.setMinutes(minutes);
-    
-    handleInputChange("date", newDate);
+    // Pass the date directly to the event state
+    handleInputChange("date", selectedDate);
   };
 
   const handleTimeChange = (timeString: string) => {
