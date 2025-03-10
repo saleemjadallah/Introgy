@@ -1,9 +1,10 @@
 
 import { useState } from "react";
-import { Brain, Users, MessageCircle, Heart } from "lucide-react";
+import { Brain, Users, MessageCircle, Heart, Archive, Bot, Wrench, LineChart, MessageSquareMore } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import CommunicationPreferences from "@/components/connection-builder/CommunicationPreferences";
+import RelationshipInventory from "@/components/connection-builder/relationship-inventory/RelationshipInventory";
 
 const ConnectionBuilder = () => {
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
@@ -12,6 +13,8 @@ const ConnectionBuilder = () => {
     switch (activeFeature) {
       case 'communication-preferences':
         return <CommunicationPreferences />;
+      case 'relationship-inventory':
+        return <RelationshipInventory />;
       default:
         return renderFeatureCards();
     }
@@ -20,13 +23,61 @@ const ConnectionBuilder = () => {
   const renderFeatureCards = () => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className={`shadow-sm ${activeFeature === 'relationship-inventory' ? 'border-primary' : ''}`}>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <Archive className="h-5 w-5 flex-shrink-0" />
+              <span>Relationship Inventory System</span>
+            </CardTitle>
+            <CardDescription className="text-sm mt-1.5">Organize and visualize your important connections</CardDescription>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Map and maintain your relationships with an intuitive visual system designed for introverts.
+            </p>
+            <Button 
+              onClick={() => setActiveFeature('relationship-inventory')}
+              className="w-full py-5 sm:py-2 text-base sm:text-sm mt-2"
+              size="lg"
+            >
+              View Relationships
+            </Button>
+          </CardContent>
+        </Card>
+
         <Card className="shadow-sm">
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <Users className="h-5 w-5 flex-shrink-0" />
-              <span>Compatibility Finder</span>
+              <Bot className="h-5 w-5 flex-shrink-0" />
+              <span>Intelligent Nurturing Assistant</span>
             </CardTitle>
-            <CardDescription className="text-sm mt-1.5">Find people who match your social style</CardDescription>
+            <CardDescription className="text-sm mt-1.5">Smart relationship maintenance recommendations</CardDescription>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-4">
+            <p className="text-sm text-muted-foreground">Coming soon in the next update!</p>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <Wrench className="h-5 w-5 flex-shrink-0" />
+              <span>Meaningful Interaction Tools</span>
+            </CardTitle>
+            <CardDescription className="text-sm mt-1.5">Resources for deeper connections</CardDescription>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-4">
+            <p className="text-sm text-muted-foreground">Coming soon in the next update!</p>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <LineChart className="h-5 w-5 flex-shrink-0" />
+              <span>Relationship Insights</span>
+            </CardTitle>
+            <CardDescription className="text-sm mt-1.5">Analytics and patterns in your connections</CardDescription>
           </CardHeader>
           <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-4">
             <p className="text-sm text-muted-foreground">Coming soon in the next update!</p>
@@ -55,13 +106,13 @@ const ConnectionBuilder = () => {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2 shadow-sm">
+        <Card className="shadow-sm">
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <Heart className="h-5 w-5 flex-shrink-0" />
-              <span>Relationship Nurturing</span>
+              <MessageSquareMore className="h-5 w-5 flex-shrink-0" />
+              <span>Authentic Communication Support</span>
             </CardTitle>
-            <CardDescription className="text-sm mt-1.5">Tools to maintain important connections with less effort</CardDescription>
+            <CardDescription className="text-sm mt-1.5">Tools for genuine expression</CardDescription>
           </CardHeader>
           <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-4">
             <p className="text-sm text-muted-foreground">Coming soon in the next update!</p>
