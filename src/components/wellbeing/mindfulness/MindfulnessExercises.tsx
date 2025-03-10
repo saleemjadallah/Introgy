@@ -5,9 +5,11 @@ import { useMindfulnessPractices } from "./hooks/useMindfulnessPractices";
 import DiscoverTab from "./tabs/DiscoverTab";
 import RecommendedTab from "./tabs/RecommendedTab";
 import HistoryTab from "./tabs/HistoryTab";
+import MindfulMomentsTab from "./tabs/MindfulMomentsTab";
 import PracticeBuilder from "./PracticeBuilder";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { MountainSnow, Sparkles } from "lucide-react";
 
 const MindfulnessExercises = () => {
   const { 
@@ -26,15 +28,22 @@ const MindfulnessExercises = () => {
     <div className="space-y-4 w-full max-w-full">
         <Tabs defaultValue="discover" className="w-full">
           <div className="sticky top-0 bg-background z-10 pb-2">
-            <div className="w-full">
+            <div className="relative overflow-x-auto">
               <ScrollArea 
-                className="pb-2 w-full" 
-                type="native" 
+                className="w-full pb-2" 
+                type="scroll" 
                 orientation="horizontal"
               >
-                <TabsList className="flex-nowrap mb-4">
-                  <TabsTrigger value="discover" className="flex-shrink-0">Discover</TabsTrigger>
+                <TabsList className="min-w-max flex-nowrap mb-4">
+                  <TabsTrigger value="discover" className="flex-shrink-0">
+                    <MountainSnow className="h-4 w-4 mr-2" />
+                    Discover
+                  </TabsTrigger>
                   <TabsTrigger value="recommended" className="flex-shrink-0">Recommended</TabsTrigger>
+                  <TabsTrigger value="moments" className="flex-shrink-0">
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Mindful Moments
+                  </TabsTrigger>
                   <TabsTrigger value="builder" className="flex-shrink-0">Practice Builder</TabsTrigger>
                   <TabsTrigger value="history" className="flex-shrink-0">History</TabsTrigger>
                 </TabsList>
@@ -59,6 +68,12 @@ const MindfulnessExercises = () => {
               completedPractices={completedPractices}
               onSelectPractice={handleSelectPractice}
             />
+          </TabsContent>
+
+          <TabsContent value="moments" className="w-full max-w-full px-0">
+            <div className="mt-4">
+              <MindfulMomentsTab />
+            </div>
           </TabsContent>
           
           <TabsContent value="builder" className="w-full max-w-full px-0">
