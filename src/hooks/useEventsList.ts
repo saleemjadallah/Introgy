@@ -42,10 +42,19 @@ export function useEventsList() {
   };
 
   const addEvent = (event: SocialEvent) => {
+    // Create event with energyDepleted flag
+    // If the event is in the past, mark it as already depleted
+    // If in the future, mark as not depleted (will be handled by useScheduledEvents)
+    const now = new Date();
+    const eventDate = new Date(event.date);
+    const isPastEvent = eventDate < now;
+    
     const newEvent = {
       ...event,
       id: crypto.randomUUID(),
+      energyDepleted: isPastEvent // Only mark as depleted if it's a past event
     };
+    
     const updatedEvents = [...events, newEvent];
     saveEvents(updatedEvents);
     toast.success("Event created successfully");
@@ -54,6 +63,21 @@ export function useEventsList() {
 
   const updateEvent = (updatedEvent: SocialEvent) => {
     if (!updatedEvent.id) return;
+    
+    // Find the original event
+    const originalEvent = events.find(event => event.id === updatedEvent.id);
+    
+    if (originalEvent) {
+      // If date has changed, reset the energyDepleted flag appropriately
+      if (originalEvent.date.toString() !== updatedEvent.date.toString()) {
+        const now = new Date();
+        const eventDate = new Date(updatedEvent.date);
+        
+        // If the event's new date is in the future, it hasn't depleted energy yet
+        // If it's in the past, mark it as already depleted 
+        updatedEvent.energyDepleted = eventDate < now;
+      }
+    }
     
     const updatedEvents = events.map(event => 
       event.id === updatedEvent.id ? updatedEvent : event

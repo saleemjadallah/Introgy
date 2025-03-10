@@ -12,6 +12,7 @@ export interface SocialEvent {
   notes?: string;
   isRecurring?: boolean;
   recurringFrequency?: RecurringFrequency;
+  energyDepleted?: boolean; // Track if this event has already depleted the battery
 }
 
 export type EventType = 

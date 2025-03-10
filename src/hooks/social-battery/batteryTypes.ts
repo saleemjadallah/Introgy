@@ -25,4 +25,5 @@ export interface UseSocialBatteryReturn {
   handleActivitySelect: (activity: RechargeActivity | DepletingActivity) => void;
   addActivity: (activity: SocialActivity) => RechargeActivity | DepletingActivity;
   recordSleepQuality: (quality: SleepQuality) => void;
+  checkScheduledEvents: () => void;
 }
