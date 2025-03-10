@@ -27,16 +27,18 @@ const MindfulnessExercises = () => {
       <ScrollArea className="w-full">
         <Tabs defaultValue="discover" className="w-full">
           <div className="sticky top-0 bg-background z-10 pb-2">
-            <ScrollArea className="pb-2 w-full">
-              <div className="min-w-max">
-                <TabsList className={`${isMobile ? 'w-auto min-w-full' : 'w-full'} mb-4 flex flex-nowrap`}>
-                  <TabsTrigger value="discover" className="flex-shrink-0">Discover</TabsTrigger>
-                  <TabsTrigger value="recommended" className="flex-shrink-0">Recommended</TabsTrigger>
-                  <TabsTrigger value="builder" className="flex-shrink-0">Practice Builder</TabsTrigger>
-                  <TabsTrigger value="history" className="flex-shrink-0">History</TabsTrigger>
-                </TabsList>
-              </div>
-            </ScrollArea>
+            <div className="relative overflow-x-auto w-full">
+              <ScrollArea className="pb-2 w-full" type="scroll">
+                <div className="min-w-max pr-4">
+                  <TabsList className={`${isMobile ? 'w-auto min-w-full' : 'w-full'} mb-4 flex flex-nowrap`}>
+                    <TabsTrigger value="discover" className="flex-shrink-0">Discover</TabsTrigger>
+                    <TabsTrigger value="recommended" className="flex-shrink-0">Recommended</TabsTrigger>
+                    <TabsTrigger value="builder" className="flex-shrink-0">Practice Builder</TabsTrigger>
+                    <TabsTrigger value="history" className="flex-shrink-0">History</TabsTrigger>
+                  </TabsList>
+                </div>
+              </ScrollArea>
+            </div>
           </div>
           
           <TabsContent value="discover" className="w-full max-w-full px-0">

@@ -1,4 +1,3 @@
-
 import { LineChart, BookOpen, Users, Battery, Book, ChevronDown, AlertCircle, User, MessageSquare, MountainSnow } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -25,42 +24,44 @@ const Wellbeing = () => {
         <p className="text-muted-foreground">Resources to support your introvert wellbeing</p>
       </div>
 
-      <ScrollArea className="w-full pb-2">
-        <div className="flex min-w-max gap-2 pb-3 px-1">
-          <Button 
-            variant={activeSection === 'overview' ? 'default' : 'outline'} 
-            onClick={() => setActiveSection('overview')}
-            className="flex-shrink-0"
-          >
-            <LineChart className="h-4 w-4 mr-2" />
-            Overview
-          </Button>
-          <Button 
-            variant={activeSection === 'education' ? 'default' : 'outline'} 
-            onClick={() => setActiveSection('education')}
-            className="flex-shrink-0"
-          >
-            <BookOpen className="h-4 w-4 mr-2" />
-            Education Center
-          </Button>
-          <Button 
-            variant={activeSection === 'mindfulness' ? 'default' : 'outline'} 
-            onClick={() => setActiveSection('mindfulness')}
-            className="flex-shrink-0"
-          >
-            <MountainSnow className="h-4 w-4 mr-2" />
-            Mindfulness Exercises
-          </Button>
-          <Button 
-            variant={activeSection === 'wisdom' ? 'default' : 'outline'} 
-            onClick={() => setActiveSection('wisdom')}
-            className="flex-shrink-0"
-          >
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Community Wisdom
-          </Button>
-        </div>
-      </ScrollArea>
+      <div className="relative overflow-x-auto w-full">
+        <ScrollArea className="w-full" type="scroll">
+          <div className="flex min-w-max gap-2 pb-3 px-1">
+            <Button 
+              variant={activeSection === 'overview' ? 'default' : 'outline'} 
+              onClick={() => setActiveSection('overview')}
+              className="flex-shrink-0"
+            >
+              <LineChart className="h-4 w-4 mr-2" />
+              Overview
+            </Button>
+            <Button 
+              variant={activeSection === 'education' ? 'default' : 'outline'} 
+              onClick={() => setActiveSection('education')}
+              className="flex-shrink-0"
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              Education Center
+            </Button>
+            <Button 
+              variant={activeSection === 'mindfulness' ? 'default' : 'outline'} 
+              onClick={() => setActiveSection('mindfulness')}
+              className="flex-shrink-0"
+            >
+              <MountainSnow className="h-4 w-4 mr-2" />
+              Mindfulness Exercises
+            </Button>
+            <Button 
+              variant={activeSection === 'wisdom' ? 'default' : 'outline'} 
+              onClick={() => setActiveSection('wisdom')}
+              className="flex-shrink-0"
+            >
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Community Wisdom
+            </Button>
+          </div>
+        </ScrollArea>
+      </div>
 
       {activeSection === 'overview' ? (
         <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2'} gap-4 w-full max-w-full`}>
