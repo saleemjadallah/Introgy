@@ -1,3 +1,4 @@
+
 import { LineChart, BookOpen, Users, Battery, Book, ChevronDown, AlertCircle, User, MessageSquare, MountainSnow } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -27,7 +28,7 @@ const Wellbeing = () => {
       <div className="w-full">
         <ScrollArea 
           className="w-full" 
-          type="native" 
+          type="scroll" 
           orientation="horizontal"
         >
           <div className="flex gap-2 pb-3 px-1 whitespace-nowrap">

@@ -36,7 +36,7 @@ const ScrollArea = React.forwardRef<
     type?: "auto" | "always" | "scroll" | "hover" | "native"
   }
 >(({ className, children, orientation = "vertical", type = "auto", ...props }, ref) => {
-  // If native scrolling is requested, use the MobileScrollArea
+  // If type is "native", use the MobileScrollArea
   if (type === "native") {
     return (
       <MobileScrollArea 
@@ -50,11 +50,16 @@ const ScrollArea = React.forwardRef<
     )
   }
 
+  // For other types, pass the type to the Radix ScrollArea if it's not "native"
+  // This resolves the TypeScript error by filtering out the "native" type
+  const validType = type !== "native" ? type : undefined;
+
   // Otherwise use the Radix UI ScrollArea with enhanced touch support
   return (
     <ScrollAreaPrimitive.Root
       ref={ref}
       className={cn("relative", className)}
+      type={validType}
       {...props}
     >
       <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
