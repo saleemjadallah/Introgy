@@ -24,13 +24,13 @@ export function useSocialBattery(): UseSocialBatteryReturn {
   const { lastRechargeDate } = useOvernightRecharge(
     batteryLevel, 
     setBatteryLevel,
-    (level: number) => addHistoryEntry({ date: new Date(), level })
+    addHistoryEntry
   );
   
   const { recordSleepQuality } = useSleepQuality(
     batteryLevel,
     setBatteryLevel,
-    (level: number) => addHistoryEntry({ date: new Date(), level })
+    addHistoryEntry
   );
   
   const { handleActivitySelect, addActivity } = useActivityManagement(
@@ -42,7 +42,7 @@ export function useSocialBattery(): UseSocialBatteryReturn {
   const { checkScheduledEvents } = useScheduledEvents(
     batteryLevel,
     setBatteryLevel,
-    (entry: BatteryHistoryEntry) => addHistoryEntry(entry)
+    addHistoryEntry
   );
 
   const handleSliderChange = (value: number[]) => {

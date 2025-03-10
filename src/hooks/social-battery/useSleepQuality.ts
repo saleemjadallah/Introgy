@@ -3,11 +3,12 @@ import { toast } from "sonner";
 import { SLEEP_QUALITY_ADJUSTMENTS } from "./batteryUtils";
 import type { SleepQuality } from "@/components/social-battery/SleepQualityDialog";
 import { RechargeActivity } from "@/types/activity";
+import { BatteryHistoryEntry } from "./batteryTypes";
 
 export function useSleepQuality(
   batteryLevel: number,
   setBatteryLevel: (level: number) => void,
-  addHistoryEntry: (level: number) => void
+  addHistoryEntry: (entry: BatteryHistoryEntry) => void
 ) {
   const recordSleepQuality = (quality: SleepQuality) => {
     const adjustment = SLEEP_QUALITY_ADJUSTMENTS[quality];
@@ -27,7 +28,7 @@ export function useSleepQuality(
     } as RechargeActivity;
     
     // Add to battery history
-    addHistoryEntry(newLevel);
+    addHistoryEntry({ date: new Date(), level: newLevel });
     
     // Show toast notification
     if (adjustment > 0) {

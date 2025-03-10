@@ -23,13 +23,9 @@ export function useBatteryHistory(batteryLevel: number) {
 
   return {
     batteryHistory,
-    addHistoryEntry: (level: number) => {
-      const newHistoryEntry = {
-        date: new Date(),
-        level
-      };
-      setBatteryHistory(prev => [...prev, newHistoryEntry]);
-      localStorage.setItem("batteryHistory", JSON.stringify([...batteryHistory, newHistoryEntry]));
+    addHistoryEntry: (entry: BatteryHistoryEntry) => {
+      setBatteryHistory(prev => [...prev, entry]);
+      localStorage.setItem("batteryHistory", JSON.stringify([...batteryHistory, entry]));
     }
   };
 }

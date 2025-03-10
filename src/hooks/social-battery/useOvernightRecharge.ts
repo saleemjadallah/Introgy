@@ -2,13 +2,13 @@
 import { useState, useEffect } from "react";
 import { getStoredEvents, hasLateNightEvents } from "./batteryUtils";
 import { toast } from "sonner";
-import { RechargeActivity } from "@/types/activity";
+import { BatteryHistoryEntry } from "./batteryTypes";
 import { startOfDay } from "date-fns";
 
 export function useOvernightRecharge(
   batteryLevel: number, 
   setBatteryLevel: (level: number) => void,
-  addHistoryEntry: (level: number) => void
+  addHistoryEntry: (entry: BatteryHistoryEntry) => void
 ) {
   const [lastRechargeDate, setLastRechargeDate] = useState<Date>(() => {
     const saved = localStorage.getItem("lastNightlyRecharge");
@@ -44,7 +44,7 @@ export function useOvernightRecharge(
           });
           
           // Add to history
-          addHistoryEntry(newLevel);
+          addHistoryEntry({ date: new Date(), level: newLevel });
         }
       }
       
