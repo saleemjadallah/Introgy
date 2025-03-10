@@ -25,7 +25,7 @@ const Wellbeing = () => {
         <p className="text-muted-foreground">Resources to support your introvert wellbeing</p>
       </div>
 
-      <ScrollArea className="w-full pb-2" orientation="horizontal">
+      <ScrollArea className="w-full pb-2">
         <div className="flex min-w-max gap-2">
           <Button 
             variant={activeSection === 'overview' ? 'default' : 'outline'} 

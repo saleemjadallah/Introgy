@@ -27,7 +27,7 @@ const MindfulnessExercises = () => {
       <ScrollArea className="w-full">
         <Tabs defaultValue="discover" className="w-full">
           <div className="sticky top-0 bg-background z-10 pb-2">
-            <ScrollArea className="pb-2" orientation="horizontal">
+            <ScrollArea className="pb-2">
               <TabsList className={`${isMobile ? 'w-auto min-w-full' : 'w-full'} mb-4 flex flex-nowrap`}>
                 <TabsTrigger value="discover" className="flex-shrink-0">Discover</TabsTrigger>
                 <TabsTrigger value="recommended" className="flex-shrink-0">Recommended</TabsTrigger>
