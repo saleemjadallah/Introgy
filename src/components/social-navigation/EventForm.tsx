@@ -47,16 +47,19 @@ const EventForm = ({ initialEvent, onSubmit, onCancel }: EventFormProps) => {
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (!selectedDate) return;
-    setDate(selectedDate);
+    
+    // Create a new Date object to avoid reference issues
+    const newDate = new Date(selectedDate);
+    setDate(newDate);
     
     // Preserve the time from the existing selection
     const hours = event.date ? new Date(event.date).getHours() : new Date().getHours();
     const minutes = event.date ? new Date(event.date).getMinutes() : new Date().getMinutes();
     
-    selectedDate.setHours(hours);
-    selectedDate.setMinutes(minutes);
+    newDate.setHours(hours);
+    newDate.setMinutes(minutes);
     
-    handleInputChange("date", selectedDate);
+    handleInputChange("date", newDate);
   };
 
   const handleTimeChange = (timeString: string) => {
