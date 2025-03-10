@@ -24,9 +24,9 @@ const Wellbeing = () => {
         <p className="text-muted-foreground">Resources to support your introvert wellbeing</p>
       </div>
 
-      <div className="relative overflow-x-auto w-full">
-        <ScrollArea className="w-full" type="scroll">
-          <div className="flex min-w-max gap-2 pb-3 px-1">
+      <div className="w-full">
+        <ScrollArea className="w-full" type="scroll" orientation="horizontal">
+          <div className="flex gap-2 pb-3 px-1 whitespace-nowrap">
             <Button 
               variant={activeSection === 'overview' ? 'default' : 'outline'} 
               onClick={() => setActiveSection('overview')}

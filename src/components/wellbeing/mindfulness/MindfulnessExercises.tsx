@@ -23,14 +23,13 @@ const MindfulnessExercises = () => {
   const isMobile = useIsMobile();
   
   return (
-    <div className="space-y-4 w-full max-w-full overflow-hidden">
-      <ScrollArea className="w-full">
+    <div className="space-y-4 w-full max-w-full">
         <Tabs defaultValue="discover" className="w-full">
           <div className="sticky top-0 bg-background z-10 pb-2">
-            <div className="relative overflow-x-auto w-full">
+            <div className="relative w-full">
               <ScrollArea className="pb-2 w-full" type="scroll">
-                <div className="min-w-max pr-4">
-                  <TabsList className={`${isMobile ? 'w-auto min-w-full' : 'w-full'} mb-4 flex flex-nowrap`}>
+                <div className="flex pr-4">
+                  <TabsList className="flex-nowrap mb-4">
                     <TabsTrigger value="discover" className="flex-shrink-0">Discover</TabsTrigger>
                     <TabsTrigger value="recommended" className="flex-shrink-0">Recommended</TabsTrigger>
                     <TabsTrigger value="builder" className="flex-shrink-0">Practice Builder</TabsTrigger>
@@ -73,7 +72,6 @@ const MindfulnessExercises = () => {
             />
           </TabsContent>
         </Tabs>
-      </ScrollArea>
     </div>
   );
 };
