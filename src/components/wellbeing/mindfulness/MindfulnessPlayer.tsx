@@ -1,15 +1,6 @@
 
 import { useState } from "react";
-import { 
-  Play, 
-  Pause, 
-  SkipForward, 
-  SkipBack, 
-  Volume2, 
-  Clock, 
-  Heart,
-  ThumbsUp
-} from "lucide-react";
+import { ThumbsUp } from "lucide-react";
 import { 
   Card, 
   CardContent, 
@@ -19,11 +10,13 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/avatar";
 import { MindfulnessPractice } from "@/types/mindfulness";
 import PracticeCompletionDialog from "./PracticeCompletionDialog";
+import PlayerControls from "./player/PlayerControls";
+import ProgressDisplay from "./player/ProgressDisplay";
+import EnergyImpactVisual from "./player/EnergyImpactVisual";
+import PracticeInfo from "./player/PracticeInfo";
 
 interface MindfulnessPlayerProps {
   practice: MindfulnessPractice;
@@ -67,10 +60,9 @@ const MindfulnessPlayer = ({
     }
   };
   
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  const handleProgressChange = (values: number[]) => {
+    setProgress(values[0]);
+    setElapsedTime(Math.floor((values[0] / 100) * totalSeconds));
   };
   
   const totalSeconds = practice.duration * 60;
@@ -95,108 +87,21 @@ const MindfulnessPlayer = ({
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            {practice.tags.map(tag => (
-              <Badge key={tag} variant="secondary" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-          </div>
+          <PracticeInfo practice={practice} />
           
-          <div className="border-t pt-4">
-            <h4 className="text-sm font-medium mb-2">Description</h4>
-            <p className="text-sm text-muted-foreground">{practice.description}</p>
-          </div>
+          <ProgressDisplay 
+            elapsedTime={elapsedTime}
+            totalSeconds={totalSeconds}
+            progress={progress}
+            onProgressChange={handleProgressChange}
+          />
           
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Clock size={16} className="text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                {formatTime(elapsedTime)} / {formatTime(totalSeconds)}
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Volume2 size={16} className="text-muted-foreground" />
-              <Slider
-                defaultValue={[70]}
-                max={100}
-                step={1}
-                className="w-24"
-              />
-            </div>
-          </div>
+          <PlayerControls 
+            isPlaying={isPlaying}
+            onPlayPause={handlePlayPause}
+          />
           
-          <div className="space-y-2">
-            <Slider
-              value={[progress]}
-              max={100}
-              step={0.1}
-              className="w-full"
-              onValueChange={(values) => {
-                setProgress(values[0]);
-                setElapsedTime(Math.floor((values[0] / 100) * totalSeconds));
-              }}
-            />
-            
-            <div className="flex justify-center items-center gap-3">
-              <Button variant="outline" size="icon" disabled>
-                <SkipBack size={16} />
-              </Button>
-              
-              <Button 
-                size="icon" 
-                className="h-12 w-12 rounded-full"
-                onClick={handlePlayPause}
-              >
-                {isPlaying ? <Pause size={20} /> : <Play size={20} className="ml-1" />}
-              </Button>
-              
-              <Button variant="outline" size="icon" disabled>
-                <SkipForward size={16} />
-              </Button>
-            </div>
-          </div>
-          
-          <div className="border-t pt-4 mt-6">
-            <div className="flex items-center gap-3 mb-3">
-              <Avatar className="h-8 w-8 bg-primary">
-                <Heart size={14} />
-              </Avatar>
-              <div>
-                <p className="text-sm font-medium">Energy Impact</p>
-                <p className="text-xs text-muted-foreground">
-                  {practice.energyImpact < 0 
-                    ? "Calming" 
-                    : practice.energyImpact > 0 
-                      ? "Energizing" 
-                      : "Neutral"}
-                </p>
-              </div>
-            </div>
-            
-            <div className="relative h-2 bg-muted rounded-full overflow-hidden">
-              <div 
-                className={`absolute top-0 bottom-0 left-1/2 ${
-                  practice.energyImpact < 0 
-                    ? "bg-blue-500" 
-                    : practice.energyImpact > 0 
-                      ? "bg-amber-500" 
-                      : "bg-green-500"
-                }`}
-                style={{
-                  width: `${Math.abs(practice.energyImpact * 10)}%`,
-                  left: practice.energyImpact <= 0 ? `${50 - Math.abs(practice.energyImpact * 10)}%` : "50%"
-                }}
-              />
-              <div className="absolute top-0 bottom-0 left-1/2 w-1 -ml-0.5 bg-foreground" />
-            </div>
-            
-            <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-              <span>Calming</span>
-              <span>Neutral</span>
-              <span>Energizing</span>
-            </div>
-          </div>
+          <EnergyImpactVisual energyImpact={practice.energyImpact} />
         </CardContent>
         <CardFooter>
           <Button variant="outline" className="w-full" onClick={() => setIsDialogOpen(true)}>
