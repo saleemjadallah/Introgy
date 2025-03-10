@@ -1,10 +1,11 @@
 
-import { LineChart, BookOpen, Users, Battery, Book, ChevronDown, AlertCircle, User, MessageSquare } from "lucide-react";
+import { LineChart, BookOpen, Users, Battery, Book, ChevronDown, AlertCircle, User, MessageSquare, MountainSnow } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import IntrovertGlossary from "@/components/wellbeing/IntrovertGlossary";
 import IntrovertMythbusters from "@/components/wellbeing/IntrovertMythbusters";
 import FamousIntrovertsGallery from "@/components/wellbeing/FamousIntrovertsGallery";
 import CommunityWisdom from "@/components/wellbeing/community-wisdom/CommunityWisdom";
+import MindfulnessExercises from "@/components/wellbeing/mindfulness/MindfulnessExercises";
 import { 
   Collapsible,
   CollapsibleContent,
@@ -17,7 +18,7 @@ const Wellbeing = () => {
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
   const [isMythbustersOpen, setIsMythbustersOpen] = useState(false);
   const [isIntrovertsGalleryOpen, setIsIntrovertsGalleryOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<'education' | 'wisdom'>('education');
+  const [activeSection, setActiveSection] = useState<'education' | 'wisdom' | 'mindfulness'>('education');
 
   return (
     <div className="space-y-6">
@@ -35,6 +36,13 @@ const Wellbeing = () => {
           Education Center
         </Button>
         <Button 
+          variant={activeSection === 'mindfulness' ? 'default' : 'outline'} 
+          onClick={() => setActiveSection('mindfulness')}
+        >
+          <MountainSnow className="h-4 w-4 mr-2" />
+          Mindfulness Exercises
+        </Button>
+        <Button 
           variant={activeSection === 'wisdom' ? 'default' : 'outline'} 
           onClick={() => setActiveSection('wisdom')}
         >
@@ -48,13 +56,24 @@ const Wellbeing = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Battery className="h-5 w-5" />
+                <MountainSnow className="h-5 w-5" />
                 Mindfulness Exercises
               </CardTitle>
               <CardDescription>Introvert-specific mindfulness practices</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">Coming soon in the next update!</p>
+              <div className="flex flex-col items-center gap-4">
+                <p className="text-muted-foreground">
+                  Explore our library of mindfulness practices specifically designed for introverts.
+                </p>
+                <Button 
+                  onClick={() => setActiveSection('mindfulness')}
+                  className="gap-2"
+                >
+                  <MountainSnow className="h-4 w-4" />
+                  Explore Mindfulness Practices
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -154,7 +173,7 @@ const Wellbeing = () => {
             <CardContent>
               <div className="flex flex-col items-center gap-4">
                 <p className="text-muted-foreground">
-                  Now available! Share and discover strategies from fellow introverts.
+                  Share and discover strategies from fellow introverts.
                 </p>
                 <Button 
                   onClick={() => setActiveSection('wisdom')}
@@ -167,8 +186,10 @@ const Wellbeing = () => {
             </CardContent>
           </Card>
         </div>
-      ) : (
+      ) : activeSection === 'wisdom' ? (
         <CommunityWisdom />
+      ) : (
+        <MindfulnessExercises />
       )}
     </div>
   );
