@@ -5,7 +5,7 @@ import { useOvernightRecharge } from "./social-battery/useOvernightRecharge";
 import { useSleepQuality } from "./social-battery/useSleepQuality";
 import { useActivityManagement } from "./social-battery/useActivityManagement";
 import { useScheduledEvents } from "./useScheduledEvents";
-import type { UseSocialBatteryReturn } from "./social-battery/batteryTypes";
+import type { UseSocialBatteryReturn, BatteryHistoryEntry } from "./social-battery/batteryTypes";
 
 export function useSocialBattery(): UseSocialBatteryReturn {
   const [batteryLevel, setBatteryLevel] = useState(() => {
@@ -24,13 +24,13 @@ export function useSocialBattery(): UseSocialBatteryReturn {
   const { lastRechargeDate } = useOvernightRecharge(
     batteryLevel, 
     setBatteryLevel,
-    addHistoryEntry
+    (level: number) => addHistoryEntry({ date: new Date(), level })
   );
   
   const { recordSleepQuality } = useSleepQuality(
     batteryLevel,
     setBatteryLevel,
-    addHistoryEntry
+    (level: number) => addHistoryEntry({ date: new Date(), level })
   );
   
   const { handleActivitySelect, addActivity } = useActivityManagement(
@@ -42,7 +42,7 @@ export function useSocialBattery(): UseSocialBatteryReturn {
   const { checkScheduledEvents } = useScheduledEvents(
     batteryLevel,
     setBatteryLevel,
-    addHistoryEntry
+    (entry: BatteryHistoryEntry) => addHistoryEntry(entry)
   );
 
   const handleSliderChange = (value: number[]) => {
