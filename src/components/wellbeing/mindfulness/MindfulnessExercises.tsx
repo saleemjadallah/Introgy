@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useSocialBattery } from "@/hooks/useSocialBattery";
@@ -100,7 +101,7 @@ const MindfulnessExercises = () => {
               ) : (
                 <div className="h-64 border rounded-lg flex items-center justify-center p-6 bg-card">
                   <p className="text-center text-muted-foreground">
-                    Select a mindfulness practice from the left to begin
+                    Select a mindfulness practice to begin
                   </p>
                 </div>
               )}
