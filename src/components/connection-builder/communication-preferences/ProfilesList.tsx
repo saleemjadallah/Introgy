@@ -53,14 +53,17 @@ const ProfilesList = ({
 }: ProfilesListProps) => {
   if (profiles.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center space-y-4 py-8">
-        <div className="text-center space-y-2">
-          <h3 className="text-xl font-semibold">No Communication Profiles Yet</h3>
-          <p className="text-muted-foreground max-w-md">
+      <div className="flex flex-col items-center justify-center space-y-4 py-6 sm:py-8">
+        <div className="text-center space-y-2 px-4">
+          <h3 className="text-lg sm:text-xl font-semibold">No Communication Profiles Yet</h3>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-md">
             Create your first communication profile to define how you prefer others to interact with you.
           </p>
         </div>
-        <Button onClick={onCreateNew} className="mt-4">
+        <Button 
+          onClick={onCreateNew} 
+          className="mt-2 w-full sm:w-auto py-5 sm:py-2 text-base sm:text-sm max-w-xs"
+        >
           <ListPlus className="mr-2 h-4 w-4" />
           Create Your First Profile
         </Button>
@@ -70,66 +73,70 @@ const ProfilesList = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-xl font-semibold">Your Communication Profiles</h3>
-        <Button onClick={onCreateNew}>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-2">
+        <h3 className="text-lg sm:text-xl font-semibold">Your Communication Profiles</h3>
+        <Button 
+          onClick={onCreateNew} 
+          size="sm" 
+          className="w-full sm:w-auto py-5 sm:py-2 text-base sm:text-sm"
+        >
           <ListPlus className="mr-2 h-4 w-4" />
-          Create New
+          Create New Profile
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {profiles.map((profile) => (
-          <Card key={profile.profileId} className="overflow-hidden">
-            <CardHeader className="pb-3">
+          <Card key={profile.profileId} className="overflow-hidden shadow-sm">
+            <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-3">
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="flex items-center gap-2">
-                    {profile.profileName}
+                  <CardTitle className="text-base sm:text-lg flex items-center gap-1 sm:gap-2 flex-wrap">
+                    <span className="mr-1">{profile.profileName}</span>
                     {profile.isDefault && (
-                      <Badge variant="default" className="ml-2">
+                      <Badge variant="default" className="ml-0 text-xs">
                         <Star className="h-3 w-3 mr-1" /> Default
                       </Badge>
                     )}
                   </CardTitle>
-                  <CardDescription>
-                    Last updated: {format(new Date(profile.lastUpdated), 'MMM d, yyyy')}
+                  <CardDescription className="text-xs sm:text-sm mt-1">
+                    Updated: {format(new Date(profile.lastUpdated), 'MMM d, yyyy')}
                   </CardDescription>
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="sm" className="h-8 w-8">
                       <MoreVertical className="h-4 w-4" />
                       <span className="sr-only">Menu</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onProfileSelect(profile)}>
+                    <DropdownMenuItem onClick={() => onProfileSelect(profile)} className="text-sm">
                       <Edit className="mr-2 h-4 w-4" />
                       Edit Profile
                     </DropdownMenuItem>
                     {!profile.isDefault && (
-                      <DropdownMenuItem onClick={() => onSetDefault(profile.profileId)}>
+                      <DropdownMenuItem onClick={() => onSetDefault(profile.profileId)} className="text-sm">
                         <Star className="mr-2 h-4 w-4" />
                         Set as Default
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem>
+                    <DropdownMenuItem className="text-sm">
                       <Share2 className="mr-2 h-4 w-4" />
                       Share Profile
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive">
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive text-sm">
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete Profile
                         </DropdownMenuItem>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent className="sm:max-w-md">
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Communication Profile</AlertDialogTitle>
-                          <AlertDialogDescription>
+                          <AlertDialogTitle className="text-lg">Delete Profile</AlertDialogTitle>
+                          <AlertDialogDescription className="text-sm">
                             Are you sure you want to delete "{profile.profileName}"? This action cannot be undone.
                             {profile.isDefault && (
                               <p className="mt-2 font-semibold">
@@ -138,8 +145,8 @@ const ProfilesList = ({
                             )}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogFooter className="gap-2 sm:gap-0">
+                          <AlertDialogCancel className="mt-0">Cancel</AlertDialogCancel>
                           <AlertDialogAction 
                             onClick={() => onDeleteProfile(profile.profileId)}
                             className="bg-destructive hover:bg-destructive/90"
@@ -153,12 +160,13 @@ const ProfilesList = ({
                 </DropdownMenu>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
+            <CardContent className="p-4 sm:p-6 pt-1 sm:pt-2">
+              <div className="space-y-2 text-sm">
                 <ProfilePreviewInfo profile={profile} />
                 <Button 
                   variant="outline" 
-                  className="w-full mt-4"
+                  size="sm"
+                  className="w-full mt-4 py-5 sm:py-2 text-base sm:text-sm"
                   onClick={() => onProfileSelect(profile)}
                 >
                   <Edit className="mr-2 h-4 w-4" />
@@ -182,24 +190,24 @@ const ProfilePreviewInfo = ({ profile }: { profile: CommunicationProfile }) => {
     .join(', ');
 
   return (
-    <>
-      <div className="flex justify-between items-center">
-        <span className="text-sm font-medium">Top channels:</span>
-        <span className="text-sm">{topChannels}</span>
+    <div className="space-y-2 mt-1">
+      <div className="flex justify-between items-center text-xs sm:text-sm">
+        <span className="font-medium">Top channels:</span>
+        <span className="text-muted-foreground">{topChannels}</span>
       </div>
-      <div className="flex justify-between items-center">
-        <span className="text-sm font-medium">Conversation depth:</span>
-        <span className="text-sm">{profile.interactionStyle.conversationDepth}/10</span>
+      <div className="flex justify-between items-center text-xs sm:text-sm">
+        <span className="font-medium">Conversation depth:</span>
+        <span className="text-muted-foreground">{profile.interactionStyle.conversationDepth}/10</span>
       </div>
-      <div className="flex justify-between items-center">
-        <span className="text-sm font-medium">Ideal group size:</span>
-        <span className="text-sm">{profile.boundaries.groupSizePreference.ideal} people</span>
+      <div className="flex justify-between items-center text-xs sm:text-sm">
+        <span className="font-medium">Ideal group size:</span>
+        <span className="text-muted-foreground">{profile.boundaries.groupSizePreference.ideal} people</span>
       </div>
-      <div className="flex justify-between items-center">
-        <span className="text-sm font-medium">Preparation needed:</span>
-        <span className="text-sm">{profile.interactionStyle.preparationNeeded}/10</span>
+      <div className="flex justify-between items-center text-xs sm:text-sm">
+        <span className="font-medium">Preparation needed:</span>
+        <span className="text-muted-foreground">{profile.interactionStyle.preparationNeeded}/10</span>
       </div>
-    </>
+    </div>
   );
 };
 

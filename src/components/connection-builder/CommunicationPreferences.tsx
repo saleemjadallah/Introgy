@@ -72,32 +72,42 @@ const CommunicationPreferences = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight mb-2">Communication Preferences</h2>
-        <p className="text-muted-foreground">Define how you prefer to communicate and share with others</p>
+      <div className="space-y-1 mb-4">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Communication Preferences</h2>
+        <p className="text-sm sm:text-base text-muted-foreground">Define how you prefer to communicate and share with others</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="profiles" className="flex items-center gap-2">
-            <ListPlus className="h-4 w-4" />
-            <span className="hidden sm:inline">My Profiles</span>
-            <span className="sm:hidden">Profiles</span>
+        <TabsList className="grid w-full grid-cols-4 h-auto">
+          <TabsTrigger 
+            value="profiles" 
+            className="flex flex-col items-center gap-1 py-3 px-1 sm:px-2 text-xs sm:text-sm h-auto"
+          >
+            <ListPlus className="h-4 w-4 mb-1" />
+            <span>Profiles</span>
           </TabsTrigger>
-          <TabsTrigger value="create" className="flex items-center gap-2">
-            <MessageCircle className="h-4 w-4" />
-            <span className="hidden sm:inline">Create New</span>
-            <span className="sm:hidden">Create</span>
+          <TabsTrigger 
+            value="create" 
+            className="flex flex-col items-center gap-1 py-3 px-1 sm:px-2 text-xs sm:text-sm h-auto"
+          >
+            <MessageCircle className="h-4 w-4 mb-1" />
+            <span>Create</span>
           </TabsTrigger>
-          <TabsTrigger value="edit" className="flex items-center gap-2" disabled={!currentProfile && !isCreating}>
-            <Users className="h-4 w-4" />
-            <span className="hidden sm:inline">Edit Profile</span>
-            <span className="sm:hidden">Edit</span>
+          <TabsTrigger 
+            value="edit" 
+            className="flex flex-col items-center gap-1 py-3 px-1 sm:px-2 text-xs sm:text-sm h-auto" 
+            disabled={!currentProfile && !isCreating}
+          >
+            <Users className="h-4 w-4 mb-1" />
+            <span>Edit</span>
           </TabsTrigger>
-          <TabsTrigger value="share" className="flex items-center gap-2" disabled={profiles.length === 0}>
-            <Share2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Share Settings</span>
-            <span className="sm:hidden">Share</span>
+          <TabsTrigger 
+            value="share" 
+            className="flex flex-col items-center gap-1 py-3 px-1 sm:px-2 text-xs sm:text-sm h-auto" 
+            disabled={profiles.length === 0}
+          >
+            <Share2 className="h-4 w-4 mb-1" />
+            <span>Share</span>
           </TabsTrigger>
         </TabsList>
 
