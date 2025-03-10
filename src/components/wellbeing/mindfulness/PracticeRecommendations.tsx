@@ -1,4 +1,3 @@
-
 import { 
   MountainSnow, 
   Sunrise, 
@@ -9,7 +8,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getRecommendedPractices, getPracticeById } from "@/data/mindfulnessPractices";
+import { getRecommendedPractices, getPracticeById } from "@/data/mindfulness";
 
 interface PracticeRecommendationsProps {
   batteryLevel: number;

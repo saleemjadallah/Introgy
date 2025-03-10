@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useSocialBattery } from "@/hooks/useSocialBattery";
@@ -7,7 +6,7 @@ import MindfulnessCategoryList from "./MindfulnessCategoryList";
 import MindfulnessPlayer from "./MindfulnessPlayer";
 import PracticeRecommendations from "./PracticeRecommendations";
 import { MindfulnessPractice } from "@/types/mindfulness";
-import { getPractices, getPracticeById, getRecommendedPractices } from "@/data/mindfulnessPractices";
+import { getPractices, getPracticeById } from "@/data/mindfulness";
 
 const MindfulnessExercises = () => {
   const [selectedPractice, setSelectedPractice] = useState<MindfulnessPractice | null>(null);
@@ -15,7 +14,6 @@ const MindfulnessExercises = () => {
   const { toast } = useToast();
   const { batteryLevel } = useSocialBattery();
   
-  // Load completed practices from localStorage on component mount
   useEffect(() => {
     const storedCompletedPractices = localStorage.getItem('completedPractices');
     if (storedCompletedPractices) {
@@ -28,7 +26,6 @@ const MindfulnessExercises = () => {
     const practice = getPracticeById(id);
     if (practice) {
       setSelectedPractice(practice);
-      // Scroll to player if on mobile
       document.getElementById('practice-player')?.scrollIntoView({ behavior: 'smooth' });
     } else {
       toast({
@@ -46,8 +43,6 @@ const MindfulnessExercises = () => {
   ) => {
     if (!selectedPractice) return;
     
-    // In a real app, this would call an API
-    // For now, just store in localStorage
     const completedPracticesData = localStorage.getItem('completedPractices') 
       ? JSON.parse(localStorage.getItem('completedPractices')!) 
       : [];
@@ -62,7 +57,6 @@ const MindfulnessExercises = () => {
     
     localStorage.setItem('completedPractices', JSON.stringify(completedPracticesData));
     
-    // Update state
     setCompletedPractices([...completedPractices, selectedPractice.id]);
     
     toast({
@@ -71,7 +65,6 @@ const MindfulnessExercises = () => {
     });
   };
   
-  // Determine time of day for recommendations
   const getTimeOfDay = (): 'morning' | 'afternoon' | 'evening' => {
     const hour = new Date().getHours();
     if (hour < 12) return 'morning';
