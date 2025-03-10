@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useCommunicationProfiles } from '@/hooks/useCommunicationProfiles';
 import { SharingConfiguration } from '@/types/communication-preferences';
@@ -128,7 +129,7 @@ const SharingManager = () => {
     
     if (daysUntil <= 3) {
       return (
-        <Badge variant="warning" className="flex items-center gap-1 bg-orange-500">
+        <Badge variant="secondary" className="flex items-center gap-1 bg-orange-500 text-white">
           <Clock className="h-3 w-3" />
           Expires soon
         </Badge>

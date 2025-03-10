@@ -5,7 +5,7 @@ import { useOvernightRecharge } from "./social-battery/useOvernightRecharge";
 import { useSleepQuality } from "./social-battery/useSleepQuality";
 import { useActivityManagement } from "./social-battery/useActivityManagement";
 import { useScheduledEvents } from "./useScheduledEvents";
-import type { UseSocialBatteryReturn } from "./social-battery/batteryTypes";
+import type { UseSocialBatteryReturn, BatteryHistoryEntry } from "./social-battery/batteryTypes";
 
 export function useSocialBattery(): UseSocialBatteryReturn {
   const [batteryLevel, setBatteryLevel] = useState(() => {
