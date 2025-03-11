@@ -54,6 +54,11 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
     
     --container-secondary: 212 75% 98%;  /* Very pale blue #F5F8FC */
+    
+    /* Text colors */
+    --text-primary: 221 52% 15%;  /* Deep navy #121F36 */
+    --text-secondary: 214 15% 46%;  /* Slate blue #627286 */
+    --text-accent: 248 21% 45%;  /* Dusky purple #5D5A8C */
   }
 
   .dark {
@@ -127,5 +132,26 @@
 
 .card {
   @apply bg-card border-[#D8DEE9] shadow-sm;
+}
+
+/* Text styles */
+.text-primary {
+  @apply text-[#121F36];
+}
+
+.text-secondary {
+  @apply text-[#627286];
+}
+
+.text-accent {
+  @apply text-[#5D5A8C];
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply text-[#121F36];
+}
+
+p {
+  @apply text-[#627286];
 }
 

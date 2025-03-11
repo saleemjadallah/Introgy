@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -67,6 +68,11 @@ export default {
 				},
 				container: {
 					secondary: 'hsl(var(--container-secondary))'
+				},
+				text: {
+					primary: 'hsl(var(--text-primary))',
+					secondary: 'hsl(var(--text-secondary))',
+					accent: 'hsl(var(--text-accent))'
 				}
 			},
 			boxShadow: {
