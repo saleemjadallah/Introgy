@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { 
@@ -39,6 +40,10 @@ export function useConversationStarters(
         if (error) throw error;
         
         if (data?.content && Array.isArray(data.content)) {
+          // Get the current user ID
+          const { data: userData } = await supabase.auth.getUser();
+          const userId = userData.user?.id;
+          
           // Map the AI-generated starters to our database format
           const newStarters = data.content.map(starter => ({
             relationship_id: relationshipId,
@@ -47,19 +52,8 @@ export function useConversationStarters(
             context: starter.context,
             confidence_score: 0.85,
             source: starter.source || 'interest',
-            user_id: ''
+            user_id: userId || ''
           }));
-          
-          // Get the current user ID
-          const { data: userData } = await supabase.auth.getUser();
-          const userId = userData.user?.id;
-          
-          if (userId) {
-            // Update the user_id in each starter
-            newStarters.forEach(starter => {
-              starter.user_id = userId;
-            });
-          }
           
           // Save to database
           const { data: insertedData, error: insertError } = await supabase
