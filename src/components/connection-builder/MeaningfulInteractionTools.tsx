@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { useMeaningfulInteractions } from '@/hooks/useMeaningfulInteractions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Heart, MessageCircle, Zap, Calendar, Timer, Clock, 
   ArrowRight, BookOpen, Send, Save, Plus, LinkIcon, 
@@ -108,6 +110,9 @@ const DeepQuestionsTab = () => {
     isLoading
   } = useMeaningfulInteractions();
   
+  const isMobile = useIsMobile();
+  const { toast } = useToast();
+  
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -128,7 +133,7 @@ const DeepQuestionsTab = () => {
     }, 300); // 300ms debounce
     
     return () => clearTimeout(handler);
-  }, [selectedCategories, selectedDepthLevels, selectedRelationshipTypes, searchTerm]);
+  }, [selectedCategories, selectedDepthLevels, selectedRelationshipTypes, searchTerm, setQuestionFilters]);
   
   // Apply filters with debounce
   const applyFilters = () => {
@@ -515,6 +520,9 @@ const MessageGeneratorTab = () => {
     isLoading
   } = useMeaningfulInteractions();
   
+  const isMobile = useIsMobile();
+  const { toast } = useToast();
+  
   const [selectedTemplate, setSelectedTemplate] = useState<MessageTemplate | null>(null);
   const [templateVariables, setTemplateVariables] = useState<Record<string, string>>({});
   const [purposeFilter, setPurposeFilter] = useState<string>('');
@@ -799,6 +807,9 @@ const ConnectionRitualsTab = () => {
     isLoading
   } = useMeaningfulInteractions();
   
+  const isMobile = useIsMobile();
+  const { toast } = useToast();
+  
   const [showActive, setShowActive] = useState(false);
   const [selectedRitual, setSelectedRitual] = useState<ConnectionRitual | null>(null);
   const [interactionTypeFilter, setInteractionTypeFilter] = useState<string>('');
@@ -1041,6 +1052,9 @@ const SharedExperiencesTab = () => {
     getExperienceRecommendations,
     isLoading
   } = useMeaningfulInteractions();
+  
+  const isMobile = useIsMobile();
+  const { toast } = useToast();
   
   const [showSaved, setShowSaved] = useState(false);
   const [selectedExperience, setSelectedExperience] = useState<SharedExperience | null>(null);
@@ -1396,6 +1410,10 @@ const SharedExperiencesTab = () => {
                   onClick={() => {
                     if (selectedExperience.url) {
                       navigator.clipboard.writeText(selectedExperience.url);
+                      toast({
+                        description: "Link copied to clipboard",
+                        duration: 1500
+                      });
                     }
                   }}
                   disabled={!selectedExperience.url}
