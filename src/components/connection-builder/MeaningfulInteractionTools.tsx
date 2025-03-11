@@ -1,7 +1,6 @@
-
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useMeaningfulInteractions } from '@/hooks/useMeaningfulInteractions';
+import { useAIMeaningfulInteractions } from '@/hooks/useAIMeaningfulInteractions';
 import { MessageSquare, MessageSquareText, Heart, Image } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -10,20 +9,35 @@ const MessageTemplatesTab = React.lazy(() => import('./meaningful-interactions/M
 const ConnectionRitualsTab = React.lazy(() => import('./meaningful-interactions/ConnectionRitualsTab'));
 const SharedExperiencesTab = React.lazy(() => import('./meaningful-interactions/SharedExperiencesTab'));
 
-// Meaningful Interaction Tools component
 const MeaningfulInteractionTools: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('questions');
   const isMobile = useIsMobile();
   const { 
-    questions,
-    messageTemplates,
-    rituals,
-    experiences,
-    isLoading,
-    // Include other properties and functions as needed
-  } = useMeaningfulInteractions();
+    generateInteraction, 
+    fetchStoredInteractions,
+    isLoading 
+  } = useAIMeaningfulInteractions();
 
-  // Fallback component for lazy loading
+  const [interactions, setInteractions] = useState({
+    questions: [],
+    templates: [],
+    rituals: [],
+    experiences: []
+  });
+
+  useEffect(() => {
+    const loadInteractions = async () => {
+      const data = await fetchStoredInteractions();
+      const grouped = data.reduce((acc, item) => {
+        acc[item.type + 's'] = [...(acc[item.type + 's'] || []), item];
+        return acc;
+      }, {});
+      setInteractions(grouped);
+    };
+    
+    loadInteractions();
+  }, []);
+
   const LoadingFallback = () => (
     <div className="flex justify-center items-center p-12">
       <div className="space-y-2 text-center">
@@ -33,7 +47,6 @@ const MeaningfulInteractionTools: React.FC = () => {
     </div>
   );
 
-  // Handle tab change
   const handleTabChange = (value: string) => {
     setActiveTab(value);
   };
@@ -43,7 +56,7 @@ const MeaningfulInteractionTools: React.FC = () => {
       <div className="flex flex-col space-y-2">
         <h2 className="text-2xl font-bold">Meaningful Interaction Tools</h2>
         <p className="text-muted-foreground">
-          Tools and resources to create more meaningful connections with the people in your life
+          AI-powered tools to create more meaningful connections with the people in your life
         </p>
       </div>
       
@@ -69,19 +82,43 @@ const MeaningfulInteractionTools: React.FC = () => {
         
         <Suspense fallback={<LoadingFallback />}>
           <TabsContent value="questions" className="space-y-4">
-            {activeTab === 'questions' && <DeepQuestionsTab questions={questions} />}
+            {activeTab === 'questions' && 
+              <DeepQuestionsTab 
+                questions={interactions.questions} 
+                onGenerate={() => generateInteraction('question', 'deep personal reflection')}
+                isLoading={isLoading}
+              />
+            }
           </TabsContent>
           
           <TabsContent value="templates" className="space-y-4">
-            {activeTab === 'templates' && <MessageTemplatesTab templates={messageTemplates} />}
+            {activeTab === 'templates' && 
+              <MessageTemplatesTab 
+                templates={interactions.templates}
+                onGenerate={() => generateInteraction('template', 'meaningful connection')}
+                isLoading={isLoading}
+              />
+            }
           </TabsContent>
           
           <TabsContent value="rituals" className="space-y-4">
-            {activeTab === 'rituals' && <ConnectionRitualsTab rituals={rituals} />}
+            {activeTab === 'rituals' && 
+              <ConnectionRitualsTab 
+                rituals={interactions.rituals}
+                onGenerate={() => generateInteraction('ritual', 'regular meaningful connection')}
+                isLoading={isLoading}
+              />
+            }
           </TabsContent>
           
           <TabsContent value="experiences" className="space-y-4">
-            {activeTab === 'experiences' && <SharedExperiencesTab experiences={experiences} />}
+            {activeTab === 'experiences' && 
+              <SharedExperiencesTab 
+                experiences={interactions.experiences}
+                onGenerate={() => generateInteraction('experience', 'shared meaningful activity')}
+                isLoading={isLoading}
+              />
+            }
           </TabsContent>
         </Suspense>
       </Tabs>
