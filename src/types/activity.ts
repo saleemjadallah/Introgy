@@ -30,6 +30,22 @@ export const rechargeActivities: RechargeActivity[] = [
   { id: 3, name: "Listen to calming music", duration: 15, energyGain: 8 },
   { id: 4, name: "Meditate", duration: 10, energyGain: 12 },
   { id: 5, name: "Make a cup of tea", duration: 5, energyGain: 5 },
+  // New recharge activities
+  { id: 6, name: "Journal or creative writing", duration: 25, energyGain: 13, description: "Expressive writing provides mental clarity and emotional processing" },
+  { id: 7, name: "Hot bath or shower", duration: 20, energyGain: 11, description: "Warmth and isolation create a perfect recharge environment" },
+  { id: 8, name: "Nature observation", duration: 30, energyGain: 15, description: "Bird watching, cloud gazing, or sitting by water" },
+  { id: 9, name: "Crafting or hands-on hobby", duration: 45, energyGain: 18, description: "Knitting, woodworking, painting, or any focused creative activity" },
+  { id: 10, name: "Watch a favorite show alone", duration: 40, energyGain: 14, description: "Comfortable, predictable entertainment without social demands" },
+  { id: 11, name: "Play with a pet", duration: 15, energyGain: 9, description: "Companionship without human social complexity" },
+  { id: 12, name: "Gardening or plant care", duration: 30, energyGain: 13, description: "Connecting with nature in a structured, nurturing way" },
+  { id: 13, name: "Listen to a podcast or audiobook", duration: 30, energyGain: 12, description: "Engaging content without visual overstimulation" },
+  { id: 14, name: "Cook or bake something", duration: 40, energyGain: 16, description: "Creative, sensory engagement with tangible results" },
+  { id: 15, name: "Technology-free quiet time", duration: 25, energyGain: 14, description: "Deliberate disconnection from digital stimulation" },
+  { id: 16, name: "Star gazing", duration: 20, energyGain: 10, description: "Perspective-shifting, peaceful nighttime activity" },
+  { id: 17, name: "Organize a small space", duration: 15, energyGain: 8, description: "Creating order reduces mental load" },
+  { id: 18, name: "Deep breathing exercises", duration: 5, energyGain: 6, description: "Quick but effective reset for overwhelm" },
+  { id: 19, name: "Stretch or gentle yoga", duration: 15, energyGain: 9, description: "Physical release of tension without exertion" },
+  { id: 20, name: "Browse a bookstore or library alone", duration: 45, energyGain: 17, description: "Quiet exploration in a low-pressure social environment" },
 ];
 
 // Mock data for depleting activities
