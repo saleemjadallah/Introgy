@@ -2,6 +2,8 @@
 import React, { Suspense, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMeaningfulInteractions } from '@/hooks/useMeaningfulInteractions';
+import { MessageSquare, MessageSquareText, Heart, Image } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const DeepQuestionsTab = React.lazy(() => import('./meaningful-interactions/DeepQuestionsTab'));
 const MessageTemplatesTab = React.lazy(() => import('./meaningful-interactions/MessageTemplatesTab'));
@@ -11,6 +13,7 @@ const SharedExperiencesTab = React.lazy(() => import('./meaningful-interactions/
 // Meaningful Interaction Tools component
 const MeaningfulInteractionTools: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('questions');
+  const isMobile = useIsMobile();
   const { 
     questions,
     messageTemplates,
@@ -45,11 +48,23 @@ const MeaningfulInteractionTools: React.FC = () => {
       </div>
       
       <Tabs defaultValue="questions" onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid grid-cols-4 mb-4">
-          <TabsTrigger value="questions">Deep Questions</TabsTrigger>
-          <TabsTrigger value="templates">Message Templates</TabsTrigger>
-          <TabsTrigger value="rituals">Connection Rituals</TabsTrigger>
-          <TabsTrigger value="experiences">Shared Experiences</TabsTrigger>
+        <TabsList className={`grid grid-cols-4 mb-4 ${isMobile ? 'h-auto p-2 gap-1' : ''}`}>
+          <TabsTrigger value="questions" className={`${isMobile ? 'flex flex-col items-center gap-1 py-2 h-auto' : ''}`}>
+            <MessageSquare className="h-4 w-4" />
+            <span className={isMobile ? "text-xs mt-1" : "ml-2"}>Questions</span>
+          </TabsTrigger>
+          <TabsTrigger value="templates" className={`${isMobile ? 'flex flex-col items-center gap-1 py-2 h-auto' : ''}`}>
+            <MessageSquareText className="h-4 w-4" />
+            <span className={isMobile ? "text-xs mt-1" : "ml-2"}>Templates</span>
+          </TabsTrigger>
+          <TabsTrigger value="rituals" className={`${isMobile ? 'flex flex-col items-center gap-1 py-2 h-auto' : ''}`}>
+            <Heart className="h-4 w-4" />
+            <span className={isMobile ? "text-xs mt-1" : "ml-2"}>Rituals</span>
+          </TabsTrigger>
+          <TabsTrigger value="experiences" className={`${isMobile ? 'flex flex-col items-center gap-1 py-2 h-auto' : ''}`}>
+            <Image className="h-4 w-4" />
+            <span className={isMobile ? "text-xs mt-1" : "ml-2"}>Experiences</span>
+          </TabsTrigger>
         </TabsList>
         
         <Suspense fallback={<LoadingFallback />}>
