@@ -37,19 +37,23 @@ export const usePracticeBuilder = () => {
     setIsGenerating(true);
     
     try {
-      const mockPractice = await generatePractice(practiceRequest);
-      setGeneratedPractice(mockPractice);
+      const practice = await generatePractice(practiceRequest);
+      setGeneratedPractice(practice);
       
       toast({
         title: "Practice Generated",
-        description: "Your custom practice is ready to try",
+        description: "Your AI-powered mindfulness practice is ready",
       });
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'There was an error creating your practice';
+      
       toast({
         title: "Generation Failed",
-        description: "There was an error creating your practice",
+        description: message,
         variant: "destructive"
       });
+      
+      console.error("Practice generation error:", error);
     } finally {
       setIsGenerating(false);
     }

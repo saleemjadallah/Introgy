@@ -8,6 +8,7 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Sparkles } from "lucide-react";
 import PracticeForm from "./builder/PracticeForm";
 import GeneratedPracticeView from "./builder/GeneratedPracticeView";
 import { usePracticeBuilder } from "./builder/usePracticeBuilder";
@@ -36,9 +37,12 @@ const PracticeBuilder = () => {
     <div className="space-y-4 w-full max-w-full">
       <Card className="w-full max-w-full overflow-hidden">
         <CardHeader>
-          <CardTitle>Intelligent Practice Builder</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-blueteal" />
+            AI Practice Builder
+          </CardTitle>
           <CardDescription>
-            Create a personalized mindfulness practice tailored to your needs
+            Create a personalized mindfulness practice tailored to your unique introvert needs
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -79,7 +83,7 @@ const PracticeBuilder = () => {
             </>
           ) : (
             <div className="text-xs text-muted-foreground italic w-full text-center">
-              Your practice will be customized based on your selections and learning from past preferences
+              Our AI will create a custom mindfulness practice specifically designed for introverts based on your selections
             </div>
           )}
         </CardFooter>
