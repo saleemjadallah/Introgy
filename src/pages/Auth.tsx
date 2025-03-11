@@ -32,7 +32,7 @@ const Auth = () => {
       <Card>
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center">
-            Welcome to InnerCircle
+            Welcome to Introfy
           </CardTitle>
           <CardDescription className="text-center">
             Sign in with your phone number to get started
