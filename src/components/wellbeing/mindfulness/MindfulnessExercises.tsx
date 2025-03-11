@@ -7,6 +7,7 @@ import RecommendedTab from "./tabs/RecommendedTab";
 import MindfulMomentsTab from "./tabs/MindfulMomentsTab";
 import PracticeBuilder from "./PracticeBuilder";
 import { useMindfulnessPractices } from "./hooks/useMindfulnessPractices";
+import { useSocialBattery } from "@/hooks/useSocialBattery";
 
 const MindfulnessExercises = () => {
   const [activeTab, setActiveTab] = useState("discover");
@@ -19,8 +20,8 @@ const MindfulnessExercises = () => {
     getTimeOfDay 
   } = useMindfulnessPractices();
   
-  // Mock battery level - in a real app this would come from the social battery context
-  const batteryLevel = 70; // Default to 70% battery
+  // Get the real battery level from the social battery context
+  const { batteryLevel } = useSocialBattery();
   
   return (
     <div className="space-y-4 w-full max-w-full">
