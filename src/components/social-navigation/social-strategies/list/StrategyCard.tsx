@@ -13,13 +13,13 @@ interface StrategyCardProps {
 }
 
 const StrategyCard = ({ strategy, onStrategySelect, toggleFavorite }: StrategyCardProps) => {
-  // Strategy type icons
+  // Updated strategy type icons with colors
   const strategyTypeIcons = {
-    "quick": <Zap className="h-4 w-4" />,
-    "preparation": <Calendar className="h-4 w-4" />,
-    "recovery": <Battery className="h-4 w-4" />,
-    "energy-conservation": <BatteryCharging className="h-4 w-4" />,
-    "connection": <Heart className="h-4 w-4" />
+    "quick": <Zap className="h-4 w-4 text-amber fill-amber/10" />,
+    "preparation": <Calendar className="h-4 w-4 text-periwinkle fill-periwinkle/10" />,
+    "recovery": <Battery className="h-4 w-4 text-sage fill-sage/10" />,
+    "energy-conservation": <BatteryCharging className="h-4 w-4 text-teal fill-teal/10" />,
+    "connection": <Heart className="h-4 w-4 text-mauve fill-mauve/10" />
   };
 
   // Energy level colors
