@@ -1,7 +1,7 @@
-
 import { format, isYesterday, isAfter, isBefore, startOfDay, endOfDay, set } from "date-fns";
 import { SocialEvent } from "@/types/events";
 import type { BatteryHistoryEntry, SocialActivity } from "./batteryTypes";
+import { SleepQuality } from "@/components/social-battery/SleepQualityDialog";
 
 // Helper function to determine if there were late night events
 export const hasLateNightEvents = (events: SocialEvent[]): boolean => {
@@ -51,8 +51,8 @@ export const getBatteryColor = (batteryLevel: number) => {
 };
 
 // Sleep quality battery adjustments
-export const SLEEP_QUALITY_ADJUSTMENTS = {
-  good: 50,   // +50% for good sleep
-  medium: 10, // +10% for medium sleep
-  bad: -5,    // -5% for bad sleep
+export const SLEEP_QUALITY_ADJUSTMENTS: Record<SleepQuality, number> = {
+  good: 50,   // Good sleep gives a significant boost
+  medium: 10, // Medium sleep gives a small boost
+  bad: -5     // Bad sleep depletes battery slightly
 };
