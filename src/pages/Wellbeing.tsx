@@ -35,7 +35,7 @@ const Wellbeing = () => {
             <Button 
               variant={activeSection === 'overview' ? 'default' : 'outline'} 
               onClick={() => setActiveSection('overview')}
-              className="flex-shrink-0"
+              className="flex-shrink-0 hover:text-white"
             >
               <LineChart className="h-4 w-4 mr-2 text-blueteal" />
               Overview
@@ -43,7 +43,7 @@ const Wellbeing = () => {
             <Button 
               variant={activeSection === 'education' ? 'default' : 'outline'} 
               onClick={() => setActiveSection('education')}
-              className="flex-shrink-0"
+              className="flex-shrink-0 hover:text-white"
             >
               <BookOpen className="h-4 w-4 mr-2 text-blueteal" />
               Education Center
@@ -51,7 +51,7 @@ const Wellbeing = () => {
             <Button 
               variant={activeSection === 'mindfulness' ? 'default' : 'outline'} 
               onClick={() => setActiveSection('mindfulness')}
-              className="flex-shrink-0"
+              className="flex-shrink-0 hover:text-white"
             >
               <MountainSnow className="h-4 w-4 mr-2 text-blueteal" />
               Mindfulness Exercises
@@ -59,7 +59,7 @@ const Wellbeing = () => {
             <Button 
               variant={activeSection === 'wisdom' ? 'default' : 'outline'} 
               onClick={() => setActiveSection('wisdom')}
-              className="flex-shrink-0"
+              className="flex-shrink-0 hover:text-white"
             >
               <MessageSquare className="h-4 w-4 mr-2 text-blueteal" />
               Community Wisdom

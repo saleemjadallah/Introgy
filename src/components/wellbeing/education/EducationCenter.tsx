@@ -21,15 +21,15 @@ const EducationCenter = () => {
             orientation="horizontal"
           >
             <TabsList className="min-w-max wellbeing-container-gradient">
-              <TabsTrigger value="glossary" className="whitespace-nowrap data-[state=active]:bg-white/60">
+              <TabsTrigger value="glossary" className="whitespace-nowrap data-[state=active]:bg-white/60 hover:text-white">
                 <Book className="h-4 w-4 mr-2 text-blueteal" />
                 Psychology Glossary
               </TabsTrigger>
-              <TabsTrigger value="mythbusters" className="whitespace-nowrap data-[state=active]:bg-white/60">
+              <TabsTrigger value="mythbusters" className="whitespace-nowrap data-[state=active]:bg-white/60 hover:text-white">
                 <AlertCircle className="h-4 w-4 mr-2 text-blueteal" />
                 Mythbusters
               </TabsTrigger>
-              <TabsTrigger value="famous" className="whitespace-nowrap data-[state=active]:bg-white/60">
+              <TabsTrigger value="famous" className="whitespace-nowrap data-[state=active]:bg-white/60 hover:text-white">
                 <User className="h-4 w-4 mr-2 text-blueteal" />
                 Famous Introverts
               </TabsTrigger>
