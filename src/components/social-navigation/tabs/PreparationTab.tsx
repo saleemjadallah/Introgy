@@ -3,7 +3,6 @@ import React from "react";
 import { Card } from "@/components/ui/card";
 import { SocialEvent } from "@/types/events";
 import { EventPreparation as EventPreparationType } from "@/types/events";
-import EventPreparationComponent from "@/components/social-navigation/EventPreparation";
 import EnergyPlanning from "@/components/social-navigation/EnergyPlanning";
 import ConversationStarters from "@/components/social-navigation/ConversationStarters";
 import ExitStrategies from "@/components/social-navigation/ExitStrategies";
@@ -49,7 +48,24 @@ const PreparationTab = ({
 
   return (
     <div className="space-y-6">
-      <EventPreparationComponent event={activeEvent} />
+      <div className="p-4 border rounded-lg bg-white dark:bg-gray-800">
+        <div className="flex flex-col md:flex-row justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-semibold">{activeEvent.name || "Unnamed Event"}</h3>
+            <p className="text-muted-foreground">
+              {new Date(activeEvent.date).toLocaleDateString()} at {activeEvent.location || "Location TBD"}
+            </p>
+          </div>
+          <div>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-periwinkle/10 text-periwinkle">
+              {activeEvent.eventType}
+            </span>
+            <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-periwinkle/10 text-periwinkle">
+              {activeEvent.peopleCount}
+            </span>
+          </div>
+        </div>
+      </div>
       
       <EnergyPlanning 
         energyCost={activeEvent.energyCost}

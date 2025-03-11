@@ -65,7 +65,7 @@ const EventsList = ({
           onClick={() => onAddEvent({ 
             id: '',
             name: '',
-            date: new Date(), // Fixed: Use Date object instead of string
+            date: new Date(), 
             location: '',
             eventType: 'casual gathering',
             peopleCount: 'small group (5-15)',
@@ -89,7 +89,7 @@ const EventsList = ({
                 title="Today"
                 events={todayEvents}
                 onEventSelect={onEventSelect}
-                onEditEvent={onUpdateEvent} // Added missing prop
+                onEditEvent={onUpdateEvent}
                 onDeleteEvent={onDeleteEvent}
                 selectedEventId={selectedEventId}
               />
@@ -100,7 +100,7 @@ const EventsList = ({
                 title="Tomorrow"
                 events={tomorrowEvents}
                 onEventSelect={onEventSelect}
-                onEditEvent={onUpdateEvent} // Added missing prop
+                onEditEvent={onUpdateEvent}
                 onDeleteEvent={onDeleteEvent}
                 selectedEventId={selectedEventId}
               />
@@ -111,7 +111,7 @@ const EventsList = ({
                 title="Upcoming"
                 events={upcomingEvents}
                 onEventSelect={onEventSelect}
-                onEditEvent={onUpdateEvent} // Added missing prop
+                onEditEvent={onUpdateEvent}
                 onDeleteEvent={onDeleteEvent}
                 selectedEventId={selectedEventId}
               />
@@ -122,7 +122,7 @@ const EventsList = ({
                 title="Past Events"
                 events={pastEvents}
                 onEventSelect={onEventSelect}
-                onEditEvent={onUpdateEvent} // Added missing prop
+                onEditEvent={onUpdateEvent}
                 onDeleteEvent={onDeleteEvent}
                 selectedEventId={selectedEventId}
                 isPast={true}

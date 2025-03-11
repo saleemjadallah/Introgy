@@ -13,10 +13,10 @@ const EmptyEventsList = ({ onAddEvent }: EmptyEventsListProps) => {
     onAddEvent({
       id: "",
       name: "",
-      date: new Date(), // Fixed: Use Date object instead of string
+      date: new Date(), // Use Date object
       location: "",
-      eventType: "casual gathering", // Fixed: Use proper eventType from the type
-      peopleCount: "small group (5-15)", // Fixed: Use proper peopleCount from the type
+      eventType: "casual gathering",
+      peopleCount: "small group (5-15)",
       energyCost: 5,
       notes: "",
     });
