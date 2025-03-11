@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { MindfulnessPractice } from '@/types/mindfulness';
 import { useFormState } from './hooks/useFormState';
 import { generatePractice } from './services/practiceGenerationService';
+import { useMindfulnessPractices } from '../hooks/useMindfulnessPractices';
 
 export const usePracticeBuilder = () => {
   const {
@@ -20,9 +21,11 @@ export const usePracticeBuilder = () => {
   } = useFormState();
   
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [generatedPractice, setGeneratedPractice] = useState<MindfulnessPractice | null>(null);
   
   const { toast } = useToast();
+  const { handleSavePractice } = useMindfulnessPractices();
   
   const handleGenerate = async () => {
     if (practiceRequest.focusAreas.length === 0) {
@@ -63,16 +66,41 @@ export const usePracticeBuilder = () => {
     resetFormState();
     setGeneratedPractice(null);
   };
+  
+  const savePractice = async () => {
+    if (!generatedPractice) return;
+    
+    setIsSaving(true);
+    try {
+      await handleSavePractice(generatedPractice);
+      
+      toast({
+        title: "Practice Saved",
+        description: "Your custom practice has been saved to My Practices",
+      });
+    } catch (error) {
+      toast({
+        title: "Save Failed",
+        description: "There was an error saving your practice",
+        variant: "destructive"
+      });
+      console.error("Error saving practice:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return {
     practiceRequest,
     isAdvancedOpen,
     setIsAdvancedOpen,
     isGenerating,
+    isSaving,
     generatedPractice,
     handleFocusAreaToggle,
     handleTechniqueToggle,
     handleGenerate,
+    savePractice,
     resetForm,
     updateDuration,
     updateSituationType,

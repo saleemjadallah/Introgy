@@ -8,7 +8,7 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import PracticeForm from "./builder/PracticeForm";
 import GeneratedPracticeView from "./builder/GeneratedPracticeView";
 import { usePracticeBuilder } from "./builder/usePracticeBuilder";
@@ -20,10 +20,12 @@ const PracticeBuilder = () => {
     isAdvancedOpen,
     setIsAdvancedOpen,
     isGenerating,
+    isSaving,
     generatedPractice,
     handleFocusAreaToggle,
     handleTechniqueToggle,
     handleGenerate,
+    savePractice,
     resetForm,
     updateDuration,
     updateSituationType,
@@ -77,8 +79,19 @@ const PracticeBuilder = () => {
               >
                 Create Another
               </Button>
-              <Button className={isMobile ? 'w-full' : ''}>
-                Save to My Practices
+              <Button 
+                className={isMobile ? 'w-full' : ''}
+                onClick={savePractice}
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save to My Practices"
+                )}
               </Button>
             </>
           ) : (

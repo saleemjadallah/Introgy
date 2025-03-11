@@ -7,17 +7,36 @@ import { getPracticeById } from "@/data/mindfulness";
 export const useMindfulnessPractices = () => {
   const [selectedPractice, setSelectedPractice] = useState<MindfulnessPractice | null>(null);
   const [completedPractices, setCompletedPractices] = useState<string[]>([]);
+  const [savedPractices, setSavedPractices] = useState<MindfulnessPractice[]>([]);
   const { toast } = useToast();
   
   useEffect(() => {
+    // Load completed practices
     const storedCompletedPractices = localStorage.getItem('completedPractices');
     if (storedCompletedPractices) {
       const parsedPractices = JSON.parse(storedCompletedPractices);
       setCompletedPractices(parsedPractices.map((p: any) => p.practiceId));
     }
+    
+    // Load saved practices
+    const storedSavedPractices = localStorage.getItem('savedPractices');
+    if (storedSavedPractices) {
+      const parsedSavedPractices = JSON.parse(storedSavedPractices);
+      setSavedPractices(parsedSavedPractices);
+    }
   }, []);
   
   const handleSelectPractice = (id: string) => {
+    // First check if it's a saved custom practice
+    const savedPractice = savedPractices.find(p => p.id === id);
+    
+    if (savedPractice) {
+      setSelectedPractice(savedPractice);
+      document.getElementById('practice-player')?.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    
+    // If not a saved practice, check library practices
     const practice = getPracticeById(id);
     if (practice) {
       setSelectedPractice(practice);
@@ -60,6 +79,30 @@ export const useMindfulnessPractices = () => {
     });
   };
   
+  const handleSavePractice = async (practice: MindfulnessPractice): Promise<void> => {
+    // First check if this practice is already saved
+    const existingIndex = savedPractices.findIndex(p => p.id === practice.id);
+    
+    let updatedSavedPractices: MindfulnessPractice[];
+    
+    if (existingIndex >= 0) {
+      // Update existing practice
+      updatedSavedPractices = [...savedPractices];
+      updatedSavedPractices[existingIndex] = practice;
+    } else {
+      // Add new practice
+      updatedSavedPractices = [...savedPractices, practice];
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('savedPractices', JSON.stringify(updatedSavedPractices));
+    
+    // Update state
+    setSavedPractices(updatedSavedPractices);
+    
+    return Promise.resolve();
+  };
+  
   const getTimeOfDay = (): 'morning' | 'afternoon' | 'evening' => {
     const hour = new Date().getHours();
     if (hour < 12) return 'morning';
@@ -70,8 +113,10 @@ export const useMindfulnessPractices = () => {
   return {
     selectedPractice,
     completedPractices,
+    savedPractices,
     handleSelectPractice,
     handleCompletePractice,
+    handleSavePractice,
     getTimeOfDay
   };
 };
