@@ -1,18 +1,14 @@
 
 import React from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
+import ReactDOM from 'react-dom/client'
+import App from './App'
 import './index.css'
+import { ThemeProvider } from './components/providers/ThemeProvider'
 
-// Get the root element and create a root instance using createRoot
-const rootElement = document.getElementById('root')
-if (!rootElement) throw new Error('Root element not found')
-
-const root = createRoot(rootElement)
-
-// Render the App component to the DOM
-root.render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <ThemeProvider defaultTheme="system" storageKey="app-theme">
+      <App />
+    </ThemeProvider>
+  </React.StrictMode>,
 )

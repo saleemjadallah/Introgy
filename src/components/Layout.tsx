@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { Moon, Sun, Battery, Users, Brain, LineChart, Home, Bell, User } from "lucide-react";
@@ -6,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/profile/UserAvatar";
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
+import { useTheme } from "@/components/providers/ThemeProvider";
 
 const Layout = () => {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
 
-  // Initialize with light theme (changed from dark)
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
@@ -42,7 +41,6 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
       <header className="border-b px-4 py-3 flex items-center justify-between bg-card">
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-semibold">Introgy</h1>
@@ -68,9 +66,7 @@ const Layout = () => {
         </div>
       </header>
 
-      {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
         <nav className="w-64 border-r p-3 hidden md:block">
           <div className="space-y-1">
             <NavItem to="/" icon={Home} label="Home" />
@@ -82,7 +78,6 @@ const Layout = () => {
           </div>
         </nav>
 
-        {/* Mobile navigation - removed Profile icon and increased size of remaining icons */}
         <div className="fixed bottom-0 left-0 right-0 border-t bg-white md:hidden z-10">
           <div className="flex justify-around py-2">
             <Link to="/" className={cn("p-2 rounded-full", location.pathname === "/" && "text-[#2A7D8B]")}>
@@ -103,7 +98,6 @@ const Layout = () => {
           </div>
         </div>
 
-        {/* Page content */}
         <main className="flex-1 overflow-auto p-4 pb-16 md:pb-4">
           <Outlet />
         </main>
