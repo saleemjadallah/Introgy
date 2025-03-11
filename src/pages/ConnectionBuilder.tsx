@@ -26,10 +26,10 @@ const ConnectionBuilder = () => {
   const renderFeatureCards = () => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="shadow-sm">
+        <Card className="shadow-sm connection-container-gradient">
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <Users className="h-5 w-5 flex-shrink-0" />
+              <Users className="h-5 w-5 flex-shrink-0 text-mauve" />
               <span>Compatibility Finder</span>
             </CardTitle>
             <CardDescription className="text-sm mt-1.5">Find people who match your social style</CardDescription>
@@ -39,10 +39,10 @@ const ConnectionBuilder = () => {
           </CardContent>
         </Card>
 
-        <Card className={`shadow-sm ${activeFeature === 'communication-preferences' ? 'border-primary' : ''}`}>
+        <Card className={`shadow-sm connection-container-gradient ${activeFeature === 'communication-preferences' ? 'border-primary' : ''}`}>
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <MessageCircle className="h-5 w-5 flex-shrink-0" />
+              <MessageCircle className="h-5 w-5 flex-shrink-0 text-mauve" />
               <span>Communication Preferences</span>
             </CardTitle>
             <CardDescription className="text-sm mt-1.5">Set your ideal communication style</CardDescription>
@@ -53,7 +53,7 @@ const ConnectionBuilder = () => {
             </p>
             <Button 
               onClick={() => setActiveFeature('communication-preferences')}
-              className="w-full py-5 sm:py-2 text-base sm:text-sm mt-2"
+              className="w-full py-5 sm:py-2 text-base sm:text-sm mt-2 bg-white/70 hover:bg-white text-mauve"
               size="lg"
             >
               Manage Preferences
@@ -61,10 +61,10 @@ const ConnectionBuilder = () => {
           </CardContent>
         </Card>
 
-        <Card className={`shadow-sm ${activeFeature === 'meaningful-interactions' ? 'border-primary' : ''}`}>
+        <Card className={`shadow-sm connection-container-gradient ${activeFeature === 'meaningful-interactions' ? 'border-primary' : ''}`}>
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <Sparkles className="h-5 w-5 flex-shrink-0" />
+              <Sparkles className="h-5 w-5 flex-shrink-0 text-mauve" />
               <span>Meaningful Interaction Tools</span>
             </CardTitle>
             <CardDescription className="text-sm mt-1.5">Tools for deeper connections</CardDescription>
@@ -75,7 +75,7 @@ const ConnectionBuilder = () => {
             </p>
             <Button 
               onClick={() => setActiveFeature('meaningful-interactions')}
-              className="w-full py-5 sm:py-2 text-base sm:text-sm mt-2"
+              className="w-full py-5 sm:py-2 text-base sm:text-sm mt-2 bg-white/70 hover:bg-white text-mauve"
               size="lg"
             >
               Open Tools
@@ -83,10 +83,10 @@ const ConnectionBuilder = () => {
           </CardContent>
         </Card>
 
-        <Card className={`md:col-span-2 shadow-sm ${activeFeature === 'relationship-nurturing' ? 'border-primary' : ''}`}>
+        <Card className={`md:col-span-2 shadow-sm connection-container-gradient ${activeFeature === 'relationship-nurturing' ? 'border-primary' : ''}`}>
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <Heart className="h-5 w-5 flex-shrink-0" />
+              <Heart className="h-5 w-5 flex-shrink-0 text-mauve" />
               <span>Relationship Nurturing</span>
             </CardTitle>
             <CardDescription className="text-sm mt-1.5">Tools to maintain important connections with less effort</CardDescription>
@@ -97,7 +97,7 @@ const ConnectionBuilder = () => {
             </p>
             <Button 
               onClick={() => setActiveFeature('relationship-nurturing')}
-              className="w-full py-5 sm:py-2 text-base sm:text-sm mt-2"
+              className="w-full py-5 sm:py-2 text-base sm:text-sm mt-2 bg-white/70 hover:bg-white text-mauve"
               size="lg"
             >
               Open Intelligent Assistant

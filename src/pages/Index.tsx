@@ -1,3 +1,4 @@
+
 import { Battery, Brain, Users, LineChart } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,10 +27,10 @@ const Index = () => {
       </div>
 
       {/* Social battery summary */}
-      <Card>
+      <Card className="battery-container-gradient">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2">
-            <Battery className="h-5 w-5" />
+            <Battery className="h-5 w-5 text-sage" />
             Social Battery
           </CardTitle>
           <CardDescription>Your current social energy level</CardDescription>
@@ -40,11 +41,12 @@ const Index = () => {
               <span className="text-sm font-medium">Current Level</span>
               <span className="text-sm font-medium">{batteryLevel}%</span>
             </div>
-            <Progress 
-              value={batteryLevel} 
-              className="h-2" 
-              indicatorClassName={getBatteryColor(batteryLevel)}
-            />
+            <div className="h-2 w-full bg-white/50 rounded-full overflow-hidden">
+              <div 
+                className="h-full transition-all duration-500 battery-indicator-gradient"
+                style={{ width: `${batteryLevel}%` }}
+              />
+            </div>
             <div className="pt-2">
               <Link to="/social-battery">
                 <Button variant="outline" size="sm" className="w-full">Update Battery</Button>
@@ -57,10 +59,10 @@ const Index = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Feature cards */}
         <Link to="/social-navigation" className="block">
-          <Card className="h-full hover:bg-accent/10 transition-colors">
+          <Card className="h-full navigation-container-gradient hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
+                <Users className="h-5 w-5 text-periwinkle" />
                 Social Navigation
               </CardTitle>
               <CardDescription>Tools for navigating social situations</CardDescription>
@@ -72,10 +74,10 @@ const Index = () => {
         </Link>
 
         <Link to="/connection-builder" className="block">
-          <Card className="h-full hover:bg-accent/10 transition-colors">
+          <Card className="h-full connection-container-gradient hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Brain className="h-5 w-5" />
+                <Brain className="h-5 w-5 text-mauve" />
                 Connection Builder
               </CardTitle>
               <CardDescription>Create meaningful relationships</CardDescription>
@@ -87,10 +89,10 @@ const Index = () => {
         </Link>
 
         <Link to="/wellbeing" className="block">
-          <Card className="h-full hover:bg-accent/10 transition-colors">
+          <Card className="h-full wellbeing-container-gradient hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <LineChart className="h-5 w-5" />
+                <LineChart className="h-5 w-5 text-blueteal" />
                 Wellbeing Center
               </CardTitle>
               <CardDescription>Resources for introvert wellness</CardDescription>

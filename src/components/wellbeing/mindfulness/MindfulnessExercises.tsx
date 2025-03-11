@@ -34,18 +34,18 @@ const MindfulnessExercises = () => {
                 type="scroll" 
                 orientation="horizontal"
               >
-                <TabsList className="min-w-max flex-nowrap mb-4">
-                  <TabsTrigger value="discover" className="flex-shrink-0">
-                    <MountainSnow className="h-4 w-4 mr-2" />
+                <TabsList className="min-w-max flex-nowrap mb-4 wellbeing-container-gradient">
+                  <TabsTrigger value="discover" className="flex-shrink-0 data-[state=active]:bg-white/60">
+                    <MountainSnow className="h-4 w-4 mr-2 text-blueteal" />
                     Discover
                   </TabsTrigger>
-                  <TabsTrigger value="recommended" className="flex-shrink-0">Recommended</TabsTrigger>
-                  <TabsTrigger value="moments" className="flex-shrink-0">
-                    <Sparkles className="h-4 w-4 mr-2" />
+                  <TabsTrigger value="recommended" className="flex-shrink-0 data-[state=active]:bg-white/60">Recommended</TabsTrigger>
+                  <TabsTrigger value="moments" className="flex-shrink-0 data-[state=active]:bg-white/60">
+                    <Sparkles className="h-4 w-4 mr-2 text-blueteal" />
                     Mindful Moments
                   </TabsTrigger>
-                  <TabsTrigger value="builder" className="flex-shrink-0">Practice Builder</TabsTrigger>
-                  <TabsTrigger value="history" className="flex-shrink-0">History</TabsTrigger>
+                  <TabsTrigger value="builder" className="flex-shrink-0 data-[state=active]:bg-white/60">Practice Builder</TabsTrigger>
+                  <TabsTrigger value="history" className="flex-shrink-0 data-[state=active]:bg-white/60">History</TabsTrigger>
                 </TabsList>
               </ScrollArea>
             </div>

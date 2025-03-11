@@ -20,17 +20,17 @@ const EducationCenter = () => {
             type="scroll" 
             orientation="horizontal"
           >
-            <TabsList className="min-w-max">
-              <TabsTrigger value="glossary" className="whitespace-nowrap">
-                <Book className="h-4 w-4 mr-2" />
+            <TabsList className="min-w-max education-container-gradient">
+              <TabsTrigger value="glossary" className="whitespace-nowrap data-[state=active]:bg-white/60">
+                <Book className="h-4 w-4 mr-2 text-amber opacity-80" />
                 Psychology Glossary
               </TabsTrigger>
-              <TabsTrigger value="mythbusters" className="whitespace-nowrap">
-                <AlertCircle className="h-4 w-4 mr-2" />
+              <TabsTrigger value="mythbusters" className="whitespace-nowrap data-[state=active]:bg-white/60">
+                <AlertCircle className="h-4 w-4 mr-2 text-amber opacity-80" />
                 Mythbusters
               </TabsTrigger>
-              <TabsTrigger value="famous" className="whitespace-nowrap">
-                <User className="h-4 w-4 mr-2" />
+              <TabsTrigger value="famous" className="whitespace-nowrap data-[state=active]:bg-white/60">
+                <User className="h-4 w-4 mr-2 text-amber opacity-80" />
                 Famous Introverts
               </TabsTrigger>
             </TabsList>

@@ -10,7 +10,7 @@ interface BatteryStatusProps {
 }
 
 export const BatteryStatus = ({ batteryLevel, onLevelChange }: BatteryStatusProps) => (
-  <Card>
+  <Card className="battery-container-gradient">
     <CardHeader>
       <CardTitle className="flex items-center gap-2">
         <Battery className="h-5 w-5" />
@@ -24,15 +24,9 @@ export const BatteryStatus = ({ batteryLevel, onLevelChange }: BatteryStatusProp
           <span className="text-sm font-medium">Current Level</span>
           <span className="text-sm font-medium">{batteryLevel}%</span>
         </div>
-        <div className="h-4 w-full bg-secondary rounded-full overflow-hidden">
+        <div className="h-4 w-full bg-white/50 rounded-full overflow-hidden">
           <div 
-            className={`h-full transition-all duration-500 ${
-              batteryLevel > 60 
-                ? "bg-[#3E9D9D]" // Soft teal for high battery
-                : batteryLevel > 30 
-                  ? "bg-[#F5B85E]" // Amber for medium battery
-                  : "bg-[#E57373]" // Red for low battery
-            }`}
+            className="h-full transition-all duration-500 battery-indicator-gradient"
             style={{ width: `${batteryLevel}%` }}
           />
         </div>
@@ -48,7 +42,7 @@ export const BatteryStatus = ({ batteryLevel, onLevelChange }: BatteryStatusProp
           max={100}
           step={1}
           onValueChange={onLevelChange}
-          className="[&>.relative>div]:bg-[#3E9D9D]"
+          className="[&>.relative>div]:bg-[#7DAA92]"
         />
       </div>
     </CardContent>

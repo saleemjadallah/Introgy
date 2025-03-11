@@ -92,7 +92,32 @@
   }
 }
 
-/* Remove duplicate base layer */
+/* Container gradient styles */
+.battery-container-gradient {
+  @apply bg-gradient-to-br from-[#E0F2F1] to-[#E8F5E9];
+}
+
+.navigation-container-gradient {
+  @apply bg-gradient-to-br from-[#E8EAF6] to-[#F3E5F5];
+}
+
+.connection-container-gradient {
+  @apply bg-gradient-to-br from-[#FFF3E0] to-[#FCEAE3];
+}
+
+.wellbeing-container-gradient {
+  @apply bg-gradient-to-br from-[#E1F5FE] to-[#E0F7FA];
+}
+
+.education-container-gradient {
+  @apply bg-gradient-to-br from-[#FFF8E1] to-[#FFFDE7];
+}
+
+/* Battery indicator gradient */
+.battery-indicator-gradient {
+  @apply bg-gradient-to-r from-[#7DAA92] to-[#A5D6A7];
+}
+
 /* Container styles */
 .container-secondary {
   @apply bg-[#F5F8FC] border border-[#D8DEE9] rounded-lg;
@@ -148,6 +173,23 @@
 
 .footer-nav-inactive {
   @apply text-[#8A94A6] !important;
+}
+
+/* Icon colors for each section */
+.navigation-icon {
+  @apply text-[#7B7FC4];
+}
+
+.connection-icon {
+  @apply text-[#AD7A99];
+}
+
+.wellbeing-icon {
+  @apply text-[#4DB6AC];
+}
+
+.education-icon {
+  @apply text-[#FFA726] opacity-80;
 }
 
 /* Override headings and paragraphs explicitly */

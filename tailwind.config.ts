@@ -67,7 +67,27 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				container: {
-					secondary: 'hsl(var(--container-secondary))'
+					secondary: 'hsl(var(--container-secondary))',
+					battery: {
+						from: '#E0F2F1',
+						to: '#E8F5E9'
+					},
+					navigation: {
+						from: '#E8EAF6',
+						to: '#F3E5F5'
+					},
+					connection: {
+						from: '#FFF3E0',
+						to: '#FCEAE3'
+					},
+					wellbeing: {
+						from: '#E1F5FE',
+						to: '#E0F7FA'
+					},
+					education: {
+						from: '#FFF8E1',
+						to: '#FFFDE7'
+					}
 				},
 				text: {
 					primary: 'hsl(var(--text-primary))',
@@ -95,8 +115,23 @@ export default {
 				},
 				sage: {
 					DEFAULT: '#7DAA92',
-					light: '#9ECBB6',
+					light: '#A5D6A7',
 					dark: '#6C9981'
+				},
+				mauve: {
+					DEFAULT: '#AD7A99',
+					light: '#C49FB6',
+					dark: '#96657F'
+				},
+				blueteal: {
+					DEFAULT: '#4DB6AC',
+					light: '#80CBC4',
+					dark: '#26A69A'
+				},
+				amber: {
+					DEFAULT: '#FFA726',
+					light: '#FFB74D',
+					dark: '#FF9800'
 				}
 			},
 			boxShadow: {

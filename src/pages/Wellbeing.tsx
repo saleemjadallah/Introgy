@@ -37,7 +37,7 @@ const Wellbeing = () => {
               onClick={() => setActiveSection('overview')}
               className="flex-shrink-0"
             >
-              <LineChart className="h-4 w-4 mr-2" />
+              <LineChart className="h-4 w-4 mr-2 text-blueteal" />
               Overview
             </Button>
             <Button 
@@ -45,7 +45,7 @@ const Wellbeing = () => {
               onClick={() => setActiveSection('education')}
               className="flex-shrink-0"
             >
-              <BookOpen className="h-4 w-4 mr-2" />
+              <BookOpen className="h-4 w-4 mr-2 text-amber" />
               Education Center
             </Button>
             <Button 
@@ -53,7 +53,7 @@ const Wellbeing = () => {
               onClick={() => setActiveSection('mindfulness')}
               className="flex-shrink-0"
             >
-              <MountainSnow className="h-4 w-4 mr-2" />
+              <MountainSnow className="h-4 w-4 mr-2 text-blueteal" />
               Mindfulness Exercises
             </Button>
             <Button 
@@ -61,7 +61,7 @@ const Wellbeing = () => {
               onClick={() => setActiveSection('wisdom')}
               className="flex-shrink-0"
             >
-              <MessageSquare className="h-4 w-4 mr-2" />
+              <MessageSquare className="h-4 w-4 mr-2 text-blueteal" />
               Community Wisdom
             </Button>
           </div>
@@ -70,10 +70,10 @@ const Wellbeing = () => {
 
       {activeSection === 'overview' ? (
         <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2'} gap-4 w-full max-w-full`}>
-          <Card className="w-full">
+          <Card className="w-full education-container-gradient">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
+                <BookOpen className="h-5 w-5 text-amber opacity-80" />
                 Education Center
               </CardTitle>
               <CardDescription>Learn about introvert psychology</CardDescription>
@@ -85,7 +85,7 @@ const Wellbeing = () => {
                 </p>
                 <Button 
                   onClick={() => setActiveSection('education')}
-                  className="gap-2"
+                  className="gap-2 bg-white/70 hover:bg-white text-amber"
                 >
                   <BookOpen className="h-4 w-4" />
                   Explore Education Center
@@ -94,10 +94,10 @@ const Wellbeing = () => {
             </CardContent>
           </Card>
 
-          <Card className="w-full">
+          <Card className="w-full wellbeing-container-gradient">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <MountainSnow className="h-5 w-5" />
+                <MountainSnow className="h-5 w-5 text-blueteal" />
                 Mindfulness Exercises
               </CardTitle>
               <CardDescription>Introvert-specific mindfulness practices</CardDescription>
@@ -109,7 +109,7 @@ const Wellbeing = () => {
                 </p>
                 <Button 
                   onClick={() => setActiveSection('mindfulness')}
-                  className="gap-2"
+                  className="gap-2 bg-white/70 hover:bg-white text-blueteal"
                 >
                   <MountainSnow className="h-4 w-4" />
                   Explore Mindfulness Practices
@@ -118,10 +118,10 @@ const Wellbeing = () => {
             </CardContent>
           </Card>
 
-          <Card className={`w-full ${isMobile ? '' : 'md:col-span-2'}`}>
+          <Card className={`w-full wellbeing-container-gradient ${isMobile ? '' : 'md:col-span-2'}`}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
+                <Users className="h-5 w-5 text-blueteal" />
                 Community Wisdom
               </CardTitle>
               <CardDescription>Anonymous sharing of introvert strategies</CardDescription>
@@ -133,7 +133,7 @@ const Wellbeing = () => {
                 </p>
                 <Button 
                   onClick={() => setActiveSection('wisdom')}
-                  className="gap-2"
+                  className="gap-2 bg-white/70 hover:bg-white text-blueteal"
                 >
                   <MessageSquare className="h-4 w-4" />
                   Explore Community Wisdom
