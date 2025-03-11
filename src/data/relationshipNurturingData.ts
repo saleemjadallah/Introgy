@@ -534,7 +534,7 @@ export const mockMessageTemplates: MessageTemplate[] = [
     name: 'Casual Check-in',
     category: 'close friends',
     context: 'check_in',
-    template: 'Hey {name}, it's been a while! How have you been? Would love to hear what's new in your world.',
+    template: 'Hey {name}, it\'s been a while! How have you been? Would love to hear what\'s new in your world.',
     personalizable: true,
     tone: 'casual',
     energyRequired: 2
@@ -544,7 +544,7 @@ export const mockMessageTemplates: MessageTemplate[] = [
     name: 'Life Event Follow-up',
     category: 'family',
     context: 'life_event',
-    template: 'Hi {name}, I've been thinking about your {event}. How are things going with that? I'm here if you want to talk about it.',
+    template: 'Hi {name}, I\'ve been thinking about your {event}. How are things going with that? I\'m here if you want to talk about it.',
     personalizable: true,
     tone: 'warm',
     energyRequired: 3
@@ -554,7 +554,7 @@ export const mockMessageTemplates: MessageTemplate[] = [
     name: 'Professional Reconnect',
     category: 'work contacts',
     context: 'reconnect',
-    template: 'Hello {name}, I hope you've been well. I was thinking about our last conversation about {topic} and wondered if you'd like to catch up sometime.',
+    template: 'Hello {name}, I hope you\'ve been well. I was thinking about our last conversation about {topic} and wondered if you\'d like to catch up sometime.',
     personalizable: true,
     tone: 'professional',
     energyRequired: 4
@@ -564,7 +564,7 @@ export const mockMessageTemplates: MessageTemplate[] = [
     name: 'Birthday Wish',
     category: 'all',
     context: 'celebration',
-    template: 'Happy Birthday, {name}! 🎉 Hope your day is filled with joy and that the year ahead brings you everything you're hoping for.',
+    template: 'Happy Birthday, {name}! 🎉 Hope your day is filled with joy and that the year ahead brings you everything you\'re hoping for.',
     personalizable: false,
     tone: 'warm',
     energyRequired: 2
@@ -574,7 +574,7 @@ export const mockMessageTemplates: MessageTemplate[] = [
     name: 'Post-Meeting Follow-up',
     category: 'all',
     context: 'follow_up',
-    template: 'It was great to see you yesterday, {name}! I really enjoyed our conversation about {topic}. Let's do it again soon!',
+    template: 'It was great to see you yesterday, {name}! I really enjoyed our conversation about {topic}. Let\'s do it again soon!',
     personalizable: true,
     tone: 'casual',
     energyRequired: 2
@@ -605,7 +605,7 @@ export const mockIntelligentConversationStarters: IntelligentConversationStarter
     id: uuidv4(),
     relationshipId: mockRelationships[1].id,
     topic: 'Watercolor painting progress',
-    starter: 'How's your watercolor class going? Have you created any new pieces you're particularly proud of?',
+    starter: 'How\'s your watercolor class going? Have you created any new pieces you\'re particularly proud of?',
     context: 'Based on recent activity mentioned in conversation',
     confidenceScore: 0.89,
     source: 'past_conversation'
@@ -623,7 +623,7 @@ export const mockIntelligentConversationStarters: IntelligentConversationStarter
     id: uuidv4(),
     relationshipId: mockRelationships[3].id,
     topic: 'New apartment',
-    starter: 'How's the move to your new place going? Found any good local spots in the neighborhood yet?',
+    starter: 'How\'s the move to your new place going? Found any good local spots in the neighborhood yet?',
     context: 'Based on upcoming life event',
     confidenceScore: 0.95,
     source: 'life_event'

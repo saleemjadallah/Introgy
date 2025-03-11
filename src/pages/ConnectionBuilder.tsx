@@ -1,10 +1,11 @@
 
 import { useState } from "react";
-import { Brain, Users, MessageCircle, Heart } from "lucide-react";
+import { Brain, Users, MessageCircle, Heart, Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import CommunicationPreferences from "@/components/connection-builder/CommunicationPreferences";
 import RelationshipNurturing from "@/components/connection-builder/RelationshipNurturing";
+import MeaningfulInteractionTools from "@/components/connection-builder/MeaningfulInteractionTools";
 
 const ConnectionBuilder = () => {
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
@@ -15,6 +16,8 @@ const ConnectionBuilder = () => {
         return <CommunicationPreferences />;
       case 'relationship-nurturing':
         return <RelationshipNurturing />;
+      case 'meaningful-interactions':
+        return <MeaningfulInteractionTools />;
       default:
         return renderFeatureCards();
     }
@@ -54,6 +57,28 @@ const ConnectionBuilder = () => {
               size="lg"
             >
               Manage Preferences
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className={`shadow-sm ${activeFeature === 'meaningful-interactions' ? 'border-primary' : ''}`}>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <Sparkles className="h-5 w-5 flex-shrink-0" />
+              <span>Meaningful Interaction Tools</span>
+            </CardTitle>
+            <CardDescription className="text-sm mt-1.5">Tools for deeper connections</CardDescription>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-4">
+            <p className="text-sm text-muted-foreground">
+              AI-powered tools to help you create deeper connections with less effort. Find conversation starters, message templates, and more.
+            </p>
+            <Button 
+              onClick={() => setActiveFeature('meaningful-interactions')}
+              className="w-full py-5 sm:py-2 text-base sm:text-sm mt-2"
+              size="lg"
+            >
+              Open Tools
             </Button>
           </CardContent>
         </Card>
