@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { PhoneAuthForm } from "@/components/auth/PhoneAuthForm";
 import { useAuth } from "@/contexts/AuthContext";
+import { ArrowLeft } from "lucide-react";
 
 const Auth = () => {
   const [mode] = useState<"signin" | "signup">("signin");
