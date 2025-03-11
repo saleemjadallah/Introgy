@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useRelationshipNurturing } from '@/hooks/useRelationshipNurturing';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { BatteryFull, Calendar, MessageCircle, Clock, TrendingUp, AlertCircle, Heart, Copy, ChevronRight } from "lucide-react";
 import { format, isToday, isTomorrow, addDays } from 'date-fns';
+import { Relationship } from '@/types/relationship-nurturing';
 
 // Main component for the Relationship Nurturing feature
 export const RelationshipNurturing = () => {
@@ -16,7 +18,7 @@ export const RelationshipNurturing = () => {
     relationshipHealth,
     connectionSuggestions,
     conversationStarters,
-    relationships = [],
+    relationships = [], // Provide default empty array
     isLoading,
     markInsightAsRead,
     markAllInsightsAsRead,
@@ -103,7 +105,7 @@ export const RelationshipNurturing = () => {
         <TabsContent value="starters" className="space-y-4">
           <StartersTab 
             starters={conversationStarters} 
-            relationships={relationships}
+            relationships={relationships || []} // Provide fallback empty array
             onGenerateMore={generateMoreConversationStarters}
             onCopy={copyConversationStarter}
           />
@@ -321,7 +323,7 @@ const StartersTab = ({ starters, relationships, onGenerateMore, onCopy }) => {
               defaultValue=""
             >
               <option value="" disabled>Generate for...</option>
-              {relationships.map(relationship => (
+              {relationships.map((relationship: Relationship) => (
                 <option key={relationship.id} value={relationship.id}>
                   {relationship.name}
                 </option>
@@ -338,7 +340,7 @@ const StartersTab = ({ starters, relationships, onGenerateMore, onCopy }) => {
           </div>
         ) : (
           Object.entries(relationshipGroups).map(([relationshipId, relationshipStarters]) => {
-            const relationshipName = relationships.find(r => r.id === relationshipId)?.name || 'Unknown';
+            const relationshipName = relationships.find((r: Relationship) => r.id === relationshipId)?.name || 'Unknown';
             
             return (
               <div key={relationshipId} className="space-y-3">
