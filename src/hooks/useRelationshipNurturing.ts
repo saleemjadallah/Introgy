@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { 
@@ -17,6 +16,14 @@ import { useSocialBattery } from '@/hooks/useSocialBattery';
 import { addDays, format, isAfter, isBefore, parseISO, subDays } from 'date-fns';
 import { ConnectionScheduler, ScheduledInteraction } from '@/types/relationship-nurturing';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  convertDbRelationship,
+  convertDbInsight,
+  convertDbHealth,
+  convertDbSuggestion,
+  convertDbStarter,
+  convertDbTemplate
+} from '@/utils/relationshipTypeConverters';
 
 // Import mock data for fallback when not authenticated
 import { 
@@ -96,18 +103,11 @@ export function useRelationshipNurturing() {
             .select('*');
             
           if (healthError) throw healthError;
-          
-          // Load health suggestions for each health assessment
-          for (const health of healthData) {
-            const { data: suggestionsData, error: suggestionsError } = await supabase
-              .from('relationship_health_suggestions')
-              .select('suggestion')
-              .eq('health_id', health.id);
-              
-            if (suggestionsError) throw suggestionsError;
-            
-            health.suggestions = suggestionsData.map(item => item.suggestion);
-          }
+
+          // Convert health data and load suggestions for each
+          const convertedHealth = await Promise.all(
+            healthData.map(health => convertDbHealth(health, supabase))
+          );
           
           // Load connection suggestions from Supabase
           const { data: suggestionsData, error: suggestionsError } = await supabase
@@ -131,22 +131,12 @@ export function useRelationshipNurturing() {
           if (templatesError) throw templatesError;
           
           // Convert data to application types
-          setRelationships(relationshipsData as Relationship[]);
-          setInsights(insightsData as RelationshipInsight[]);
-          setRelationshipHealth(healthData as RelationshipHealth[]);
-          setConnectionSuggestions(suggestionsData as ConnectionSuggestion[]);
-          setConversationStarters(startersData as IntelligentConversationStarter[]);
-          
-          // Convert message templates to match expected format
-          const convertedTemplates = templatesData.map(template => ({
-            ...template,
-            title: template.name,
-            body: template.template,
-            appropriate_for: [template.category],
-            energy_required: template.energy_required
-          }));
-          
-          setMessageTemplates(convertedTemplates as MessageTemplate[]);
+          setRelationships(relationshipsData.map(convertDbRelationship));
+          setInsights(insightsData.map(convertDbInsight));
+          setRelationshipHealth(convertedHealth);
+          setConnectionSuggestions(suggestionsData.map(convertDbSuggestion));
+          setConversationStarters(startersData.map(convertDbStarter));
+          setMessageTemplates(templatesData.map(convertDbTemplate));
           
           // For now, still use mock scheduler data until we implement that in Supabase
           setScheduler(mockScheduler);
@@ -1092,6 +1082,36 @@ export function useRelationshipNurturing() {
     });
   };
 
+  const saveInsight = async (insight: RelationshipInsight) => {
+    try {
+      if (!isAuthenticated) return;
+
+      const { error } = await supabase
+        .from('relationship_insights')
+        .update({
+          title: insight.title,
+          description: insight.description,
+          recommendation: insight.recommendation,
+          type: insight.type,
+          severity: insight.severity,
+          relationship_id: insight.relationshipId,
+          relationship_name: insight.relationshipName,
+          date_generated: insight.dateGenerated,
+          is_new: insight.isNew
+        })
+        .eq('id', insight.id);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error saving insight:', error);
+      toast({
+        title: 'Failed to save insight',
+        description: 'There was an error saving the insight. Please try again.',
+        variant: 'destructive'
+      });
+    }
+  };
+
   return {
     // Base nurturing data
     scheduler,
@@ -1128,6 +1148,7 @@ export function useRelationshipNurturing() {
     skipSuggestion,
     generateMoreConversationStarters,
     copyConversationStarter,
-    takeActionOnInsight
+    takeActionOnInsight,
+    saveInsight
   };
 }
