@@ -1,4 +1,3 @@
-
 import {
   Eye,
   Calendar,
@@ -85,7 +84,7 @@ export const badgesData: BadgeData[] = [
     "Inner Observer",
     "Complete your introvert profile assessment to gain deeper self-understanding.",
     "self-awareness",
-    React.createElement(Eye, { className: "h-8 w-8" }),
+    React.createElement(Eye, { className: "h-8 w-8 text-periwinkle fill-periwinkle/10" }),
     { type: "profile_complete" },
     "achieved",
     undefined,
@@ -98,7 +97,7 @@ export const badgesData: BadgeData[] = [
     "Reflection Master",
     "Log your energy levels for 7 consecutive days to understand your patterns.",
     "self-awareness",
-    React.createElement(Calendar, { className: "h-8 w-8" }),
+    React.createElement(Calendar, { className: "h-8 w-8 text-sage fill-sage/10" }),
     { type: "consecutive_logs", requiredCount: 7 },
     "in-progress",
     4,
@@ -110,7 +109,7 @@ export const badgesData: BadgeData[] = [
     "Pattern Finder",
     "Identify 3 personal energy drain triggers in your social interactions.",
     "self-awareness",
-    React.createElement(Sparkles, { className: "h-8 w-8" }),
+    React.createElement(Sparkles, { className: "h-8 w-8 text-amber fill-amber/10" }),
     { type: "identify_triggers", requiredCount: 3 },
     "locked"
   ),
@@ -120,7 +119,7 @@ export const badgesData: BadgeData[] = [
     "Self-Knowledge Seeker",
     "Read 10 articles in the Education Center to expand your understanding.",
     "self-awareness",
-    React.createElement(BookOpen, { className: "h-8 w-8" }),
+    React.createElement(BookOpen, { className: "h-8 w-8 text-teal fill-teal/10" }),
     { type: "read_articles", requiredCount: 10 },
     "in-progress",
     3,
@@ -132,7 +131,7 @@ export const badgesData: BadgeData[] = [
     "Energy Cartographer",
     "Create a detailed map of your social battery patterns over time.",
     "self-awareness",
-    React.createElement(Map, { className: "h-8 w-8" }),
+    React.createElement(Map, { className: "h-8 w-8 text-mauve fill-mauve/10" }),
     { type: "energy_map_complete" },
     "locked"
   ),
@@ -143,7 +142,7 @@ export const badgesData: BadgeData[] = [
     "Battery Guardian",
     "Maintain your social energy above 30% for a full week.",
     "energy-management",
-    React.createElement(Battery, { className: "h-8 w-8" }),
+    React.createElement(Battery, { className: "h-8 w-8 text-blueteal fill-blueteal/10" }),
     { type: "maintain_energy", requiredDuration: 7 },
     "locked"
   ),
@@ -153,7 +152,7 @@ export const badgesData: BadgeData[] = [
     "Recharge Rookie",
     "Use recharge activities 10 times to restore your social energy.",
     "energy-management",
-    React.createElement(BatteryCharging, { className: "h-8 w-8" }),
+    React.createElement(BatteryCharging, { className: "h-8 w-8 text-amber fill-amber/10" }),
     { type: "use_recharge", requiredCount: 10 },
     "achieved",
     undefined,
@@ -166,7 +165,7 @@ export const badgesData: BadgeData[] = [
     "Preparation Pro",
     "Use the Event Preparation feature before 5 different social events.",
     "energy-management",
-    React.createElement(ClipboardCheck, { className: "h-8 w-8" }),
+    React.createElement(ClipboardCheck, { className: "h-8 w-8 text-periwinkle fill-periwinkle/10" }),
     { type: "event_preparation", requiredCount: 5 },
     "in-progress",
     2,
@@ -178,7 +177,7 @@ export const badgesData: BadgeData[] = [
     "Energy Economist",
     "Balance your social expenditures effectively for 2 weeks.",
     "energy-management",
-    React.createElement(Scale, { className: "h-8 w-8" }),
+    React.createElement(Scale, { className: "h-8 w-8 text-teal fill-teal/10" }),
     { type: "energy_balance", requiredDuration: 14 },
     "locked"
   ),
@@ -188,7 +187,7 @@ export const badgesData: BadgeData[] = [
     "Recovery Specialist",
     "Utilize 10 different recharge activities to restore your energy.",
     "energy-management",
-    React.createElement(Wrench, { className: "h-8 w-8" }), // Changed from Toolbox to Wrench
+    React.createElement(Wrench, { className: "h-8 w-8 text-sage fill-sage/10" }), // Changed from Toolbox to Wrench
     { type: "diverse_recharge", requiredCount: 10 },
     "locked"
   ),
@@ -199,7 +198,7 @@ export const badgesData: BadgeData[] = [
     "Conversation Apprentice",
     "Complete 5 conversation simulations to build your social skills.",
     "social-skill",
-    React.createElement(MessageSquare, { className: "h-8 w-8" }),
+    React.createElement(MessageSquare, { className: "h-8 w-8 text-mauve fill-mauve/10" }),
     { type: "conversation_sim", requiredCount: 5 },
     "locked"
   ),
@@ -209,7 +208,7 @@ export const badgesData: BadgeData[] = [
     "Exit Strategist",
     "Save 5 exit strategies to your personal collection for social situations.",
     "social-skill",
-    React.createElement(DoorOpen, { className: "h-8 w-8" }),
+    React.createElement(DoorOpen, { className: "h-8 w-8 text-blueteal fill-blueteal/10" }),
     { type: "save_exit_strategies", requiredCount: 5 },
     "locked"
   ),
@@ -219,7 +218,7 @@ export const badgesData: BadgeData[] = [
     "Small Talk Survivor",
     "Complete 3 Small Talk practice sessions to navigate casual conversation.",
     "social-skill",
-    React.createElement(LifeBuoy, { className: "h-8 w-8" }),
+    React.createElement(LifeBuoy, { className: "h-8 w-8 text-amber fill-amber/10" }),
     { type: "small_talk_practice", requiredCount: 3 },
     "locked"
   ),
@@ -229,7 +228,7 @@ export const badgesData: BadgeData[] = [
     "Deep Connection Cultivator",
     "Apply deep conversation techniques in real life interactions.",
     "social-skill",
-    React.createElement(Trees, { className: "h-8 w-8" }),
+    React.createElement(Trees, { className: "h-8 w-8 text-periwinkle fill-periwinkle/10" }),
     { type: "use_deep_techniques" },
     "locked"
   ),
@@ -239,7 +238,7 @@ export const badgesData: BadgeData[] = [
     "Boundary Setter",
     "Successfully implement personal boundaries in social situations.",
     "social-skill",
-    React.createElement(Shield, { className: "h-8 w-8" }),
+    React.createElement(Shield, { className: "h-8 w-8 text-teal fill-teal/10" }),
     { type: "set_boundaries" },
     "locked"
   ),
@@ -250,7 +249,7 @@ export const badgesData: BadgeData[] = [
     "First Step",
     "Try one strategy outside your comfort zone to expand your capabilities.",
     "growth",
-    React.createElement(Footprints, { className: "h-8 w-8" }),
+    React.createElement(Footprints, { className: "h-8 w-8 text-sage fill-sage/10" }),
     { type: "outside_comfort_zone", requiredCount: 1 },
     "achieved",
     undefined,
@@ -263,7 +262,7 @@ export const badgesData: BadgeData[] = [
     "Comfort Zone Explorer",
     "Expand your social capabilities in 3 different areas.",
     "growth",
-    React.createElement(Circle, { className: "h-8 w-8" }),
+    React.createElement(Circle, { className: "h-8 w-8 text-mauve fill-mauve/10" }),
     { type: "expand_capabilities", requiredCount: 3 },
     "in-progress",
     1,
@@ -275,7 +274,7 @@ export const badgesData: BadgeData[] = [
     "Introvert Adventurer",
     "Navigate challenging social situations using app strategies.",
     "growth",
-    React.createElement(Compass, { className: "h-8 w-8" }),
+    React.createElement(Compass, { className: "h-8 w-8 text-blueteal fill-blueteal/10" }),
     { type: "use_strategies" },
     "locked"
   ),
@@ -285,7 +284,7 @@ export const badgesData: BadgeData[] = [
     "Growth Mindset",
     "Track your progress in social development for a full month.",
     "growth",
-    React.createElement(Leaf, { className: "h-8 w-8" }), // Changed from Seedling to Leaf
+    React.createElement(Leaf, { className: "h-8 w-8 text-amber fill-amber/10" }), // Changed from Seedling to Leaf
     { type: "track_progress", requiredDuration: 30 },
     "locked"
   ),
@@ -295,7 +294,7 @@ export const badgesData: BadgeData[] = [
     "Personal Milestone",
     "Create and achieve a custom personal goal for your social journey.",
     "growth",
-    React.createElement(Flag, { className: "h-8 w-8" }),
+    React.createElement(Flag, { className: "h-8 w-8 text-periwinkle fill-periwinkle/10" }),
     { type: "custom_goal" },
     "locked"
   ),
@@ -306,7 +305,7 @@ export const badgesData: BadgeData[] = [
     "InnerCircle Initiate",
     "Complete the app onboarding process to start your journey.",
     "app-engagement",
-    React.createElement(Home, { className: "h-8 w-8" }),
+    React.createElement(Home, { className: "h-8 w-8 text-teal fill-teal/10" }),
     { type: "complete_onboarding" },
     "achieved",
     undefined,
@@ -319,7 +318,7 @@ export const badgesData: BadgeData[] = [
     "Feature Explorer",
     "Use each main feature of the app at least once to discover all tools.",
     "app-engagement",
-    React.createElement(AppWindow, { className: "h-8 w-8" }),
+    React.createElement(AppWindow, { className: "h-8 w-8 text-sage fill-sage/10" }),
     { type: "use_all_features" },
     "in-progress",
     3,
@@ -331,7 +330,7 @@ export const badgesData: BadgeData[] = [
     "Consistent Companion",
     "Use the app for 5 consecutive days to build a helpful habit.",
     "app-engagement",
-    React.createElement(CalendarDays, { className: "h-8 w-8" }),
+    React.createElement(CalendarDays, { className: "h-8 w-8 text-mauve fill-mauve/10" }),
     { type: "consecutive_days", requiredCount: 5 },
     "achieved",
     undefined,
@@ -344,7 +343,7 @@ export const badgesData: BadgeData[] = [
     "Feedback Provider",
     "Offer constructive feedback on strategies to improve the experience.",
     "app-engagement",
-    React.createElement(MessageSquareQuote, { className: "h-8 w-8" }),
+    React.createElement(MessageSquareQuote, { className: "h-8 w-8 text-blueteal fill-blueteal/10" }),
     { type: "provide_feedback" },
     "locked"
   ),
@@ -354,7 +353,7 @@ export const badgesData: BadgeData[] = [
     "Power User",
     "Show regular engagement with multiple features of the app.",
     "app-engagement",
-    React.createElement(AppWindow, { className: "h-8 w-8" }),
+    React.createElement(AppWindow, { className: "h-8 w-8 text-amber fill-amber/10" }),
     { type: "regular_engagement" },
     "locked"
   ),
@@ -365,7 +364,7 @@ export const badgesData: BadgeData[] = [
     "Introvert Wisdom",
     "Create personal insight that resonates with your introvert journey.",
     "special",
-    React.createElement(Lightbulb, { className: "h-8 w-8" }),
+    React.createElement(Lightbulb, { className: "h-8 w-8 text-periwinkle fill-periwinkle/10" }),
     { type: "create_insight" },
     "locked"
   ),
@@ -375,7 +374,7 @@ export const badgesData: BadgeData[] = [
     "Balance Finder",
     "Maintain social engagement while honoring your introvert needs.",
     "special",
-    React.createElement(Scale, { className: "h-8 w-8" }),
+    React.createElement(Scale, { className: "h-8 w-8 text-teal fill-teal/10" }),
     { type: "maintain_balance" },
     "locked"
   ),
@@ -385,7 +384,7 @@ export const badgesData: BadgeData[] = [
     "Resilience Builder",
     "Recover effectively from social overload situations.",
     "special",
-    React.createElement(Flame, { className: "h-8 w-8" }),
+    React.createElement(Flame, { className: "h-8 w-8 text-sage fill-sage/10" }),
     { type: "recover_from_overload" },
     "locked"
   ),
@@ -395,7 +394,7 @@ export const badgesData: BadgeData[] = [
     "Authenticity Champion",
     "Stay true to your introvert nature in challenging situations.",
     "special",
-    React.createElement(Gem, { className: "h-8 w-8" }),
+    React.createElement(Gem, { className: "h-8 w-8 text-mauve fill-mauve/10" }),
     { type: "maintain_authenticity" },
     "locked"
   ),
@@ -405,7 +404,7 @@ export const badgesData: BadgeData[] = [
     "Full Circle",
     "Demonstrate mastery of self-awareness, strategies, and personal growth.",
     "special",
-    React.createElement(CircleIcon, { className: "h-8 w-8" }),
+    React.createElement(CircleIcon, { className: "h-8 w-8 text-blueteal fill-blueteal/10" }),
     { type: "achieve_mastery" },
     "locked"
   ),
