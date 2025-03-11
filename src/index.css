@@ -10,10 +10,10 @@
     --background: 240 22% 95%;  /* Soft lavender-gray #F0F0F7 */
     --foreground: 222.2 84% 4.9%;
 
-    --card: 0 0% 100%;
+    --card: 0 0% 100%;  /* Pure white #FFFFFF */
     --card-foreground: 222.2 84% 4.9%;
 
-    --popover: 0 0% 100%;
+    --popover: 0 0% 100%;  /* Pure white #FFFFFF */
     --popover-foreground: 222.2 84% 4.9%;
 
     --primary: 222.2 47.4% 11.2%;
@@ -31,8 +31,8 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 218 27% 88%;  /* Light periwinkle #D8DEE9 */
+    --input: 218 27% 88%;  /* Light periwinkle #D8DEE9 */
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
@@ -52,6 +52,8 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    --container-secondary: 212 75% 98%;  /* Very pale blue #F5F8FC */
   }
 
   .dark {
@@ -117,3 +119,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Container styles */
+.container-secondary {
+  @apply bg-[#F5F8FC] border border-[#D8DEE9] rounded-lg;
+}
+
+.card {
+  @apply bg-card border-[#D8DEE9] shadow-sm;
+}
+
