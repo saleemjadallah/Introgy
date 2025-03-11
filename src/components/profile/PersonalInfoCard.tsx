@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { UserAvatar } from "@/components/profile/UserAvatar";
 import { Edit, Save, X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface PersonalInfoCardProps {
   userData: {
@@ -30,6 +32,65 @@ const PersonalInfoCard = ({
   setUserData, 
   onSave 
 }: PersonalInfoCardProps) => {
+  const { user } = useAuth();
+  
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (user) {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+          if (error) throw error;
+
+          if (data) {
+            setUserData({
+              ...userData,
+              displayName: data.display_name || userData.displayName,
+              email: data.email || userData.email,
+              // Keep other fields as they may not be in the profiles table
+            });
+          }
+        } catch (error) {
+          console.error('Error loading profile:', error);
+        }
+      }
+    };
+
+    loadUserProfile();
+  }, [user]);
+
+  const handleSave = async () => {
+    if (user) {
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            display_name: userData.displayName,
+            // Don't update email through this method as it requires auth verification
+            updated_at: new Date()
+          })
+          .eq('id', user.id);
+
+        if (error) throw error;
+        
+        onSave();
+        toast({
+          title: "Profile updated",
+          description: "Your profile has been successfully updated.",
+        });
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        toast.error('Error updating profile');
+      }
+    } else {
+      onSave(); // Fall back to local save for demo
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -45,7 +106,7 @@ const PersonalInfoCard = ({
           </Button>
         ) : (
           <div className="flex gap-2">
-            <Button variant="default" size="sm" onClick={onSave}>
+            <Button variant="default" size="sm" onClick={handleSave}>
               <Save size={16} className="mr-2" /> Save
             </Button>
             <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>

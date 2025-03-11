@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "./UserAvatar";
 import { 
@@ -16,7 +15,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { getRecentlyEarnedBadges } from "@/data/badgesData";
 
@@ -26,13 +26,12 @@ interface ProfileDropdownProps {
 }
 
 export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { user, signOut, isAuthenticated } = useAuth();
   const [darkMode, setDarkMode] = useState(
     document.documentElement.classList.contains("dark")
   );
   const [notifications, setNotifications] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
   
   // Get recently earned badges
   const recentBadges = getRecentlyEarnedBadges(7); // badges earned in the last 7 days
@@ -70,6 +69,11 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
     });
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -86,13 +90,11 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
               Sign in to track your social battery and access personalized features
             </p>
             <div className="space-y-2">
-              <Button 
-                variant="default" 
-                className="w-full"
-                onClick={() => setIsAuthenticated(true)}
-              >
-                Sign In (Demo)
-              </Button>
+              <Link to="/auth?mode=signin" className="block w-full">
+                <Button variant="default" className="w-full">
+                  Sign In
+                </Button>
+              </Link>
               <Link to="/auth?mode=signup" className="block w-full">
                 <Button variant="outline" className="w-full">
                   Create Account
@@ -123,8 +125,8 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
             <div className="flex items-center gap-3">
               <UserAvatar size="lg" showStatus status="online" />
               <div>
-                <h3 className="font-medium">Guest User</h3>
-                <p className="text-sm text-muted-foreground">guest@example.com</p>
+                <h3 className="font-medium">{user?.user_metadata?.display_name || 'User'}</h3>
+                <p className="text-sm text-muted-foreground">{user?.email || user?.phone || ''}</p>
               </div>
             </div>
           </div>
@@ -184,13 +186,7 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
             
             <button 
               className="flex items-center gap-2 p-2 text-sm hover:bg-accent rounded-md w-full text-left text-destructive"
-              onClick={() => {
-                toast({
-                  title: "Signed out successfully",
-                  duration: 2000,
-                });
-                setIsAuthenticated(false);
-              }}
+              onClick={handleSignOut}
             >
               <LogOut size={18} />
               <span>Sign Out</span>

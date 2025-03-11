@@ -9,13 +9,11 @@ import {
 } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { 
   User, 
   Settings, 
   Award, 
-  HelpCircle, 
-  Trophy
+  HelpCircle
 } from "lucide-react";
 
 import ProfileSection from "@/components/profile/ProfileSection";
@@ -23,22 +21,26 @@ import SettingsSection from "@/components/profile/SettingsSection";
 import BadgesSection from "@/components/profile/BadgesSection";
 import HelpFaqSection from "@/components/profile/HelpFaqSection";
 import { earnBadge } from "@/services/badgeService";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("profile");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
   const handleEarnDemo = () => {
     earnBadge("reflection-master");
     earnBadge("feature-explorer");
-    toast({
-      title: "Demo Mode",
-      description: "Earned some badges for demonstration purposes.",
-      duration: 3000,
-    });
   };
+
+  useEffect(() => {
+    // Check for tab in URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, []);
 
   if (!isAuthenticated) {
     return (
@@ -52,9 +54,9 @@ const Profile = () => {
             <div className="flex flex-col gap-2">
               <Button 
                 className="w-full" 
-                onClick={() => setIsAuthenticated(true)}
+                onClick={() => navigate("/auth?mode=signin")}
               >
-                Sign In (Demo)
+                Sign In
               </Button>
               <Button 
                 variant="outline" 
