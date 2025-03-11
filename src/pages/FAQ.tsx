@@ -12,15 +12,15 @@ const FAQ = () => {
   const faqCategories = [
     {
       id: "getting-started",
-      title: "Getting Started with InnerCircle",
+      title: "Getting Started with Introgy",
       items: [
         {
-          question: "What is InnerCircle?",
-          answer: "InnerCircle is an app designed specifically for introverts to help manage social energy, navigate social situations, build meaningful connections, and embrace your introverted nature. It offers tools for tracking your social battery, preparing for social events, and learning strategies that work well for introverts."
+          question: "What is Introgy?",
+          answer: "Introgy is an app designed specifically for introverts to help manage social energy, navigate social situations, build meaningful connections, and embrace your introverted nature. It offers tools for tracking your social battery, preparing for social events, and learning strategies that work well for introverts."
         },
         {
           question: "What is a Social Battery and how does tracking work?",
-          answer: "Your social battery represents your mental and emotional energy for social interactions. InnerCircle helps you track this energy throughout the day as different activities drain or recharge it. You can log activities and see patterns over time to better manage your social energy and avoid burnout."
+          answer: "Your social battery represents your mental and emotional energy for social interactions. Introgy helps you track this energy throughout the day as different activities drain or recharge it. You can log activities and see patterns over time to better manage your social energy and avoid burnout."
         },
         {
           question: "How can I customize my introvert profile?",
@@ -28,7 +28,7 @@ const FAQ = () => {
         },
         {
           question: "Is my data shared with others on the platform?",
-          answer: "No, InnerCircle is focused on personal insight rather than social networking. Your data is private by default and not shared with other users. You have complete control over what information is stored in your profile and can export or delete it at any time."
+          answer: "No, Introgy is focused on personal insight rather than social networking. Your data is private by default and not shared with other users. You have complete control over what information is stored in your profile and can export or delete it at any time."
         }
       ]
     },
@@ -38,10 +38,10 @@ const FAQ = () => {
       items: [
         {
           question: "How is my personal information protected?",
-          answer: "InnerCircle takes your privacy seriously. We use encryption for all sensitive data, don't share your information with third parties, and give you complete control over what data is stored. You can export or delete your data at any time from the Privacy & Data settings in your profile."
+          answer: "Introgy takes your privacy seriously. We use encryption for all sensitive data, don't share your information with third parties, and give you complete control over what data is stored. You can export or delete your data at any time from the Privacy & Data settings in your profile."
         },
         {
-          question: "Can I use InnerCircle without creating an account?",
+          question: "Can I use Introgy without creating an account?",
           answer: "Yes, you can use basic features without an account. However, creating an account allows us to save your preferences, history, and personalized settings across devices. Your data remains private and secure."
         },
         {
@@ -82,11 +82,11 @@ const FAQ = () => {
       items: [
         {
           question: "How do I update the app?",
-          answer: "InnerCircle updates automatically through your device's app store. Ensure you have automatic updates enabled or periodically check for updates in your app store. Important new features are highlighted when you open the app after an update."
+          answer: "Introgy updates automatically through your device's app store. Ensure you have automatic updates enabled or periodically check for updates in your app store. Important new features are highlighted when you open the app after an update."
         },
         {
-          question: "Can I access InnerCircle on multiple devices?",
-          answer: "Yes, with an account you can access InnerCircle across multiple devices. Your data will synchronize automatically, allowing you to check your social battery or event preparations regardless of which device you're using."
+          question: "Can I access Introgy on multiple devices?",
+          answer: "Yes, with an account you can access Introgy across multiple devices. Your data will synchronize automatically, allowing you to check your social battery or event preparations regardless of which device you're using."
         },
         {
           question: "The app is crashing or not working properly, what should I do?",
@@ -94,7 +94,7 @@ const FAQ = () => {
         },
         {
           question: "How do I report a bug or request a feature?",
-          answer: "In your Profile section, navigate to Help & FAQ and use the 'Contact Support' button. For bug reports, include steps to reproduce the issue and your device information. Feature requests are reviewed by our team regularly as we continue improving InnerCircle."
+          answer: "In your Profile section, navigate to Help & FAQ and use the 'Contact Support' button. For bug reports, include steps to reproduce the issue and your device information. Feature requests are reviewed by our team regularly as we continue improving Introgy."
         }
       ]
     }
@@ -122,7 +122,7 @@ const FAQ = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-semibold mb-2">Frequently Asked Questions</h1>
         <p className="text-muted-foreground">
-          Find answers to common questions about using InnerCircle
+          Find answers to common questions about using Introgy
         </p>
       </div>
       

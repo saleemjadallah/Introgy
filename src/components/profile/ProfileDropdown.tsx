@@ -1,3 +1,4 @@
+
 import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "./UserAvatar";
@@ -80,7 +81,7 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
       {!isAuthenticated ? (
         <div className="divide-y divide-border">
           <div className="p-4 text-center">
-            <h3 className="font-medium text-lg mb-2">Welcome to InnerCircle</h3>
+            <h3 className="font-medium text-lg mb-2">Welcome to Introgy</h3>
             <p className="text-sm text-muted-foreground mb-4">
               Sign in to track your social battery and access personalized features
             </p>

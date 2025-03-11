@@ -7,7 +7,7 @@ import type { BadgeData } from "./badgeUtils";
 export const appEngagementBadges: BadgeData[] = [
   createBadge(
     "innercircle-initiate",
-    "InnerCircle Initiate",
+    "Introgy Initiate",
     "Complete the app onboarding process to start your journey.",
     "app-engagement",
     React.createElement(Home, { className: "h-8 w-8 text-teal fill-teal/10" }),

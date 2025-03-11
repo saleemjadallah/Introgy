@@ -12,14 +12,14 @@ const HelpFaqSection = () => {
     },
     {
       question: "How is my personal information protected?",
-      answer: "InnerCircle takes your privacy seriously. We use encryption for all sensitive data, don't share your information with third parties, and give you complete control over what data is stored. You can export or delete your data at any time from the Privacy & Data settings."
+      answer: "Introgy takes your privacy seriously. We use encryption for all sensitive data, don't share your information with third parties, and give you complete control over what data is stored. You can export or delete your data at any time from the Privacy & Data settings."
     },
     {
       question: "How do I prepare for an upcoming social event?",
       answer: "Navigate to the Social Navigation section and use the Event Preparation tool. You can create an event, estimate its energy cost, set up boundaries, prepare conversation topics, and create exit strategies. The app will also suggest personalized tips based on your introvert profile."
     },
     {
-      question: "Can I use InnerCircle without creating an account?",
+      question: "Can I use Introgy without creating an account?",
       answer: "Yes, you can use basic features without an account. However, creating an account allows us to save your preferences, history, and personalized settings across devices. Your data remains private and secure."
     },
     {
@@ -33,7 +33,7 @@ const HelpFaqSection = () => {
       <CardHeader>
         <CardTitle>Frequently Asked Questions</CardTitle>
         <CardDescription>
-          Find answers to common questions about using InnerCircle
+          Find answers to common questions about using Introgy
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

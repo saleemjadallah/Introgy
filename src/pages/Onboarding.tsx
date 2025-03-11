@@ -53,7 +53,7 @@ const Onboarding = () => {
   return (
     <div className="container py-8 px-4">
       <div className="max-w-lg mx-auto">
-        <h1 className="text-2xl font-bold mb-6 text-center">Welcome to InnerCircle</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">Welcome to Introgy</h1>
         <p className="text-center mb-8 text-muted-foreground">
           Let's customize your experience based on your introvert preferences
         </p>
