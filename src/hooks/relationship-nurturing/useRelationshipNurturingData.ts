@@ -7,6 +7,20 @@ import { useNurturingStats } from './useNurturingStats';
 import { mockRelationships, mockScheduler } from '@/data/relationshipNurturingData';
 import { ConnectionScheduler, Relationship } from '@/types/relationship-nurturing';
 
+// Helper to convert DB format to app format
+const convertDbRelationshipToApp = (dbRelationship: any): Relationship => ({
+  id: dbRelationship.id,
+  name: dbRelationship.name,
+  category: dbRelationship.category,
+  importance: dbRelationship.importance_level || 1,
+  notes: "",
+  contactMethods: [],
+  interests: [],
+  lifeEvents: [],
+  conversationTopics: [],
+  interactionHistory: []
+});
+
 export function useRelationshipNurturingData() {
   const [relationships, setRelationships] = useState<Relationship[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -48,7 +62,13 @@ export function useRelationshipNurturingData() {
           .select('*');
 
         if (error) throw error;
-        setRelationships(data || mockRelationships);
+        
+        // Convert DB format to app format
+        const convertedRelationships = data 
+          ? data.map(convertDbRelationshipToApp)
+          : mockRelationships;
+          
+        setRelationships(convertedRelationships);
       } catch (error) {
         console.error('Error loading relationships:', error);
         setRelationships(mockRelationships);

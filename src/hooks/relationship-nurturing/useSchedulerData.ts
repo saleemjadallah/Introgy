@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -97,8 +98,20 @@ export const useSchedulerData = () => {
         }
 
         if (settingsData) {
+          // Ensure reminder_style is one of the valid options
+          const validReminderStyle = (
+            settingsData.reminder_style === 'gentle' || 
+            settingsData.reminder_style === 'direct' || 
+            settingsData.reminder_style === 'minimal'
+          ) ? settingsData.reminder_style as 'gentle' | 'direct' | 'minimal' : 'gentle';
+          
+          const typedSettings: DbSchedulerSettings = {
+            ...settingsData,
+            reminder_style: validReminderStyle
+          };
+          
           setScheduler(convertDbSchedulerToApp(
-            settingsData,
+            typedSettings,
             frequenciesData || [],
             defaultsData || []
           ));
