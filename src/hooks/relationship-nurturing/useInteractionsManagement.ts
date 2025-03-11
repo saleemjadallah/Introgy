@@ -1,15 +1,18 @@
+
 import { useState, useEffect, useCallback } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { format } from 'date-fns';
 import { 
   Relationship,
   NurturingStats,
   ConnectionScheduler,
-  ScheduledInteraction,
-  InteractionStatus,
-  RelationshipFrequency
+  ScheduledInteraction
 } from '@/types/relationship-nurturing';
-import { addDays, format, isAfter, isBefore, parseISO, subDays } from 'date-fns';
-import { supabase } from '@/integrations/supabase/client';
+
+// Import utility functions
+import { calculateStats } from './utils/statsCalculator';
+import { useInteractionGeneration } from './interactions/useInteractionGeneration';
+import { useInteractionOperations } from './interactions/useInteractionOperations';
+import { useFrequencyManagement } from './interactions/useFrequencyManagement';
 
 export function useInteractionsManagement(
   relationships: Relationship[],
@@ -19,323 +22,88 @@ export function useInteractionsManagement(
   const [scheduledInteractions, setScheduledInteractions] = useState<ScheduledInteraction[]>([]);
   const [todayInteractions, setTodayInteractions] = useState<ScheduledInteraction[]>([]);
   const [stats, setStats] = useState<NurturingStats | null>(null);
-
+  const [relationshipFrequencies, setRelationshipFrequencies] = useState(
+    scheduler?.relationshipFrequencies || []
+  );
+  
+  // Initialize interactions from scheduler
   useEffect(() => {
     if (scheduler) {
       setScheduledInteractions(scheduler.scheduledInteractions);
+      setRelationshipFrequencies(scheduler.relationshipFrequencies);
       
       const today = format(new Date(), 'yyyy-MM-dd');
       const todaysInteractions = scheduler.scheduledInteractions.filter(i => i.scheduledDate === today);
       setTodayInteractions(todaysInteractions);
       
-      calculateStats(scheduler.scheduledInteractions, relationships);
+      const updatedStats = calculateStats(
+        scheduler.scheduledInteractions, 
+        relationships,
+        scheduler.relationshipFrequencies
+      );
+      setStats(updatedStats);
     }
   }, [scheduler, relationships]);
-
-  const calculateStats = useCallback((interactions: ScheduledInteraction[], relations: Relationship[]) => {
-    const today = new Date();
-    const todayStr = format(today, 'yyyy-MM-dd');
-    const startOfWeek = subDays(today, today.getDay());
-
-    const plannedToday = interactions.filter(i => i.scheduledDate === todayStr).length;
-    const completedToday = interactions.filter(i => i.scheduledDate === todayStr && i.status === 'completed').length;
-    
-    const plannedThisWeek = interactions.filter(i => {
-      const interactionDate = parseISO(i.scheduledDate);
-      return isAfter(interactionDate, startOfWeek) && 
-             isBefore(interactionDate, addDays(startOfWeek, 7));
-    }).length;
-    
-    const completedThisWeek = interactions.filter(i => {
-      const interactionDate = parseISO(i.scheduledDate);
-      return isAfter(interactionDate, startOfWeek) && 
-             isBefore(interactionDate, addDays(startOfWeek, 7)) &&
-             i.status === 'completed';
-    }).length;
-
-    const overdueInteractions = scheduler?.relationshipFrequencies.filter(rf => rf.isOverdue) || [];
-    const overdueCount = overdueInteractions.length;
-    
-    const healthyRelationships = relations.filter(r => {
-      const frequency = scheduler?.relationshipFrequencies.find(rf => rf.relationshipId === r.id);
-      return frequency && !frequency.isOverdue;
-    }).length;
-
-    const needsAttentionCount = relations.length - healthyRelationships;
-
-    const upcomingEvents = relations.flatMap(r => 
-      r.lifeEvents.filter(e => {
-        const eventDate = parseISO(e.date);
-        const daysUntil = Math.floor((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-        return daysUntil >= 0 && daysUntil <= 14;
-      })
-    ).length;
-
-    setStats({
-      plannedToday,
-      completedToday,
-      plannedThisWeek,
-      completedThisWeek,
-      overdueCount,
-      healthyRelationships,
-      needsAttentionCount,
-      upcomingEvents
-    });
-  }, [scheduler]);
-
-  const scheduleInteraction = useCallback(async (interaction: Omit<ScheduledInteraction, 'id'>) => {
-    const newInteraction: ScheduledInteraction = {
-      ...interaction,
-      id: uuidv4()
-    };
-
-    const updatedInteractions = [...scheduledInteractions, newInteraction];
-    setScheduledInteractions(updatedInteractions);
-
-    if (scheduler) {
-      const updatedScheduler = {
-        ...scheduler,
-        scheduledInteractions: updatedInteractions
-      };
-      
-      if (newInteraction.scheduledDate === format(new Date(), 'yyyy-MM-dd')) {
-        setTodayInteractions([...todayInteractions, newInteraction]);
-      }
+  
+  // Recalculate stats when interactions change
+  useEffect(() => {
+    if (scheduledInteractions.length && relationshipFrequencies.length) {
+      const updatedStats = calculateStats(
+        scheduledInteractions, 
+        relationships,
+        relationshipFrequencies
+      );
+      setStats(updatedStats);
     }
+  }, [scheduledInteractions, relationships, relationshipFrequencies]);
 
-    toast({
-      title: 'Interaction scheduled',
-      description: `Scheduled to connect with ${newInteraction.relationshipName} on ${format(parseISO(newInteraction.scheduledDate), 'MMM d, yyyy')}.`
-    });
+  // Use the interaction generation hook
+  const { generateInteractions } = useInteractionGeneration(
+    relationships,
+    scheduler,
+    setScheduledInteractions,
+    setTodayInteractions,
+    toast
+  );
 
-    return newInteraction;
-  }, [scheduledInteractions, todayInteractions, scheduler, toast]);
+  // Use the interaction operations hook
+  const {
+    scheduleInteraction,
+    updateInteraction,
+    completeInteraction,
+    skipInteraction,
+    rescheduleInteraction,
+    updateScheduleSettings
+  } = useInteractionOperations(
+    scheduledInteractions,
+    setScheduledInteractions,
+    setTodayInteractions,
+    toast
+  );
 
-  const updateInteraction = useCallback(async (interactionId: string, updates: Partial<ScheduledInteraction>) => {
-    const updatedInteractions = scheduledInteractions.map(interaction => {
-      if (interaction.id === interactionId) {
-        return { ...interaction, ...updates };
-      }
-      return interaction;
-    });
+  // Use the frequency management hook
+  const { updateFrequencyAfterInteraction } = useFrequencyManagement(
+    relationships,
+    relationshipFrequencies,
+    scheduler?.categoryDefaults || [],
+    setRelationshipFrequencies
+  );
 
-    setScheduledInteractions(updatedInteractions);
-
-    const today = format(new Date(), 'yyyy-MM-dd');
-    const updatedTodayInteractions = updatedInteractions.filter(i => i.scheduledDate === today);
-    setTodayInteractions(updatedTodayInteractions);
-
-    toast({
-      title: 'Interaction updated',
-      description: 'Your scheduled interaction has been updated.'
-    });
-  }, [scheduledInteractions, toast]);
-
-  const completeInteraction = useCallback(async (interactionId: string, notes?: string) => {
+  // Wrap completeInteraction to also update frequencies
+  const handleCompleteInteraction = useCallback(async (interactionId: string, notes?: string) => {
     const completedDate = format(new Date(), 'yyyy-MM-dd');
-
-    const updatedInteractions = scheduledInteractions.map(interaction => {
-      if (interaction.id === interactionId) {
-        return { 
-          ...interaction, 
-          status: 'completed' as InteractionStatus,
-          completedDate,
-          ...(notes && { preparationNotes: notes })
-        };
-      }
-      return interaction;
-    });
-
-    setScheduledInteractions(updatedInteractions);
-
-    const today = format(new Date(), 'yyyy-MM-dd');
-    const updatedTodayInteractions = updatedInteractions.filter(i => i.scheduledDate === today);
-    setTodayInteractions(updatedTodayInteractions);
-
-    if (scheduler) {
-      const interaction = scheduledInteractions.find(i => i.id === interactionId);
-      if (interaction) {
-        const updatedFrequencies = scheduler.relationshipFrequencies.map(freq => {
-          if (freq.relationshipId === interaction.relationshipId) {
-            const nextDate = calculateNextInteractionDate(freq);
-            return {
-              ...freq,
-              lastInteraction: completedDate,
-              nextScheduled: nextDate,
-              isOverdue: false,
-              overdueDays: 0
-            };
-          }
-          return freq;
-        });
-      }
-    }
-
-    calculateStats(updatedInteractions, relationships);
-
-    toast({
-      title: 'Interaction completed',
-      description: 'Your interaction has been marked as completed.'
-    });
-  }, [scheduledInteractions, scheduler, relationships, calculateStats, toast]);
-
-  const skipInteraction = useCallback(async (interactionId: string, reason?: string) => {
-    const updatedInteractions = scheduledInteractions.map(interaction => {
-      if (interaction.id === interactionId) {
-        return { 
-          ...interaction, 
-          status: 'skipped' as InteractionStatus,
-          ...(reason && { preparationNotes: `Skipped: ${reason}` })
-        };
-      }
-      return interaction;
-    });
-
-    setScheduledInteractions(updatedInteractions);
-
-    const today = format(new Date(), 'yyyy-MM-dd');
-    const updatedTodayInteractions = updatedInteractions.filter(i => i.scheduledDate === today);
-    setTodayInteractions(updatedTodayInteractions);
-
-    toast({
-      title: 'Interaction skipped',
-      description: reason || 'Your interaction has been skipped.'
-    });
-  }, [scheduledInteractions, toast]);
-
-  const rescheduleInteraction = useCallback(async (interactionId: string, newDate: string, reason?: string) => {
-    const updatedInteractions = scheduledInteractions.map(interaction => {
-      if (interaction.id === interactionId) {
-        return { 
-          ...interaction, 
-          scheduledDate: newDate,
-          status: 'planned' as InteractionStatus,
-          ...(reason && { preparationNotes: `Rescheduled: ${reason}` })
-        };
-      }
-      return interaction;
-    });
-
-    setScheduledInteractions(updatedInteractions);
-
-    const today = format(new Date(), 'yyyy-MM-dd');
-    const updatedTodayInteractions = updatedInteractions.filter(i => i.scheduledDate === today);
-    setTodayInteractions(updatedTodayInteractions);
-
-    toast({
-      title: 'Interaction rescheduled',
-      description: `Rescheduled to ${format(parseISO(newDate), 'MMM d, yyyy')}.`
-    });
-  }, [scheduledInteractions, toast]);
-
-  const calculateNextInteractionDate = (frequency: RelationshipFrequency): string => {
-    const today = new Date();
-    let nextDate = today;
-
-    if (frequency.categoryDefault && scheduler) {
-      const relationship = relationships.find(r => r.id === frequency.relationshipId);
-      if (relationship) {
-        const categoryDefault = scheduler.categoryDefaults.find(cd => cd.category === relationship.category);
-        if (categoryDefault) {
-          const { unit, value } = categoryDefault.frequency;
-          switch (unit) {
-            case 'days':
-              nextDate = addDays(today, value);
-              break;
-            case 'weeks':
-              nextDate = addDays(today, value * 7);
-              break;
-            case 'months':
-              nextDate = addDays(today, value * 30);
-              break;
-          }
-        }
-      }
-    } else if (frequency.customFrequency) {
-      const { unit, value } = frequency.customFrequency;
-      switch (unit) {
-        case 'days':
-          nextDate = addDays(today, value);
-          break;
-        case 'weeks':
-          nextDate = addDays(today, value * 7);
-          break;
-        case 'months':
-          nextDate = addDays(today, value * 30);
-          break;
-      }
-    }
-
-    return format(nextDate, 'yyyy-MM-dd');
-  };
-
-  const generateInteractions = useCallback(async () => {
-    if (!scheduler || !relationships.length) return [];
-
-    const newInteractions: ScheduledInteraction[] = [];
     
-    for (const relationship of relationships) {
-      try {
-        const { data, error } = await supabase.functions.invoke('generate-ai-content', {
-          body: {
-            type: 'meaningful_interaction',
-            context: {
-              relationship,
-              interactionType: relationship.category === 'professional' ? 'professional' : 'casual'
-            }
-          }
-        });
-
-        if (error) throw error;
-
-        if (data?.content) {
-          const today = new Date();
-          const daysToAdd = relationship.importance > 4 ? 3 : relationship.importance < 2 ? 14 : 7;
-          
-          const newInteraction: ScheduledInteraction = {
-            id: uuidv4(),
-            relationshipId: relationship.id,
-            relationshipName: relationship.name,
-            scheduledDate: format(addDays(today, daysToAdd), 'yyyy-MM-dd'),
-            suggestedTimeSlots: ['10:00', '14:00', '18:00'],
-            interactionType: relationship.category === 'professional' ? 'call' : 'message',
-            duration: relationship.category === 'professional' ? 30 : 15,
-            purpose: data.content,
-            preparationNeeded: relationship.importance > 3,
-            preparationNotes: `AI-generated suggestion based on relationship context`,
-            status: 'planned',
-            energyCost: relationship.importance * 2
-          };
-          
-          newInteractions.push(newInteraction);
-        }
-      } catch (error) {
-        console.error(`Error generating interaction for ${relationship.name}:`, error);
-      }
-    }
+    // Find the interaction
+    const interaction = scheduledInteractions.find(i => i.id === interactionId);
     
-    setScheduledInteractions(newInteractions);
-
-    const today = format(new Date(), 'yyyy-MM-dd');
-    const todaysInteractions = newInteractions.filter(i => i.scheduledDate === today);
-    setTodayInteractions(todaysInteractions);
-
-    toast({
-      title: 'Interaction schedule generated',
-      description: 'New AI-suggested interactions have been added to your schedule.'
-    });
-
-    return newInteractions;
-  }, [scheduler, relationships, toast]);
-
-  const updateScheduleSettings = useCallback(async (settings: Partial<ConnectionScheduler['scheduleSettings']>) => {
-    if (!scheduler) return;
-
-    toast({
-      title: 'Settings updated',
-      description: 'Your nurturing schedule settings have been updated.'
-    });
-  }, [scheduler, toast]);
+    // Call the original complete function
+    await completeInteraction(interactionId, notes);
+    
+    // Update frequencies if we found the interaction
+    if (interaction) {
+      updateFrequencyAfterInteraction(interaction, completedDate);
+    }
+  }, [scheduledInteractions, completeInteraction, updateFrequencyAfterInteraction]);
 
   return {
     scheduledInteractions,
@@ -343,7 +111,7 @@ export function useInteractionsManagement(
     stats,
     scheduleInteraction,
     updateInteraction,
-    completeInteraction,
+    completeInteraction: handleCompleteInteraction,
     skipInteraction,
     rescheduleInteraction,
     generateInteractions,
