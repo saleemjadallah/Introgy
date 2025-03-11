@@ -48,10 +48,10 @@ const SocialStrategies = () => {
   };
 
   return (
-    <Card>
+    <Card className="navigation-container-gradient">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <BookOpen className="h-5 w-5" />
+          <BookOpen className="h-5 w-5 text-periwinkle" />
           Social Strategies
         </CardTitle>
         <CardDescription>Evidence-based strategies for different social scenarios</CardDescription>
@@ -95,7 +95,7 @@ const SocialStrategies = () => {
                     <TabsTrigger
                       key={scenario.id}
                       value={scenario.id}
-                      className="flex flex-col items-center gap-1 h-auto py-2"
+                      className="flex flex-col items-center gap-1 h-auto py-2 hover:text-white"
                       onClick={() => setActiveScenario(scenario.id)}
                     >
                       <div>
