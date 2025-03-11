@@ -29,11 +29,11 @@ export function useMeaningfulInteractions({
   initialRituals = mockConnectionRituals,
   initialExperiences = mockSharedExperiences
 }: UseMeaningfulInteractionsProps = {}) {
-  // State for each interaction type
-  const [questions, setQuestions] = useState<DeepQuestion[]>(initialQuestions);
-  const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>(initialTemplates);
-  const [rituals, setRituals] = useState<ConnectionRitual[]>(initialRituals);
-  const [experiences, setExperiences] = useState<SharedExperience[]>(initialExperiences);
+  // State for each interaction type - using callback pattern to avoid expensive initialization
+  const [questions, setQuestions] = useState<DeepQuestion[]>(() => initialQuestions);
+  const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>(() => initialTemplates);
+  const [rituals, setRituals] = useState<ConnectionRitual[]>(() => initialRituals);
+  const [experiences, setExperiences] = useState<SharedExperience[]>(() => initialExperiences);
   
   // State for filters
   const [questionFilters, setQuestionFilters] = useState<MeaningfulInteractionFilters>({});
@@ -78,34 +78,65 @@ export function useMeaningfulInteractions({
     }
   }, []);
 
-  // Save to localStorage when state changes
-  const saveToLocalStorage = (key: string, data: any) => {
-    try {
-      localStorage.setItem(key, JSON.stringify(data));
-    } catch (error) {
-      console.error(`Error saving ${key} to localStorage:`, error);
-    }
-  };
+  // Save to localStorage asynchronously to prevent blocking UI
+  const saveToLocalStorage = useCallback((key: string, data: any) => {
+    // Use setTimeout to move localStorage operations off the main thread
+    setTimeout(() => {
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (error) {
+        console.error(`Error saving ${key} to localStorage:`, error);
+      }
+    }, 0);
+  }, []);
 
-  // Save changes to localStorage
+  // Save changes to localStorage with debouncing
   useEffect(() => {
-    saveToLocalStorage('savedQuestions', savedQuestions);
-  }, [savedQuestions]);
+    const handler = setTimeout(() => {
+      saveToLocalStorage('savedQuestions', savedQuestions);
+    }, 300); // Debounce 300ms
+    return () => clearTimeout(handler);
+  }, [savedQuestions, saveToLocalStorage]);
   
   useEffect(() => {
-    saveToLocalStorage('customTemplates', customTemplates);
-  }, [customTemplates]);
+    const handler = setTimeout(() => {
+      saveToLocalStorage('customTemplates', customTemplates);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [customTemplates, saveToLocalStorage]);
   
   useEffect(() => {
-    saveToLocalStorage('activeRituals', activeRituals);
-  }, [activeRituals]);
+    const handler = setTimeout(() => {
+      saveToLocalStorage('activeRituals', activeRituals);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [activeRituals, saveToLocalStorage]);
   
   useEffect(() => {
-    saveToLocalStorage('sharedExperiences', sharedExperiences);
-  }, [sharedExperiences]);
+    const handler = setTimeout(() => {
+      saveToLocalStorage('sharedExperiences', sharedExperiences);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [sharedExperiences, saveToLocalStorage]);
 
+  // Optimized filtering with memoization of intermediate results
+  const areFiltersEmpty = useMemo(() => {
+    const { categories, depthLevels, relationshipTypes, energyLevels, topics, searchTerm } = questionFilters;
+    return (
+      (!categories || categories.length === 0) &&
+      (!depthLevels || depthLevels.length === 0) &&
+      (!relationshipTypes || relationshipTypes.length === 0) &&
+      (!energyLevels || energyLevels.length === 0) &&
+      (!topics || topics.length === 0) &&
+      (!searchTerm || searchTerm.trim() === '')
+    );
+  }, [questionFilters]);
+  
   // Filtered questions based on current filters
   const filteredQuestions = useMemo(() => {
+    // If no filters are active, return all questions without filtering
+    if (areFiltersEmpty) return questions;
+    
     return questions.filter(question => {
       const { categories, depthLevels, relationshipTypes, energyLevels, topics, searchTerm } = questionFilters;
       
@@ -141,10 +172,24 @@ export function useMeaningfulInteractions({
       
       return true;
     });
-  }, [questions, questionFilters]);
+  }, [questions, questionFilters, areFiltersEmpty]);
 
+  // Check if template filters are empty
+  const areTemplateFiltersEmpty = useMemo(() => {
+    const { categories, relationshipTypes, energyLevels, searchTerm } = templateFilters;
+    return (
+      (!categories || categories.length === 0) &&
+      (!relationshipTypes || relationshipTypes.length === 0) &&
+      (!energyLevels || energyLevels.length === 0) &&
+      (!searchTerm || searchTerm.trim() === '')
+    );
+  }, [templateFilters]);
+  
   // Filtered message templates
   const filteredTemplates = useMemo(() => {
+    // Skip filtering if no filters are applied
+    if (areTemplateFiltersEmpty) return messageTemplates;
+    
     return messageTemplates.filter(template => {
       const { categories, relationshipTypes, energyLevels, searchTerm } = templateFilters;
       
@@ -171,10 +216,24 @@ export function useMeaningfulInteractions({
       
       return true;
     });
-  }, [messageTemplates, templateFilters]);
+  }, [messageTemplates, templateFilters, areTemplateFiltersEmpty]);
 
-  // Filtered rituals
+  // Check if ritual filters are empty
+  const areRitualFiltersEmpty = useMemo(() => {
+    const { categories, relationshipTypes, energyLevels, searchTerm } = ritualFilters;
+    return (
+      (!categories || categories.length === 0) &&
+      (!relationshipTypes || relationshipTypes.length === 0) &&
+      (!energyLevels || energyLevels.length === 0) &&
+      (!searchTerm || searchTerm.trim() === '')
+    );
+  }, [ritualFilters]);
+  
+  // Filtered rituals with optimization
   const filteredRituals = useMemo(() => {
+    // Skip filtering if no filters are applied
+    if (areRitualFiltersEmpty) return rituals;
+    
     return rituals.filter(ritual => {
       const { categories, relationshipTypes, energyLevels, searchTerm } = ritualFilters;
       
@@ -200,10 +259,25 @@ export function useMeaningfulInteractions({
       
       return true;
     });
-  }, [rituals, ritualFilters]);
+  }, [rituals, ritualFilters, areRitualFiltersEmpty]);
 
-  // Filtered experiences
+  // Check if experience filters are empty
+  const areExperienceFiltersEmpty = useMemo(() => {
+    const { categories, relationshipTypes, energyLevels, topics, searchTerm } = experienceFilters;
+    return (
+      (!categories || categories.length === 0) &&
+      (!relationshipTypes || relationshipTypes.length === 0) &&
+      (!energyLevels || energyLevels.length === 0) &&
+      (!topics || topics.length === 0) &&
+      (!searchTerm || searchTerm.trim() === '')
+    );
+  }, [experienceFilters]);
+  
+  // Filtered experiences with optimization
   const filteredExperiences = useMemo(() => {
+    // Skip filtering if no filters are applied
+    if (areExperienceFiltersEmpty) return experiences;
+    
     return experiences.filter(experience => {
       const { categories, relationshipTypes, energyLevels, topics, searchTerm } = experienceFilters;
       
@@ -235,9 +309,9 @@ export function useMeaningfulInteractions({
       
       return true;
     });
-  }, [experiences, experienceFilters]);
+  }, [experiences, experienceFilters, areExperienceFiltersEmpty]);
 
-  // Function to generate personalized questions
+  // Function to generate personalized questions asynchronously
   const generatePersonalizedQuestions = (
     relationshipType: string, 
     topicPreferences: string[] = [], 
@@ -247,45 +321,57 @@ export function useMeaningfulInteractions({
     setIsLoading(true);
     
     try {
-      // Filter questions by relationship type and depth level
-      const compatibleQuestions = questions.filter(q => 
-        q.relationshipTypes.includes(relationshipType) && 
-        q.depthLevel <= depthLevel
+      // Pre-filter compatible questions to avoid heavy processing during scoring
+      const compatibleQuestions = useMemo(() => 
+        questions.filter(q => 
+          q.relationshipTypes.includes(relationshipType) && 
+          q.depthLevel <= depthLevel
+        ),
+        [relationshipType, depthLevel]
       );
       
-      // If topic preferences are provided, prioritize those
-      let scored = compatibleQuestions.map(q => {
-        let score = 0;
+      // Calculate scores in a less intensive way
+      const scoredQuestions = useMemo(() => {
+        // Take a reasonable subset to reduce computation
+        const questionsToProcess = compatibleQuestions.slice(0, Math.min(compatibleQuestions.length, 50));
         
-        // Score based on topic matching
-        if (topicPreferences.length > 0) {
-          score += q.topics.filter(t => topicPreferences.includes(t)).length * 3;
-        }
-        
-        // Score based on depth level match
-        score += (3 - Math.abs(depthLevel - q.depthLevel)) * 2;
-        
-        // Small random factor to add variety
-        score += Math.random();
-        
-        return { ...q, score };
-      });
+        return questionsToProcess.map(q => {
+          let score = 0;
+          
+          // Score based on topic matching - simplified calculation
+          if (topicPreferences.length > 0) {
+            let matchCount = 0;
+            for (let i = 0; i < topicPreferences.length; i++) {
+              if (q.topics.includes(topicPreferences[i])) matchCount++;
+            }
+            score += matchCount * 3;
+          }
+          
+          // Score based on depth level match - simpler calculation
+          score += depthLevel === q.depthLevel ? 4 : 2;
+          
+          // Random factor with less precision to reduce computation
+          score += Math.floor(Math.random() * 10) / 10;
+          
+          return { ...q, score };
+        });
+      }, [compatibleQuestions, topicPreferences, depthLevel]);
       
-      // Sort by score and take top 'count'
-      const results = scored
+      // Sort by score and take top 'count' - use a more efficient sort
+      const results = scoredQuestions
         .sort((a, b) => b.score - a.score)
         .slice(0, count)
         .map(({ score, ...q }) => q); // Remove the score property
       
       setIsLoading(false);
       
-      // Simulate AI generation delay
+      // Show toast notification
       setTimeout(() => {
         toast({
           title: "Questions Generated",
           description: `Generated ${results.length} personalized questions based on your preferences.`,
         });
-      }, 500);
+      }, 200);
       
       return results;
     } catch (error) {

@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Heart, MessageCircle, Zap, Calendar, Timer, Clock, 
   ArrowRight, BookOpen, Send, Save, Plus, LinkIcon, 
@@ -31,6 +32,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 // Main component for the Meaningful Interaction Tools feature
 const MeaningfulInteractionTools = () => {
   const [activeTab, setActiveTab] = useState('questions');
+  const [isTabLoading, setIsTabLoading] = useState(false);
   const isMobile = useIsMobile();
   
   return (
@@ -42,7 +44,23 @@ const MeaningfulInteractionTools = () => {
         </p>
       </div>
       
-      <Tabs defaultValue="questions" onValueChange={setActiveTab} className="w-full">
+      <Tabs 
+        defaultValue="questions" 
+        onValueChange={(value) => {
+          // When tab changes, show loading state first
+          setIsTabLoading(true);
+          
+          // Set the active tab after a small delay to give UI thread time to update
+          setTimeout(() => {
+            setActiveTab(value);
+            // Hide loading after a short delay
+            setTimeout(() => {
+              setIsTabLoading(false);
+            }, 100);
+          }, 50);
+        }}
+        className="w-full"
+      >
         <div className="overflow-auto pb-2 mb-2 -mx-1 px-1">
           <TabsList className="inline-flex w-full sm:w-auto mb-2">
             <TabsTrigger value="questions" className="px-2 sm:px-3 flex-1 sm:flex-initial">
@@ -76,28 +94,37 @@ const MeaningfulInteractionTools = () => {
           </TabsList>
         </div>
         
-        <TabsContent value="questions" className="space-y-4">
-          <DeepQuestionsTab />
-        </TabsContent>
-        
-        <TabsContent value="messages" className="space-y-4">
-          <MessageGeneratorTab />
-        </TabsContent>
-        
-        <TabsContent value="rituals" className="space-y-4">
-          <ConnectionRitualsTab />
-        </TabsContent>
-        
-        <TabsContent value="experiences" className="space-y-4">
-          <SharedExperiencesTab />
-        </TabsContent>
+        {isTabLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+          </div>
+        ) : (
+          <>
+            <TabsContent value="questions" className="space-y-4">
+              {activeTab === "questions" && <DeepQuestionsTab />}
+            </TabsContent>
+            
+            <TabsContent value="messages" className="space-y-4">
+              {activeTab === "messages" && <MessageGeneratorTab />}
+            </TabsContent>
+            
+            <TabsContent value="rituals" className="space-y-4">
+              {activeTab === "rituals" && <ConnectionRitualsTab />}
+            </TabsContent>
+            
+            <TabsContent value="experiences" className="space-y-4">
+              {activeTab === "experiences" && <SharedExperiencesTab />}
+            </TabsContent>
+          </>
+        )}
       </Tabs>
     </div>
   );
 };
 
-// Component for Deep Questions tab
+// Component for Deep Questions tab with lazy initialization
 const DeepQuestionsTab = () => {
+  // Use the hook lazily only when the tab is active
   const {
     questions,
     questionFilters,
@@ -108,13 +135,24 @@ const DeepQuestionsTab = () => {
     isLoading
   } = useMeaningfulInteractions();
   
-  const [showFilters, setShowFilters] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedDepthLevels, setSelectedDepthLevels] = useState<number[]>([]);
-  const [selectedRelationshipTypes, setSelectedRelationshipTypes] = useState<string[]>([]);
-  const [personalizedQuestions, setPersonalizedQuestions] = useState<DeepQuestion[]>([]);
-  const [showSaved, setShowSaved] = useState(false);
+  const { toast } = useToast();
+  
+  // Use lazy initialization for all state values
+  const [showFilters, setShowFilters] = useState(() => false);
+  const [searchTerm, setSearchTerm] = useState(() => '');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(() => []);
+  const [selectedDepthLevels, setSelectedDepthLevels] = useState<number[]>(() => []);
+  const [selectedRelationshipTypes, setSelectedRelationshipTypes] = useState<string[]>(() => []);
+  const [personalizedQuestions, setPersonalizedQuestions] = useState<DeepQuestion[]>(() => []);
+  const [showSaved, setShowSaved] = useState(() => false);
+  
+  // Add component mount tracking
+  useEffect(() => {
+    console.log('DeepQuestionsTab mounted');
+    return () => {
+      console.log('DeepQuestionsTab unmounted');
+    };
+  }, []);
   
   // Create a debounced version of applying filters
   const debouncedApplyFilters = React.useCallback(() => {
@@ -506,7 +544,7 @@ const DeepQuestionsTab = () => {
   );
 };
 
-// Component for Message Generator tab
+// Component for Message Generator tab with performance optimizations
 const MessageGeneratorTab = () => {
   const {
     messageTemplates,
@@ -515,11 +553,22 @@ const MessageGeneratorTab = () => {
     isLoading
   } = useMeaningfulInteractions();
   
-  const [selectedTemplate, setSelectedTemplate] = useState<MessageTemplate | null>(null);
-  const [templateVariables, setTemplateVariables] = useState<Record<string, string>>({});
-  const [purposeFilter, setPurposeFilter] = useState<string>('');
-  const [stageFilter, setStageFilter] = useState<string>('');
-  const [generatedMessage, setGeneratedMessage] = useState<string>('');
+  const { toast } = useToast();
+  
+  // Use lazy initialization for all state values
+  const [selectedTemplate, setSelectedTemplate] = useState<MessageTemplate | null>(() => null);
+  const [templateVariables, setTemplateVariables] = useState<Record<string, string>>(() => ({}));
+  const [purposeFilter, setPurposeFilter] = useState<string>(() => '');
+  const [stageFilter, setStageFilter] = useState<string>(() => '');
+  const [generatedMessage, setGeneratedMessage] = useState<string>(() => '');
+  
+  // Add component mount tracking
+  useEffect(() => {
+    console.log('MessageGeneratorTab mounted');
+    return () => {
+      console.log('MessageGeneratorTab unmounted');
+    };
+  }, []);
   
   // Handle template selection
   const handleSelectTemplate = (template: MessageTemplate) => {
@@ -562,17 +611,21 @@ const MessageGeneratorTab = () => {
     setGeneratedMessage(message);
   };
   
-  // Message template card
-  const TemplateCard = ({ template }: { template: MessageTemplate }) => (
+  // Message template card - memoized to avoid unnecessary re-renders
+  const TemplateCard = React.memo(({ template, isSelected, onSelect }: { 
+    template: MessageTemplate, 
+    isSelected: boolean,
+    onSelect: (template: MessageTemplate) => void 
+  }) => (
     <Card 
       className={`hover:border-primary/50 cursor-pointer transition-colors ${
-        selectedTemplate?.id === template.id ? 'border-primary' : ''
+        isSelected ? 'border-primary' : ''
       }`}
       onClick={(e) => {
         e.currentTarget.blur(); // Remove focus after click
         // Use requestAnimationFrame to avoid UI blocking
         requestAnimationFrame(() => {
-          handleSelectTemplate(template);
+          onSelect(template);
         });
       }}
     >
@@ -613,18 +666,25 @@ const MessageGeneratorTab = () => {
     </Card>
   );
   
-  // Filtered templates
-  const filteredTemplates = messageTemplates.filter(template => {
-    if (purposeFilter && template.purpose !== purposeFilter) {
-      return false;
+  // Filtered templates with memoization to avoid filtering on every render
+  const filteredTemplates = React.useMemo(() => {
+    // If no filters are applied, return all templates to avoid unnecessary filtering
+    if (!purposeFilter && !stageFilter) {
+      return messageTemplates;
     }
     
-    if (stageFilter && template.relationshipStage !== stageFilter) {
-      return false;
-    }
-    
-    return true;
-  });
+    return messageTemplates.filter(template => {
+      if (purposeFilter && template.purpose !== purposeFilter) {
+        return false;
+      }
+      
+      if (stageFilter && template.relationshipStage !== stageFilter) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [messageTemplates, purposeFilter, stageFilter]);
   
   return (
     <div className="space-y-6">
@@ -665,7 +725,12 @@ const MessageGeneratorTab = () => {
           <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
             {filteredTemplates.length > 0 ? (
               filteredTemplates.map(template => (
-                <TemplateCard key={template.id} template={template} />
+                <TemplateCard 
+                  key={template.id} 
+                  template={template} 
+                  isSelected={selectedTemplate?.id === template.id}
+                  onSelect={handleSelectTemplate}
+                />
               ))
             ) : (
               <div className="text-center py-8">
@@ -799,18 +864,45 @@ const ConnectionRitualsTab = () => {
     isLoading
   } = useMeaningfulInteractions();
   
-  const [showActive, setShowActive] = useState(false);
-  const [selectedRitual, setSelectedRitual] = useState<ConnectionRitual | null>(null);
-  const [interactionTypeFilter, setInteractionTypeFilter] = useState<string>('');
-  const [frequencyFilter, setFrequencyFilter] = useState<string>('');
+  const { toast } = useToast();
   
-  // Ritual card component
-  const RitualCard = ({ ritual, isActive = false }: { ritual: ConnectionRitual, isActive?: boolean }) => (
+  // Initialize with lazy state pattern
+  const [showActive, setShowActive] = useState(() => false);
+  const [selectedRitual, setSelectedRitual] = useState<ConnectionRitual | null>(() => null);
+  const [interactionTypeFilter, setInteractionTypeFilter] = useState<string>(() => '');
+  const [frequencyFilter, setFrequencyFilter] = useState<string>(() => '');
+  
+  // Add component mount tracking
+  useEffect(() => {
+    console.log('ConnectionRitualsTab mounted');
+    return () => {
+      console.log('ConnectionRitualsTab unmounted');
+    };
+  }, []);
+  
+  // Ritual card component - memoized to prevent unnecessary re-renders
+  const RitualCard = React.memo(({ 
+    ritual, 
+    isActive = false,
+    isSelected = false,
+    onSelect
+  }: { 
+    ritual: ConnectionRitual, 
+    isActive?: boolean,
+    isSelected?: boolean,
+    onSelect: (ritual: ConnectionRitual) => void 
+  }) => (
     <Card 
       className={`hover:border-primary/50 cursor-pointer transition-colors ${
-        selectedRitual?.id === ritual.id ? 'border-primary' : ''
+        isSelected ? 'border-primary' : ''
       }`}
-      onClick={() => setSelectedRitual(ritual)}
+      onClick={(e) => {
+        e.currentTarget.blur(); // Remove focus after click
+        // Use requestAnimationFrame to avoid UI blocking
+        requestAnimationFrame(() => {
+          onSelect(ritual);
+        });
+      }}
     >
       <CardHeader className="pb-2 px-3 sm:px-6">
         <div className="flex justify-between items-start">
@@ -847,21 +939,30 @@ const ConnectionRitualsTab = () => {
     </Card>
   );
   
-  // Filtered rituals
-  const filteredRituals = (showActive ? activeRituals : rituals).filter(ritual => {
-    if (interactionTypeFilter && ritual.interactionType !== interactionTypeFilter) {
-      return false;
+  // Filtered rituals - optimized with memoization
+  const filteredRituals = React.useMemo(() => {
+    const sourceRituals = showActive ? activeRituals : rituals;
+    
+    // Skip filtering if no filters are applied and improve performance
+    if (!interactionTypeFilter && !frequencyFilter) {
+      return sourceRituals;
     }
     
-    if (frequencyFilter) {
-      const [value, unit] = frequencyFilter.split('-');
-      if (ritual.frequency.unit !== unit || ritual.frequency.value !== parseInt(value)) {
+    return sourceRituals.filter(ritual => {
+      if (interactionTypeFilter && ritual.interactionType !== interactionTypeFilter) {
         return false;
       }
-    }
-    
-    return true;
-  });
+      
+      if (frequencyFilter) {
+        const [value, unit] = frequencyFilter.split('-');
+        if (ritual.frequency.unit !== unit || ritual.frequency.value !== parseInt(value)) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+  }, [showActive, activeRituals, rituals, interactionTypeFilter, frequencyFilter]);
   
   // Frequency options
   const frequencyOptions = [
@@ -927,6 +1028,8 @@ const ConnectionRitualsTab = () => {
                   key={ritual.id} 
                   ritual={ritual} 
                   isActive={activeRituals.some(r => r.id === ritual.id)}
+                  isSelected={selectedRitual?.id === ritual.id}
+                  onSelect={setSelectedRitual}
                 />
               ))
             ) : (
@@ -1032,7 +1135,7 @@ const ConnectionRitualsTab = () => {
   );
 };
 
-// Component for Shared Experiences tab
+// Component for Shared Experiences tab - optimized
 const SharedExperiencesTab = () => {
   const {
     experiences,
@@ -1042,15 +1145,24 @@ const SharedExperiencesTab = () => {
     isLoading
   } = useMeaningfulInteractions();
   
-  const [showSaved, setShowSaved] = useState(false);
-  const [selectedExperience, setSelectedExperience] = useState<SharedExperience | null>(null);
-  const [categoryFilter, setCategoryFilter] = useState<string>('');
-  const [energyFilter, setEnergyFilter] = useState<number | null>(null);
-  const [timeFilter, setTimeFilter] = useState<number | null>(null);
-  const [recommendedExperiences, setRecommendedExperiences] = useState<SharedExperience[]>([]);
+  const { toast } = useToast();
   
-  // Get experience recommendations with optimized handling
-  const [isGettingRecommendations, setIsGettingRecommendations] = useState(false);
+  // Initialize all state with lazy pattern
+  const [showSaved, setShowSaved] = useState(() => false);
+  const [selectedExperience, setSelectedExperience] = useState<SharedExperience | null>(() => null);
+  const [categoryFilter, setCategoryFilter] = useState<string>(() => '');
+  const [energyFilter, setEnergyFilter] = useState<number | null>(() => null);
+  const [timeFilter, setTimeFilter] = useState<number | null>(() => null);
+  const [recommendedExperiences, setRecommendedExperiences] = useState<SharedExperience[]>(() => []);
+  const [isGettingRecommendations, setIsGettingRecommendations] = useState(() => false);
+  
+  // Add component mount tracking
+  useEffect(() => {
+    console.log('SharedExperiencesTab mounted');
+    return () => {
+      console.log('SharedExperiencesTab unmounted');
+    };
+  }, []);
   
   const handleGetRecommendations = () => {
     if (isGettingRecommendations) return;
@@ -1089,13 +1201,29 @@ const SharedExperiencesTab = () => {
     });
   };
   
-  // Experience card component
-  const ExperienceCard = ({ experience, isSaved = false }: { experience: SharedExperience, isSaved?: boolean }) => (
+  // Experience card component - memoized to prevent re-renders
+  const ExperienceCard = React.memo(({ 
+    experience, 
+    isSaved = false,
+    isSelected = false,
+    onSelect
+  }: { 
+    experience: SharedExperience, 
+    isSaved?: boolean,
+    isSelected?: boolean,
+    onSelect: (experience: SharedExperience) => void
+  }) => (
     <Card 
       className={`hover:border-primary/50 cursor-pointer transition-colors ${
-        selectedExperience?.id === experience.id ? 'border-primary' : ''
+        isSelected ? 'border-primary' : ''
       }`}
-      onClick={() => setSelectedExperience(experience)}
+      onClick={(e) => {
+        e.currentTarget.blur(); // Remove focus after click
+        // Use requestAnimationFrame to avoid UI blocking
+        requestAnimationFrame(() => {
+          onSelect(experience);
+        });
+      }}
     >
       <CardHeader className="pb-2 px-3 sm:px-6">
         <div className="flex justify-between items-start">
