@@ -26,7 +26,13 @@ export const BatteryStatus = ({ batteryLevel, onLevelChange }: BatteryStatusProp
         </div>
         <div className="h-4 w-full bg-secondary rounded-full overflow-hidden">
           <div 
-            className={`h-full ${getBatteryColor(batteryLevel)} transition-all duration-500`} 
+            className={`h-full transition-all duration-500 ${
+              batteryLevel > 60 
+                ? "bg-[#3E9D9D]" // Soft teal for high battery
+                : batteryLevel > 30 
+                  ? "bg-[#F5B85E]" // Amber for medium battery
+                  : "bg-[#E57373]" // Red for low battery
+            }`}
             style={{ width: `${batteryLevel}%` }}
           />
         </div>
@@ -42,6 +48,7 @@ export const BatteryStatus = ({ batteryLevel, onLevelChange }: BatteryStatusProp
           max={100}
           step={1}
           onValueChange={onLevelChange}
+          className="[&>.relative>div]:bg-[#3E9D9D]"
         />
       </div>
     </CardContent>

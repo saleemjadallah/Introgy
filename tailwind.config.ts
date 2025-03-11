@@ -73,6 +73,26 @@ export default {
 					primary: 'hsl(var(--text-primary))',
 					secondary: 'hsl(var(--text-secondary))',
 					accent: 'hsl(var(--text-accent))'
+				},
+				interactive: {
+					primary: 'hsl(var(--interactive-primary))',
+					secondary: 'hsl(var(--interactive-secondary))',
+					success: 'hsl(var(--interactive-success))'
+				},
+				teal: {
+					DEFAULT: '#3E9D9D',
+					light: '#5BBCBC',
+					dark: '#328383'
+				},
+				periwinkle: {
+					DEFAULT: '#7B7FC4',
+					light: '#9CA0D8',
+					dark: '#6A6EB3'
+				},
+				sage: {
+					DEFAULT: '#7DAA92',
+					light: '#9ECBB6',
+					dark: '#6C9981'
 				}
 			},
 			boxShadow: {

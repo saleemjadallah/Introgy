@@ -21,7 +21,7 @@ const BatteryLevelDisplay = ({ batteryLevel, onPlanEnergy }: BatteryLevelDisplay
         variant="outline" 
         size="sm"
         onClick={onPlanEnergy}
-        className="text-xs"
+        className="text-xs bg-[#3E9D9D] text-white hover:bg-[#328383] border-[#3E9D9D]"
       >
         Apply To Battery
       </Button>

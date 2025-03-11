@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -51,44 +52,15 @@
     --text-primary: 221 52% 15%;  /* Deep navy #121F36 */
     --text-secondary: 214 15% 46%;  /* Slate blue #627286 */
     --text-accent: 248 21% 45%;  /* Dusky purple #5D5A8C */
+    
+    /* Interactive Element Colors */
+    --interactive-primary: 174 43% 43%;  /* Soft teal #3E9D9D */
+    --interactive-secondary: 238 36% 63%;  /* Muted periwinkle #7B7FC4 */
+    --interactive-success: 142 23% 59%;  /* Soft sage green #7DAA92 */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* ... keep existing code */
   }
 }
 
@@ -137,6 +109,32 @@
 
 .text-accent {
   @apply text-[#5D5A8C] !important;
+}
+
+/* Interactive element styles */
+.interactive-primary {
+  @apply bg-[#3E9D9D] text-white hover:bg-[#328383] !important;
+}
+
+.interactive-secondary {
+  @apply bg-[#7B7FC4] text-white hover:bg-[#6A6EB3] !important;
+}
+
+.interactive-success {
+  @apply bg-[#7DAA92] text-white hover:bg-[#6C9981] !important;
+}
+
+/* Battery level colors */
+.battery-level-high {
+  @apply bg-[#3E9D9D] !important;
+}
+
+.battery-level-medium {
+  @apply bg-[#F5B85E] !important;
+}
+
+.battery-level-low {
+  @apply bg-[#E57373] !important;
 }
 
 /* Override headings and paragraphs explicitly */
