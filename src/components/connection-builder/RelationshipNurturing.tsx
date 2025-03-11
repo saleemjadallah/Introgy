@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useRelationshipNurturing } from '@/hooks/useRelationshipNurturing';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -103,7 +104,7 @@ export const RelationshipNurturing = () => {
         <TabsContent value="starters" className="space-y-4">
           <StartersTab 
             starters={conversationStarters} 
-            relationships={relationships}
+            relationships={relationships || []}
             onGenerateMore={generateMoreConversationStarters}
             onCopy={copyConversationStarter}
           />
