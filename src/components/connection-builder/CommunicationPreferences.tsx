@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { useCommunicationProfiles } from '@/hooks/useCommunicationProfiles';
+import { useCommunicationProfiles } from '@/hooks/useCommunicationProfiles'; // Updated import path
 import TemplateSelector from './communication-preferences/TemplateSelector';
 import ProfilesList from './communication-preferences/ProfilesList';
 import ProfileEditor from './communication-preferences/ProfileEditor';
