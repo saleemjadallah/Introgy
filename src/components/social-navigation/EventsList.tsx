@@ -1,13 +1,12 @@
 
-import { useState } from "react";
-import { isPast, isSameDay } from "date-fns";
+import React from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { PlusCircle } from "lucide-react";
 import { SocialEvent } from "@/types/events";
-import { Plus } from "lucide-react";
 import EventCard from "./events-list/EventCard";
-import EmptyEventsList from "./events-list/EmptyEventsList";
-import EventFormDialog from "./events-list/EventFormDialog";
 import EventsGroup from "./events-list/EventsGroup";
+import EmptyEventsList from "./events-list/EmptyEventsList";
 
 interface EventsListProps {
   events: SocialEvent[];
@@ -18,92 +17,107 @@ interface EventsListProps {
   selectedEventId?: string;
 }
 
-const EventsList = ({ 
-  events, 
-  onEventSelect, 
-  onAddEvent, 
-  onUpdateEvent, 
+const EventsList = ({
+  events,
+  onEventSelect,
+  onAddEvent,
+  onUpdateEvent,
   onDeleteEvent,
-  selectedEventId 
+  selectedEventId,
 }: EventsListProps) => {
-  const [showNewEventForm, setShowNewEventForm] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<SocialEvent | null>(null);
+  // Group events by time
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
   
-  // Group events by date category
-  const upcomingEvents = events.filter(event => 
-    !isPast(new Date(event.date)) || isSameDay(new Date(event.date), new Date())
-  ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const todayEvents = events.filter(event => {
+    const eventDate = new Date(event.date);
+    return eventDate.toDateString() === today.toDateString();
+  });
   
-  const pastEvents = events.filter(event => 
-    isPast(new Date(event.date)) && !isSameDay(new Date(event.date), new Date())
-  ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const tomorrowEvents = events.filter(event => {
+    const eventDate = new Date(event.date);
+    return eventDate.toDateString() === tomorrow.toDateString();
+  });
   
-  const handleAddEvent = (event: SocialEvent) => {
-    onAddEvent(event);
-    setShowNewEventForm(false);
-  };
+  const upcomingEvents = events.filter(event => {
+    const eventDate = new Date(event.date);
+    return eventDate > tomorrow && eventDate.toDateString() !== today.toDateString() && eventDate.toDateString() !== tomorrow.toDateString();
+  });
   
-  const handleUpdateEvent = (event: SocialEvent) => {
-    onUpdateEvent(event);
-    setEditingEvent(null);
-  };
-
-  const newEventButton = (
-    <Button size="sm" className="flex items-center gap-1">
-      <Plus className="h-4 w-4" />
-      New Event
-    </Button>
-  );
+  const pastEvents = events.filter(event => {
+    const eventDate = new Date(event.date);
+    return eventDate < today && eventDate.toDateString() !== today.toDateString();
+  });
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Your Events</h3>
-        <EventFormDialog
-          isOpen={showNewEventForm}
-          setIsOpen={setShowNewEventForm}
-          editingEvent={null}
-          onSubmit={handleAddEvent}
-          onCancel={() => setShowNewEventForm(false)}
-          triggerButton={newEventButton}
-        />
-      </div>
-      
-      {upcomingEvents.length === 0 && pastEvents.length === 0 ? (
-        <EmptyEventsList onAddFirstEvent={() => setShowNewEventForm(true)} />
-      ) : (
-        <>
-          <EventsGroup
-            title="Upcoming Events"
-            events={upcomingEvents}
-            onEventSelect={onEventSelect}
-            onEditEvent={setEditingEvent}
-            onDeleteEvent={onDeleteEvent}
-            selectedEventId={selectedEventId}
-            isPast={false}
-          />
-          
-          <EventsGroup
-            title="Past Events"
-            events={pastEvents}
-            onEventSelect={onEventSelect}
-            onEditEvent={setEditingEvent}
-            onDeleteEvent={onDeleteEvent}
-            selectedEventId={selectedEventId}
-            isPast={true}
-          />
-        </>
-      )}
-      
-      {/* Edit Event Dialog */}
-      <EventFormDialog
-        isOpen={!!editingEvent}
-        setIsOpen={(open) => !open && setEditingEvent(null)}
-        editingEvent={editingEvent}
-        onSubmit={handleUpdateEvent}
-        onCancel={() => setEditingEvent(null)}
-      />
-    </div>
+    <Card className="navigation-container-gradient">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <div>
+          <h3 className="text-lg font-semibold">Your Events</h3>
+          <p className="text-sm text-muted-foreground">
+            {events.length === 0
+              ? "No events scheduled yet"
+              : `You have ${events.length} event${events.length !== 1 ? "s" : ""} scheduled`}
+          </p>
+        </div>
+        <Button
+          onClick={() => onAddEvent({ id: '', name: '', date: new Date().toISOString(), location: '', people: [], type: 'social-gathering', energyCost: 5, notes: '' })}
+          className="bg-periwinkle hover:bg-periwinkle-dark"
+        >
+          <PlusCircle className="h-4 w-4 mr-2" />
+          New Event
+        </Button>
+      </CardHeader>
+
+      <CardContent>
+        {events.length === 0 ? (
+          <EmptyEventsList onAddEvent={onAddEvent} />
+        ) : (
+          <div className="space-y-4">
+            {todayEvents.length > 0 && (
+              <EventsGroup
+                title="Today"
+                events={todayEvents}
+                onEventSelect={onEventSelect}
+                onDeleteEvent={onDeleteEvent}
+                selectedEventId={selectedEventId}
+              />
+            )}
+            
+            {tomorrowEvents.length > 0 && (
+              <EventsGroup
+                title="Tomorrow"
+                events={tomorrowEvents}
+                onEventSelect={onEventSelect}
+                onDeleteEvent={onDeleteEvent}
+                selectedEventId={selectedEventId}
+              />
+            )}
+            
+            {upcomingEvents.length > 0 && (
+              <EventsGroup
+                title="Upcoming"
+                events={upcomingEvents}
+                onEventSelect={onEventSelect}
+                onDeleteEvent={onDeleteEvent}
+                selectedEventId={selectedEventId}
+              />
+            )}
+            
+            {pastEvents.length > 0 && (
+              <EventsGroup
+                title="Past Events"
+                events={pastEvents}
+                onEventSelect={onEventSelect}
+                onDeleteEvent={onDeleteEvent}
+                selectedEventId={selectedEventId}
+              />
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

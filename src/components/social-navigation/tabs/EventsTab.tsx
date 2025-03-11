@@ -46,7 +46,7 @@ const EventsTab = ({
   return (
     <>
       {showAddForm ? (
-        <Card>
+        <Card className="navigation-container-gradient">
           <CardHeader>
             <CardTitle>Create New Event</CardTitle>
             <CardDescription>Add details about an upcoming social event you'll attend</CardDescription>

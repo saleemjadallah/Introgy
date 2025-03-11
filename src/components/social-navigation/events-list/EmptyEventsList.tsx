@@ -1,27 +1,44 @@
 
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Plus } from "lucide-react";
+import { CalendarPlus } from "lucide-react";
+import { SocialEvent } from "@/types/events";
 
 interface EmptyEventsListProps {
-  onAddFirstEvent: () => void;
+  onAddEvent: (event: SocialEvent) => void;
 }
 
-const EmptyEventsList = ({ onAddFirstEvent }: EmptyEventsListProps) => {
+const EmptyEventsList = ({ onAddEvent }: EmptyEventsListProps) => {
+  const handleCreateEvent = () => {
+    // Create a default empty event
+    onAddEvent({
+      id: "",
+      name: "",
+      date: new Date().toISOString(),
+      location: "",
+      people: [],
+      type: "social-gathering",
+      energyCost: 5,
+      notes: "",
+    });
+  };
+
   return (
-    <Card className="border-dashed">
-      <CardContent className="py-10 text-center">
-        <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-        <h3 className="text-lg font-medium mb-2">No events yet</h3>
-        <p className="text-muted-foreground mb-6">
-          Add your upcoming social events to prepare for them
-        </p>
-        <Button onClick={onAddFirstEvent}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Your First Event
-        </Button>
-      </CardContent>
-    </Card>
+    <div className="text-center py-10 space-y-4">
+      <div className="mx-auto w-16 h-16 rounded-full bg-periwinkle/10 flex items-center justify-center">
+        <CalendarPlus className="h-8 w-8 text-periwinkle" />
+      </div>
+      <h3 className="text-lg font-medium">No events yet</h3>
+      <p className="text-muted-foreground max-w-sm mx-auto">
+        Create your first social event to start planning and preparing for social interactions.
+      </p>
+      <Button 
+        onClick={handleCreateEvent}
+        className="bg-periwinkle hover:bg-periwinkle-dark mt-2"
+      >
+        <CalendarPlus className="h-4 w-4 mr-2" />
+        Create Your First Event
+      </Button>
+    </div>
   );
 };
 
