@@ -1,20 +1,57 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PhoneAuthForm } from "@/components/auth/PhoneAuthForm";
 import { useAuth } from "@/contexts/AuthContext";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
 const Auth = () => {
-  const [mode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const navigate = useNavigate();
-  const { signInWithGoogle, isAuthenticated } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { signInWithGoogle, isAuthenticated, isLoading } = useAuth();
   
-  if (isAuthenticated) {
-    navigate('/profile');
-    return null;
+  useEffect(() => {
+    // Check if there's an error in URL params (from OAuth redirect)
+    const error = searchParams.get('error');
+    const errorDescription = searchParams.get('error_description');
+    
+    if (error) {
+      console.error("Auth error:", error, errorDescription);
+      toast.error(errorDescription || "Failed to authenticate. Please try again.");
+    }
+    
+    // Set mode based on URL query parameter
+    const modeParam = searchParams.get('mode');
+    if (modeParam === 'signup') {
+      setMode('signup');
+    }
+  }, [searchParams]);
+  
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      navigate('/profile');
+    }
+  }, [isAuthenticated, isLoading, navigate]);
+  
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Google sign in error:", error);
+      toast.error("Failed to sign in with Google. Please try again.");
+    }
+  };
+  
+  if (isLoading) {
+    return (
+      <div className="max-w-md mx-auto py-10 px-4 flex justify-center items-center">
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   return (
@@ -32,10 +69,12 @@ const Auth = () => {
       <Card>
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center">
-            Welcome to Introgy
+            {mode === "signin" ? "Welcome back" : "Create an account"}
           </CardTitle>
           <CardDescription className="text-center">
-            Sign in with your phone number to get started
+            {mode === "signin" 
+              ? "Sign in with your phone number to continue" 
+              : "Sign up with your phone number to get started"}
           </CardDescription>
         </CardHeader>
         
@@ -55,7 +94,7 @@ const Auth = () => {
             type="button" 
             variant="outline" 
             className="w-full" 
-            onClick={signInWithGoogle}
+            onClick={handleGoogleSignIn}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M47.532 24.5528C47.532 22.9214 47.3997 21.2811 47.1175 19.6761H24.48V28.9181H37.4434C36.9055 31.8988 35.177 34.5356 32.6461 36.2111V42.2078H40.3801C44.9217 38.0278 47.532 31.8547 47.532 24.5528Z" fill="#4285F4"/>
@@ -65,6 +104,30 @@ const Auth = () => {
             </svg>
             Continue with Google
           </Button>
+          
+          <div className="text-center text-sm mt-4">
+            {mode === "signin" ? (
+              <p>
+                Don't have an account?{" "}
+                <button 
+                  onClick={() => setMode("signup")}
+                  className="underline text-primary font-medium"
+                >
+                  Sign up
+                </button>
+              </p>
+            ) : (
+              <p>
+                Already have an account?{" "}
+                <button 
+                  onClick={() => setMode("signin")}
+                  className="underline text-primary font-medium"
+                >
+                  Sign in
+                </button>
+              </p>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
