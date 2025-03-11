@@ -1,11 +1,11 @@
-
 import { useState } from "react";
-import { Brain, Users, MessageCircle, Heart, Sparkles } from "lucide-react";
+import { Brain, MessageCircle, Heart, Shield } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import CommunicationPreferences from "@/components/connection-builder/CommunicationPreferences";
 import RelationshipNurturing from "@/components/connection-builder/RelationshipNurturing";
 import MeaningfulInteractionTools from "@/components/connection-builder/MeaningfulInteractionTools";
+import BoundaryManager from "@/components/connection-builder/boundary-manager/BoundaryManager";
 
 const ConnectionBuilder = () => {
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
@@ -18,6 +18,8 @@ const ConnectionBuilder = () => {
         return <RelationshipNurturing />;
       case 'meaningful-interactions':
         return <MeaningfulInteractionTools />;
+      case 'boundary-manager':
+        return <BoundaryManager />;
       default:
         return renderFeatureCards();
     }
@@ -29,13 +31,22 @@ const ConnectionBuilder = () => {
         <Card className="shadow-sm connection-container-gradient">
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <Users className="h-5 w-5 flex-shrink-0 text-mauve" />
-              <span>Compatibility Finder</span>
+              <Shield className="h-5 w-5 flex-shrink-0 text-mauve" />
+              <span>Boundary Manager</span>
             </CardTitle>
-            <CardDescription className="text-sm mt-1.5">Find people who match your social style</CardDescription>
+            <CardDescription className="text-sm mt-1.5">Set and maintain healthy social boundaries</CardDescription>
           </CardHeader>
           <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-4">
-            <p className="text-sm text-muted-foreground">Coming soon in the next update!</p>
+            <p className="text-sm text-muted-foreground">
+              Create personalized boundary templates, manage social limits, and get AI-powered guidance for setting and communicating boundaries effectively.
+            </p>
+            <Button 
+              onClick={() => setActiveFeature('boundary-manager')}
+              className="w-full py-5 sm:py-2 text-base sm:text-sm mt-2 bg-white/70 hover:bg-white text-mauve"
+              size="lg"
+            >
+              Manage Boundaries
+            </Button>
           </CardContent>
         </Card>
 
