@@ -6,7 +6,9 @@ const config: CapacitorConfig = {
   appName: 'Introgy',
   webDir: 'dist',
   server: {
-    url: 'https://4cb77e99-2411-4b1d-9e47-bac88f43f4af.lovableproject.com?forceHideBadge=true',
+    url: process.env.NODE_ENV === 'development' 
+      ? 'https://4cb77e99-2411-4b1d-9e47-bac88f43f4af.lovableproject.com?forceHideBadge=true'
+      : 'https://introgy-app.netlify.app', // This will be your Netlify URL once deployed
     cleartext: true
   },
   plugins: {
