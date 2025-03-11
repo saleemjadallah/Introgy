@@ -1,4 +1,5 @@
-import { RelationshipTypes } from './relationships';
+
+import { Relationship } from './relationships';
 import { ScheduledInteraction } from './interactions';
 
 export interface ScheduleItem {
@@ -27,7 +28,7 @@ export interface InteractionSchedule {
   id: string;
   name: string;
   description?: string;
-  relationshipTypes: RelationshipTypes[];
+  relationshipTypes: string[];  // Changed from RelationshipTypes[] to string[]
   frequency: {
     times: number;
     period: 'day' | 'week' | 'month' | 'year';
