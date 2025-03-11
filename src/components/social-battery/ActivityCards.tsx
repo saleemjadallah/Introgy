@@ -9,7 +9,10 @@ interface ActivityCardProps {
 }
 
 export const RechargeActivityCard = ({ activity, onSelect }: { activity: RechargeActivity; onSelect: ActivityCardProps["onSelect"] }) => (
-  <Card className="cursor-pointer hover:bg-accent/10 transition-colors" onClick={() => onSelect(activity)}>
+  <Card 
+    className="cursor-pointer hover:bg-accent/10 transition-colors bg-gradient-to-br from-green-50 to-green-100" 
+    onClick={() => onSelect(activity)}
+  >
     <CardHeader className="p-3">
       <CardTitle className="text-base flex items-center gap-2">
         <PlusCircle className="h-4 w-4 text-green-500" />
@@ -31,7 +34,10 @@ export const RechargeActivityCard = ({ activity, onSelect }: { activity: Recharg
 );
 
 export const DepletingActivityCard = ({ activity, onSelect }: { activity: DepletingActivity; onSelect: ActivityCardProps["onSelect"] }) => (
-  <Card className="cursor-pointer hover:bg-accent/10 transition-colors" onClick={() => onSelect(activity)}>
+  <Card 
+    className="cursor-pointer hover:bg-accent/10 transition-colors bg-gradient-to-br from-red-50 to-red-100" 
+    onClick={() => onSelect(activity)}
+  >
     <CardHeader className="p-3">
       <CardTitle className="text-base flex items-center gap-2">
         <MinusCircle className="h-4 w-4 text-red-500" />
