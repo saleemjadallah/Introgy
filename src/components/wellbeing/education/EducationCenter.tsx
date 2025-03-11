@@ -81,17 +81,19 @@ const EducationCenter = () => {
             <DialogTrigger asChild>
               <Button>
                 <PlusCircle className="h-4 w-4 mr-2" />
-                <span>Generate New</span>
+                <span className={isMobile ? "sr-only" : ""}>Generate New</span>
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="rounded-xl max-w-[90vw] w-full sm:max-w-md bg-white/95 backdrop-blur-sm border border-blueteal/20 shadow-lg">
               <DialogHeader>
-                <DialogTitle>Generate AI Content</DialogTitle>
+                <DialogTitle className="text-center text-blueteal">Generate AI Content</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <p>Content type: <span className="font-medium capitalize">{activeTab}</span></p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-center font-medium">
+                    Content type: <span className="text-blueteal capitalize">{activeTab}</span>
+                  </p>
+                  <p className="text-sm text-muted-foreground text-center px-2">
                     {activeTab === "glossary" ? 
                       "Enter a psychology term to define" : 
                      activeTab === "mythbusters" ? 
@@ -106,11 +108,16 @@ const EducationCenter = () => {
                      activeTab === "mythbusters" ? 
                       "e.g., Introverts don't like people" : 
                       "e.g., Albert Einstein"}
+                    className="w-full rounded-lg border-blueteal/30 focus:border-blueteal"
                   />
                 </div>
               </div>
-              <DialogFooter>
-                <Button onClick={handleGenerateContent} disabled={isLoading || !customTerm.trim()}>
+              <DialogFooter className="flex sm:flex-row justify-center">
+                <Button 
+                  onClick={handleGenerateContent} 
+                  disabled={isLoading || !customTerm.trim()}
+                  className="w-full sm:w-auto rounded-lg bg-gradient-to-r from-blueteal to-blueteal/80 hover:from-blueteal/90 hover:to-blueteal/70 text-white transition-all"
+                >
                   {isLoading ? "Generating..." : "Generate Content"}
                 </Button>
               </DialogFooter>
