@@ -62,7 +62,16 @@ const EventsList = ({
           </p>
         </div>
         <Button
-          onClick={() => onAddEvent({ id: '', name: '', date: new Date().toISOString(), location: '', people: [], type: 'social-gathering', energyCost: 5, notes: '' })}
+          onClick={() => onAddEvent({ 
+            id: '',
+            name: '',
+            date: new Date(), // Fixed: Use Date object instead of string
+            location: '',
+            eventType: 'casual gathering',
+            peopleCount: 'small group (5-15)',
+            energyCost: 5,
+            notes: ''
+          })}
           className="bg-periwinkle hover:bg-periwinkle-dark"
         >
           <PlusCircle className="h-4 w-4 mr-2" />
@@ -80,6 +89,7 @@ const EventsList = ({
                 title="Today"
                 events={todayEvents}
                 onEventSelect={onEventSelect}
+                onEditEvent={onUpdateEvent} // Added missing prop
                 onDeleteEvent={onDeleteEvent}
                 selectedEventId={selectedEventId}
               />
@@ -90,6 +100,7 @@ const EventsList = ({
                 title="Tomorrow"
                 events={tomorrowEvents}
                 onEventSelect={onEventSelect}
+                onEditEvent={onUpdateEvent} // Added missing prop
                 onDeleteEvent={onDeleteEvent}
                 selectedEventId={selectedEventId}
               />
@@ -100,6 +111,7 @@ const EventsList = ({
                 title="Upcoming"
                 events={upcomingEvents}
                 onEventSelect={onEventSelect}
+                onEditEvent={onUpdateEvent} // Added missing prop
                 onDeleteEvent={onDeleteEvent}
                 selectedEventId={selectedEventId}
               />
@@ -110,8 +122,10 @@ const EventsList = ({
                 title="Past Events"
                 events={pastEvents}
                 onEventSelect={onEventSelect}
+                onEditEvent={onUpdateEvent} // Added missing prop
                 onDeleteEvent={onDeleteEvent}
                 selectedEventId={selectedEventId}
+                isPast={true}
               />
             )}
           </div>

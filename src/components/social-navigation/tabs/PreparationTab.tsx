@@ -2,8 +2,8 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { SocialEvent } from "@/types/events";
-import { EventPreparation } from "@/types/events";
-import EventPreparation from "@/components/social-navigation/EventPreparation";
+import { EventPreparation as EventPreparationType } from "@/types/events";
+import EventPreparationComponent from "@/components/social-navigation/EventPreparation";
 import EnergyPlanning from "@/components/social-navigation/EnergyPlanning";
 import ConversationStarters from "@/components/social-navigation/ConversationStarters";
 import ExitStrategies from "@/components/social-navigation/ExitStrategies";
@@ -12,9 +12,9 @@ import PreparationMemo from "@/components/social-navigation/PreparationMemo";
 
 interface PreparationTabProps {
   activeEvent: SocialEvent | null;
-  eventPreparation: EventPreparation | null;
-  onGenerateConversationStarters: () => void;
-  onGeneratePreparationMemo: () => void;
+  eventPreparation: EventPreparationType | null;
+  onGenerateConversationStarters: () => Promise<void>;
+  onGeneratePreparationMemo: () => Promise<void>;
   batteryLevel: number;
 }
 
@@ -38,30 +38,41 @@ const PreparationTab = ({
     );
   }
 
+  // Wrap non-Promise functions with async to return Promises
+  const handleGenerateConversationStarters = async () => {
+    return onGenerateConversationStarters();
+  };
+
+  const handleGeneratePreparationMemo = async () => {
+    return onGeneratePreparationMemo();
+  };
+
   return (
     <div className="space-y-6">
-      <EventPreparation event={activeEvent} />
+      <EventPreparationComponent event={activeEvent} />
       
       <EnergyPlanning 
-        event={activeEvent} 
+        energyCost={activeEvent.energyCost}
+        eventDate={new Date(activeEvent.date)}
+        eventDuration={activeEvent.duration || 120}
         batteryLevel={batteryLevel}
       />
       
       <ConversationStarters 
-        event={activeEvent}
-        preparation={eventPreparation}
-        onGenerate={onGenerateConversationStarters}
+        eventId={activeEvent.id as string}
+        starters={eventPreparation?.conversationStarters || []}
+        onGenerate={handleGenerateConversationStarters}
       />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ExitStrategies event={activeEvent} />
-        <Boundaries event={activeEvent} />
+        <ExitStrategies eventType={activeEvent.eventType} />
+        <Boundaries />
       </div>
       
       <PreparationMemo
-        event={activeEvent}
-        preparation={eventPreparation}
-        onGenerate={onGeneratePreparationMemo}
+        eventId={activeEvent.id as string}
+        memo={eventPreparation?.aiMemo}
+        onGenerate={handleGeneratePreparationMemo}
       />
     </div>
   );
