@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useRelationshipNurturing } from '@/hooks/useRelationshipNurturing';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,7 +16,7 @@ export const RelationshipNurturing = () => {
     relationshipHealth,
     connectionSuggestions,
     conversationStarters,
-    relationships,
+    relationships = [],
     isLoading,
     markInsightAsRead,
     markAllInsightsAsRead,
@@ -104,7 +103,7 @@ export const RelationshipNurturing = () => {
         <TabsContent value="starters" className="space-y-4">
           <StartersTab 
             starters={conversationStarters} 
-            relationships={relationships || []}
+            relationships={relationships}
             onGenerateMore={generateMoreConversationStarters}
             onCopy={copyConversationStarter}
           />
@@ -294,7 +293,6 @@ const SuggestionsTab = ({ suggestions, onSchedule, onSkip }) => {
 
 // Component for displaying conversation starters
 const StartersTab = ({ starters, relationships, onGenerateMore, onCopy }) => {
-  // Group starters by relationship
   const getRelationshipGroups = () => {
     if (!starters || starters.length === 0) return {};
     
