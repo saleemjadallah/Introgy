@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -71,20 +72,21 @@ const PersonalInfoCard = ({
           .update({
             display_name: userData.displayName,
             // Don't update email through this method as it requires auth verification
-            updated_at: new Date()
+            updated_at: new Date().toISOString() // Fix: Convert Date to string
           })
           .eq('id', user.id);
 
         if (error) throw error;
         
         onSave();
-        toast({
-          title: "Profile updated",
+        toast("Profile updated", {
           description: "Your profile has been successfully updated.",
         });
       } catch (error) {
         console.error('Error updating profile:', error);
-        toast.error('Error updating profile');
+        toast("Error updating profile", {
+          description: "Failed to update your profile. Please try again.",
+        });
       }
     } else {
       onSave(); // Fall back to local save for demo

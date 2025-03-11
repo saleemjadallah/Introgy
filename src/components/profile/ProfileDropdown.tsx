@@ -33,12 +33,10 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
   const [notifications, setNotifications] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
-  // Get recently earned badges
   const recentBadges = getRecentlyEarnedBadges(7); // badges earned in the last 7 days
   const hasNewBadges = recentBadges.length > 0;
   
   useEffect(() => {
-    // Handle click outside to close dropdown
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         onClose();
@@ -55,16 +53,14 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
     const newMode = !darkMode;
     setDarkMode(newMode);
     document.documentElement.classList.toggle("dark", newMode);
-    toast({
-      title: newMode ? "Dark mode enabled" : "Light mode enabled",
+    toast(newMode ? "Dark mode enabled" : "Light mode enabled", {
       duration: 2000,
     });
   };
 
   const toggleNotifications = () => {
     setNotifications(!notifications);
-    toast({
-      title: notifications ? "Notifications disabled" : "Notifications enabled",
+    toast(notifications ? "Notifications disabled" : "Notifications enabled", {
       duration: 2000,
     });
   };
@@ -81,7 +77,6 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
       ref={dropdownRef}
       className="absolute top-16 right-4 w-72 bg-card rounded-lg border shadow-lg z-50 overflow-hidden"
     >
-      {/* Guest View (Not authenticated) */}
       {!isAuthenticated ? (
         <div className="divide-y divide-border">
           <div className="p-4 text-center">
@@ -119,7 +114,6 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
           </div>
         </div>
       ) : (
-        // Authenticated User View
         <div className="divide-y divide-border">
           <div className="p-4">
             <div className="flex items-center gap-3">
