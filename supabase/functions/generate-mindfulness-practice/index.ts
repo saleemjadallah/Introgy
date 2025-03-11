@@ -64,12 +64,18 @@ Make the script warm, supportive, and use inclusive language.
     const result = await response.json();
     let generatedScript = result[0]?.generated_text || "";
     
-    // Clean up the response to extract just the model's answer
-    const pattern = /<s>\[INST\].*?\[\/INST\](.*?)<\/s>/s;
-    const match = generatedScript.match(pattern);
-    if (match && match[1]) {
-      generatedScript = match[1].trim();
-    }
+    // Improved cleanup to properly extract just the model's answer and remove any prompt text
+    // Remove the instruction tags and everything between them
+    generatedScript = generatedScript.replace(/<s>\[INST\][\s\S]*?\[\/INST\]/g, "");
+    
+    // Remove any closing </s> tag
+    generatedScript = generatedScript.replace(/<\/s>/g, "");
+    
+    // Remove any remaining text that looks like it could be part of the prompt
+    generatedScript = generatedScript.replace(/Create a detailed mindfulness meditation[\s\S]*?inclusive language\./g, "");
+    
+    // Trim any excessive whitespace
+    generatedScript = generatedScript.trim();
 
     // Generate a descriptive title based on the focus areas
     const mainFocus = practiceRequest.focusAreas[0] || "Mindfulness";

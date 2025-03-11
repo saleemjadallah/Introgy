@@ -15,6 +15,11 @@ export const generatePractice = async (practiceRequest: PracticeRequest): Promis
       throw error;
     }
 
+    // Validate that we received a proper practice object
+    if (!data.practice || !data.practice.script) {
+      throw new Error("Invalid practice data received from the server");
+    }
+
     return data.practice;
   } catch (error) {
     console.error("Practice generation failed:", error);
