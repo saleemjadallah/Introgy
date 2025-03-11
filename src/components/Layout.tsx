@@ -45,7 +45,7 @@ const Layout = () => {
       {/* Header */}
       <header className="border-b px-4 py-3 flex items-center justify-between bg-card">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-semibold">InnerCircle</h1>
+          <h1 className="text-xl font-semibold">Introgy</h1>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={toggleTheme}>
