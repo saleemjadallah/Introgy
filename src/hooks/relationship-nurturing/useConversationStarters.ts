@@ -48,8 +48,19 @@ export function useConversationStarters(
             context: starter.context,
             confidence_score: Math.random() * 0.3 + 0.7, // Random high score for demo
             source: starter.source || 'interest',
-            user_id: (await supabase.auth.getUser()).data.user?.id
+            user_id: ''
           }));
+          
+          // Get the current user ID
+          const { data: userData } = await supabase.auth.getUser();
+          const userId = userData.user?.id;
+          
+          if (userId) {
+            // Update the user_id in each starter
+            newStarters.forEach(starter => {
+              starter.user_id = userId;
+            });
+          }
           
           const { data: insertedData, error: insertError } = await supabase
             .from('intelligent_conversation_starters')

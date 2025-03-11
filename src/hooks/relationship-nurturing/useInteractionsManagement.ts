@@ -299,7 +299,41 @@ export function useInteractionsManagement(
   const generateInteractions = useCallback(async () => {
     if (!scheduler || !relationships.length) return [];
 
-    const newInteractions = generateSuggestedInteractions(relationships, scheduler);
+    // This function needs implementation to generate interactions based on relationships and scheduler
+    const newInteractions: ScheduledInteraction[] = [];
+    
+    // For each relationship, create a basic interaction based on their importance and category
+    relationships.forEach(relationship => {
+      const today = new Date();
+      
+      // Simple logic to determine when to schedule based on importance
+      let daysToAdd = 7; // Default to a week
+      
+      if (relationship.importance > 4) {
+        daysToAdd = 3; // Important relationships get scheduled sooner
+      } else if (relationship.importance < 2) {
+        daysToAdd = 14; // Less important relationships can wait longer
+      }
+      
+      // Create a basic interaction
+      const newInteraction: ScheduledInteraction = {
+        id: uuidv4(),
+        relationshipId: relationship.id,
+        relationshipName: relationship.name,
+        scheduledDate: format(addDays(today, daysToAdd), 'yyyy-MM-dd'),
+        suggestedTimeSlots: ['10:00', '14:00', '18:00'],
+        interactionType: relationship.category === 'professional' ? 'call' : 'message',
+        duration: relationship.category === 'professional' ? 30 : 15,
+        purpose: `Check in with ${relationship.name}`,
+        preparationNeeded: relationship.importance > 3,
+        preparationNotes: `Based on ${relationship.interests.join(', ')}`,
+        status: 'planned',
+        energyCost: relationship.importance * 2 // Simple formula based on importance
+      };
+      
+      newInteractions.push(newInteraction);
+    });
+    
     setScheduledInteractions(newInteractions);
 
     // Update today's interactions
@@ -334,7 +368,7 @@ export function useInteractionsManagement(
     completeInteraction,
     skipInteraction,
     rescheduleInteraction,
-    generateInteractions: generateInteractions,
+    generateInteractions,
     updateScheduleSettings
   };
 }
