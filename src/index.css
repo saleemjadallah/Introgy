@@ -57,6 +57,10 @@
     --interactive-primary: 174 43% 43%;  /* Soft teal #3E9D9D */
     --interactive-secondary: 238 36% 63%;  /* Muted periwinkle #7B7FC4 */
     --interactive-success: 142 23% 59%;  /* Soft sage green #7DAA92 */
+    
+    /* Footer Navigation Colors */
+    --footer-inactive: 219 17% 60%;  /* Medium gray #8A94A6 */
+    --footer-active: 192 53% 35%;  /* Deep teal #2A7D8B */
   }
 
   .dark {
@@ -135,6 +139,15 @@
 
 .battery-level-low {
   @apply bg-[#E57373] !important;
+}
+
+/* Footer navigation colors */
+.footer-nav-active {
+  @apply text-[#2A7D8B] !important;
+}
+
+.footer-nav-inactive {
+  @apply text-[#8A94A6] !important;
 }
 
 /* Override headings and paragraphs explicitly */

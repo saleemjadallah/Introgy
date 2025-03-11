@@ -79,6 +79,10 @@ export default {
 					secondary: 'hsl(var(--interactive-secondary))',
 					success: 'hsl(var(--interactive-success))'
 				},
+				footer: {
+					inactive: 'hsl(var(--footer-inactive))',
+					active: 'hsl(var(--footer-active))'
+				},
 				teal: {
 					DEFAULT: '#3E9D9D',
 					light: '#5BBCBC',
