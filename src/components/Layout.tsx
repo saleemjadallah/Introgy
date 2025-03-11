@@ -82,26 +82,23 @@ const Layout = () => {
           </div>
         </nav>
 
-        {/* Mobile navigation */}
+        {/* Mobile navigation - removed Profile icon and increased size of remaining icons */}
         <div className="fixed bottom-0 left-0 right-0 border-t bg-white md:hidden z-10">
           <div className="flex justify-around py-2">
             <Link to="/" className={cn("p-2 rounded-full", location.pathname === "/" && "text-[#2A7D8B]")}>
-              <Home size={24} className={location.pathname === "/" ? "text-[#2A7D8B]" : "text-[#8A94A6]"} />
+              <Home size={28} className={location.pathname === "/" ? "text-[#2A7D8B]" : "text-[#8A94A6]"} />
             </Link>
             <Link to="/social-battery" className={cn("p-2 rounded-full", location.pathname === "/social-battery" && "text-[#2A7D8B]")}>
-              <Battery size={24} className={location.pathname === "/social-battery" ? "text-[#2A7D8B]" : "text-[#8A94A6]"} />
+              <Battery size={28} className={location.pathname === "/social-battery" ? "text-[#2A7D8B]" : "text-[#8A94A6]"} />
             </Link>
             <Link to="/social-navigation" className={cn("p-2 rounded-full", location.pathname === "/social-navigation" && "text-[#2A7D8B]")}>
-              <Users size={24} className={location.pathname === "/social-navigation" ? "text-[#2A7D8B]" : "text-[#8A94A6]"} />
+              <Users size={28} className={location.pathname === "/social-navigation" ? "text-[#2A7D8B]" : "text-[#8A94A6]"} />
             </Link>
             <Link to="/connection-builder" className={cn("p-2 rounded-full", location.pathname === "/connection-builder" && "text-[#2A7D8B]")}>
-              <Brain size={24} className={location.pathname === "/connection-builder" ? "text-[#2A7D8B]" : "text-[#8A94A6]"} />
+              <Brain size={28} className={location.pathname === "/connection-builder" ? "text-[#2A7D8B]" : "text-[#8A94A6]"} />
             </Link>
             <Link to="/wellbeing" className={cn("p-2 rounded-full", location.pathname === "/wellbeing" && "text-[#2A7D8B]")}>
-              <LineChart size={24} className={location.pathname === "/wellbeing" ? "text-[#2A7D8B]" : "text-[#8A94A6]"} />
-            </Link>
-            <Link to="/profile" className={cn("p-2 rounded-full", location.pathname === "/profile" && "text-[#2A7D8B]")}>
-              <User size={24} className={location.pathname === "/profile" ? "text-[#2A7D8B]" : "text-[#8A94A6]"} />
+              <LineChart size={28} className={location.pathname === "/wellbeing" ? "text-[#2A7D8B]" : "text-[#8A94A6]"} />
             </Link>
           </div>
         </div>
