@@ -1,4 +1,3 @@
-
 import { LineChart, BookOpen, Users, Battery, Book, ChevronDown, AlertCircle, User, MessageSquare, MountainSnow } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -22,7 +21,7 @@ const Wellbeing = () => {
     <div className="space-y-4 w-full max-w-full">
       <div>
         <h2 className="text-3xl font-bold tracking-tight mb-2">Wellbeing Center</h2>
-        <p className="text-muted-foreground">Resources to support your introvert wellbeing</p>
+        <p className="text-muted-foreground">AI-powered resources to support your introvert wellbeing</p>
       </div>
 
       <div className="w-full">
@@ -46,7 +45,7 @@ const Wellbeing = () => {
               className="flex-shrink-0 hover:text-white"
             >
               <BookOpen className="h-4 w-4 mr-2 text-blueteal" />
-              Education Center
+              AI Education Center
             </Button>
             <Button 
               variant={activeSection === 'mindfulness' ? 'default' : 'outline'} 
@@ -74,14 +73,14 @@ const Wellbeing = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5 text-blueteal" />
-                Education Center
+                AI Education Center
               </CardTitle>
               <CardDescription>Learn about introvert psychology</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center gap-4">
                 <p className="text-muted-foreground">
-                  Explore our introvert psychology education center with glossary, myth busters, and famous introverts.
+                  Explore our AI-powered introvert psychology education center with glossary, myth busters, and famous introverts.
                 </p>
                 <Button 
                   onClick={() => setActiveSection('education')}
