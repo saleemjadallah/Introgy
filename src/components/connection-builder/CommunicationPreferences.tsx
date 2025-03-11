@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
@@ -7,8 +8,10 @@ import ProfilesList from './communication-preferences/ProfilesList';
 import ProfileEditor from './communication-preferences/ProfileEditor';
 import SharingManager from './communication-preferences/SharingManager';
 import ProfileWizard from './communication-preferences/ProfileWizard';
+import AIProfileWizard from './communication-preferences/AIProfileWizard';
 import { CommunicationProfile } from '@/types/communication-preferences';
-import { MessageCircle, ListPlus, Users, Share2 } from 'lucide-react';
+import { MessageCircle, ListPlus, Users, Share2, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const CommunicationPreferences = () => {
   const { toast } = useToast();
@@ -24,15 +27,17 @@ const CommunicationPreferences = () => {
   const [activeTab, setActiveTab] = useState<string>('profiles');
   const [currentProfile, setCurrentProfile] = useState<CommunicationProfile | null>(null);
   const [isCreating, setIsCreating] = useState<boolean>(false);
+  const [createMode, setCreateMode] = useState<'template' | 'wizard' | 'ai'>('template');
 
   const handleProfileSelect = (profile: CommunicationProfile) => {
     setCurrentProfile(profile);
     setActiveTab('edit');
   };
 
-  const handleCreateNew = () => {
+  const handleCreateNew = (mode: 'template' | 'wizard' | 'ai' = 'template') => {
     setCurrentProfile(null);
     setIsCreating(true);
+    setCreateMode(mode);
     setActiveTab('create');
   };
 
@@ -78,7 +83,7 @@ const CommunicationPreferences = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 h-auto">
+        <TabsList className="grid w-full grid-cols-5 h-auto">
           <TabsTrigger 
             value="profiles" 
             className="flex flex-col items-center gap-1 py-3 px-1 sm:px-2 text-xs sm:text-sm h-auto"
@@ -92,6 +97,13 @@ const CommunicationPreferences = () => {
           >
             <MessageCircle className="h-4 w-4 mb-1" />
             <span>Create</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="ai" 
+            className="flex flex-col items-center gap-1 py-3 px-1 sm:px-2 text-xs sm:text-sm h-auto"
+          >
+            <Sparkles className="h-4 w-4 mb-1" />
+            <span>AI Assist</span>
           </TabsTrigger>
           <TabsTrigger 
             value="edit" 
@@ -115,24 +127,67 @@ const CommunicationPreferences = () => {
           <ProfilesList 
             profiles={profiles}
             onProfileSelect={handleProfileSelect}
-            onCreateNew={handleCreateNew}
+            onCreateNew={() => handleCreateNew('template')}
             onSetDefault={handleSetDefault}
             onDeleteProfile={handleProfileDelete}
           />
+          
+          <div className="flex justify-center mt-4">
+            <Button 
+              variant="outline"
+              onClick={() => handleCreateNew('ai')}
+              className="flex items-center gap-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              Create with AI assistant
+            </Button>
+          </div>
         </TabsContent>
         
         <TabsContent value="create" className="space-y-4 mt-6">
           {isCreating ? (
-            <ProfileWizard 
-              onComplete={handleCreateFromTemplate} 
-              onCancel={handleCancelCreate}
-            />
+            createMode === 'ai' ? (
+              <AIProfileWizard 
+                onComplete={handleCreateFromTemplate} 
+                onCancel={handleCancelCreate}
+              />
+            ) : (
+              <ProfileWizard 
+                onComplete={handleCreateFromTemplate} 
+                onCancel={handleCancelCreate}
+              />
+            )
           ) : (
             <TemplateSelector 
               onSelectTemplate={handleCreateFromTemplate}
               onCancel={() => setActiveTab('profiles')}
             />
           )}
+        </TabsContent>
+        
+        <TabsContent value="ai" className="space-y-4 mt-6">
+          <AIProfileWizard 
+            initialProfile={currentProfile || undefined}
+            onComplete={(profile) => {
+              if (currentProfile) {
+                // Update existing profile
+                updateProfile(currentProfile.profileId, profile);
+                toast({
+                  title: 'Profile updated',
+                  description: `Your communication profile "${profile.profileName}" has been updated with AI assistance.`
+                });
+              } else {
+                // Create new profile
+                createProfile(profile);
+                toast({
+                  title: 'Profile created',
+                  description: `Your communication profile "${profile.profileName}" has been created with AI assistance.`
+                });
+              }
+              setActiveTab('profiles');
+            }}
+            onCancel={() => setActiveTab('profiles')}
+          />
         </TabsContent>
         
         <TabsContent value="edit" className="space-y-4 mt-6">
