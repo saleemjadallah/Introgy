@@ -1,4 +1,3 @@
-
 import { socialStrategiesData } from "@/data/socialStrategiesData";
 import { Strategy } from "@/types/social-strategies";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,15 +37,15 @@ const convertAppStrategyToDb = (strategy: Strategy, userId: string) => {
     type: strategy.type,
     energylevel: strategy.energyLevel,
     preptime: strategy.prepTime,
-    steps: strategy.steps as Json,
-    examplephrases: (strategy.examplePhrases || []) as Json,
-    challenges: strategy.challenges as Json,
-    tags: strategy.tags as Json,
+    steps: JSON.stringify(strategy.steps) as Json,
+    examplephrases: JSON.stringify(strategy.examplePhrases || []) as Json,
+    challenges: JSON.stringify(strategy.challenges) as Json,
+    tags: JSON.stringify(strategy.tags) as Json,
     personalnote: strategy.personalNote || null,
     isfavorite: strategy.isFavorite,
     rating: strategy.rating || null,
-    createdat: new Date(),
-    updatedat: new Date()
+    createdat: new Date().toISOString(),
+    updatedat: new Date().toISOString()
   };
 };
 
