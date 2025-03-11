@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      category_defaults: {
+        Row: {
+          category: string
+          created_at: string
+          frequency: Json
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          frequency: Json
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          frequency?: Json
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       connection_suggestions: {
         Row: {
           created_at: string | null
@@ -306,6 +333,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      relationship_frequencies: {
+        Row: {
+          category_default: boolean
+          created_at: string
+          custom_frequency: Json | null
+          id: string
+          is_overdue: boolean
+          last_interaction: string | null
+          next_scheduled: string | null
+          overdue_days: number
+          relationship_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category_default?: boolean
+          created_at?: string
+          custom_frequency?: Json | null
+          id?: string
+          is_overdue?: boolean
+          last_interaction?: string | null
+          next_scheduled?: string | null
+          overdue_days?: number
+          relationship_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category_default?: boolean
+          created_at?: string
+          custom_frequency?: Json | null
+          id?: string
+          is_overdue?: boolean
+          last_interaction?: string | null
+          next_scheduled?: string | null
+          overdue_days?: number
+          relationship_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       relationship_health: {
         Row: {
@@ -698,6 +767,45 @@ export type Database = {
           importance_level?: number | null
           name?: string
           nickname?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      scheduler_settings: {
+        Row: {
+          batch_similar: boolean
+          created_at: string
+          id: string
+          max_daily_interactions: number
+          preferred_days: number[]
+          preferred_time_ranges: Json
+          quiet_periods: Json
+          reminder_style: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          batch_similar?: boolean
+          created_at?: string
+          id?: string
+          max_daily_interactions?: number
+          preferred_days?: number[]
+          preferred_time_ranges?: Json
+          quiet_periods?: Json
+          reminder_style?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          batch_similar?: boolean
+          created_at?: string
+          id?: string
+          max_daily_interactions?: number
+          preferred_days?: number[]
+          preferred_time_ranges?: Json
+          quiet_periods?: Json
+          reminder_style?: string
           updated_at?: string
           user_id?: string
         }

@@ -21,6 +21,7 @@ import {
   convertDbStarter,
   convertDbTemplate
 } from '@/utils/relationshipTypeConverters';
+import { useSchedulerData } from './useSchedulerData';
 
 // Import mock data for fallback when not authenticated
 import { 
@@ -35,7 +36,13 @@ import {
 } from '@/data/relationshipNurturingData';
 
 export function useRelationshipNurturingData() {
-  const [scheduler, setScheduler] = useState<ConnectionScheduler | null>(null);
+  // Replace scheduler state with the new hook
+  const { 
+    scheduler, 
+    isLoading: isSchedulerLoading,
+    saveSchedulerData 
+  } = useSchedulerData();
+  
   const [relationships, setRelationships] = useState<Relationship[]>([]);
   const [scheduledInteractions, setScheduledInteractions] = useState<ScheduledInteraction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -149,17 +156,14 @@ export function useRelationshipNurturingData() {
         setConversationStarters(convertedStarters);
         setMessageTemplates(convertedTemplates);
         
-        // For now, still use mock scheduler data until we implement that in Supabase
-        setScheduler(mockScheduler);
-        
         // Generate scheduled interactions if none exist
-        const interactions = mockScheduler.scheduledInteractions.length > 0 
-          ? mockScheduler.scheduledInteractions 
-          : generateSuggestedInteractions(convertedRelationships, mockScheduler);
+        const interactions = scheduler?.scheduledInteractions.length ? 
+          scheduler.scheduledInteractions : 
+          generateSuggestedInteractions(convertedRelationships, scheduler || mockScheduler);
         
         setScheduledInteractions(interactions);
       } else {
-        // Use mock data when not authenticated
+        // Remove scheduler loading since it's handled by useSchedulerData
         setRelationships(mockRelationships);
         setInsights(mockRelationshipInsights);
         setRelationshipHealth(mockRelationshipHealth);
@@ -177,11 +181,8 @@ export function useRelationshipNurturingData() {
         
         setMessageTemplates(convertedTemplates as MessageTemplate[]);
         
-        // Set scheduler and interactions
-        setScheduler(mockScheduler);
-        
         // Generate scheduled interactions
-        const interactions = generateSuggestedInteractions(mockRelationships, mockScheduler);
+        const interactions = generateSuggestedInteractions(mockRelationships, scheduler || mockScheduler);
         setScheduledInteractions(interactions);
       }
     } catch (error) {
@@ -192,22 +193,21 @@ export function useRelationshipNurturingData() {
         variant: 'destructive',
       });
       
-      // Fallback to mock data
+      // Remove scheduler fallback since it's handled by useSchedulerData
       setRelationships(mockRelationships);
       setInsights(mockRelationshipInsights);
       setRelationshipHealth(mockRelationshipHealth);
       setConnectionSuggestions(mockConnectionSuggestions);
       setConversationStarters(mockIntelligentConversationStarters);
       setMessageTemplates(mockMessageTemplates as MessageTemplate[]);
-      setScheduler(mockScheduler);
       
       // Generate scheduled interactions
-      const interactions = generateSuggestedInteractions(mockRelationships, mockScheduler);
+      const interactions = generateSuggestedInteractions(mockRelationships, scheduler || mockScheduler);
       setScheduledInteractions(interactions);
     } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated, toast]);
+  }, [isAuthenticated, toast, scheduler]);
 
   // Save data to Supabase or localStorage
   const saveData = useCallback(async () => {
@@ -215,6 +215,9 @@ export function useRelationshipNurturingData() {
       if (isAuthenticated) {
         // If authenticated, we don't need to implement all saving here
         // as each individual hook will handle its own saving logic
+        if (scheduler) {
+          saveSchedulerData(scheduler);
+        }
       } else {
         // If not authenticated, save to localStorage as before
         if (scheduler) {
@@ -230,7 +233,9 @@ export function useRelationshipNurturingData() {
         variant: 'destructive',
       });
     }
-  }, [isAuthenticated, scheduler, relationships, toast]);
+  }, [isAuthenticated, scheduler, relationships, toast, saveSchedulerData]);
+
+  const isLoadingAny = isLoading || isSchedulerLoading;
 
   return {
     scheduler,
@@ -241,7 +246,7 @@ export function useRelationshipNurturingData() {
     connectionSuggestions,
     conversationStarters,
     messageTemplates,
-    isLoading,
+    isLoading: isLoadingAny,
     isAuthenticated,
     loadNurturingData,
     saveData,
