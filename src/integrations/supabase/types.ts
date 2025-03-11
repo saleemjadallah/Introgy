@@ -703,6 +703,66 @@ export type Database = {
         }
         Relationships: []
       }
+      social_strategies: {
+        Row: {
+          challenges: Json
+          createdat: string
+          description: string
+          energylevel: string
+          examplephrases: Json | null
+          id: string
+          isfavorite: boolean
+          personalnote: string | null
+          preptime: number
+          rating: string | null
+          scenariotype: string
+          steps: Json
+          tags: Json
+          title: string
+          type: string
+          updatedat: string
+          user_id: string
+        }
+        Insert: {
+          challenges: Json
+          createdat?: string
+          description: string
+          energylevel: string
+          examplephrases?: Json | null
+          id?: string
+          isfavorite?: boolean
+          personalnote?: string | null
+          preptime: number
+          rating?: string | null
+          scenariotype: string
+          steps: Json
+          tags: Json
+          title: string
+          type: string
+          updatedat?: string
+          user_id: string
+        }
+        Update: {
+          challenges?: Json
+          createdat?: string
+          description?: string
+          energylevel?: string
+          examplephrases?: Json | null
+          id?: string
+          isfavorite?: boolean
+          personalnote?: string | null
+          preptime?: number
+          rating?: string | null
+          scenariotype?: string
+          steps?: Json
+          tags?: Json
+          title?: string
+          type?: string
+          updatedat?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

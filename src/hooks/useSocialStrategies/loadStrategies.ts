@@ -1,7 +1,30 @@
+
 import { socialStrategiesData } from "@/data/socialStrategiesData";
 import { Strategy } from "@/types/social-strategies";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+// Helper to convert database strategy to our application type
+const convertDbStrategyToApp = (dbStrategy: any): Strategy => {
+  return {
+    id: dbStrategy.id,
+    title: dbStrategy.title,
+    description: dbStrategy.description,
+    scenarioType: dbStrategy.scenarioType,
+    type: dbStrategy.type,
+    energyLevel: dbStrategy.energyLevel,
+    prepTime: dbStrategy.prepTime,
+    steps: dbStrategy.steps,
+    examplePhrases: dbStrategy.examplePhrases || [],
+    challenges: dbStrategy.challenges,
+    tags: dbStrategy.tags,
+    personalNote: dbStrategy.personalNote || null,
+    isFavorite: dbStrategy.isFavorite,
+    rating: dbStrategy.rating || null,
+    createdAt: new Date(dbStrategy.createdAt),
+    updatedAt: new Date(dbStrategy.updatedAt)
+  };
+};
 
 export const loadStrategiesFromStorage = async (): Promise<Strategy[]> => {
   try {
@@ -12,7 +35,8 @@ export const loadStrategiesFromStorage = async (): Promise<Strategy[]> => {
       // User is logged in, try to get their saved strategies
       const { data: savedStrategies, error } = await supabase
         .from('social_strategies')
-        .select('*');
+        .select('*')
+        .eq('user_id', session.session.user.id);
       
       if (error) {
         throw error;
@@ -20,13 +44,14 @@ export const loadStrategiesFromStorage = async (): Promise<Strategy[]> => {
       
       if (savedStrategies && savedStrategies.length > 0) {
         console.log("Loaded strategies from Supabase:", savedStrategies.length);
-        return savedStrategies;
+        return savedStrategies.map(convertDbStrategyToApp);
       } else {
         // No strategies found in Supabase, initialize with mock data
-        // We only need to do this once per user
         const initialStrategies = socialStrategiesData.map(strategy => ({
           ...strategy,
-          user_id: session.session?.user.id
+          user_id: session.session?.user.id,
+          createdAt: new Date(),
+          updatedAt: new Date()
         }));
         
         const { error: insertError } = await supabase
@@ -81,8 +106,14 @@ export const saveStrategiesToStorage = async (strategies: Strategy[]): Promise<v
     const { data: session } = await supabase.auth.getSession();
     
     if (session && session.session) {
-      // We need to handle this as an upsert operation
-      // First delete all existing strategies
+      // Handle batch upsert for Supabase
+      const strategiesForDb = strategies.map(strategy => ({
+        ...strategy,
+        user_id: session.session?.user.id,
+        updatedAt: new Date()
+      }));
+      
+      // Delete existing strategies first
       const { error: deleteError } = await supabase
         .from('social_strategies')
         .delete()
@@ -93,14 +124,9 @@ export const saveStrategiesToStorage = async (strategies: Strategy[]): Promise<v
       }
       
       // Then insert the updated strategies
-      const strategiesWithUserId = strategies.map(strategy => ({
-        ...strategy,
-        user_id: session.session?.user.id
-      }));
-      
       const { error: insertError } = await supabase
         .from('social_strategies')
-        .insert(strategiesWithUserId);
+        .insert(strategiesForDb);
         
       if (insertError) {
         throw insertError;
