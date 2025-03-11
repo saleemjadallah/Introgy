@@ -45,7 +45,7 @@ const Wellbeing = () => {
               onClick={() => setActiveSection('education')}
               className="flex-shrink-0"
             >
-              <BookOpen className="h-4 w-4 mr-2 text-amber" />
+              <BookOpen className="h-4 w-4 mr-2 text-blueteal" />
               Education Center
             </Button>
             <Button 
@@ -70,10 +70,10 @@ const Wellbeing = () => {
 
       {activeSection === 'overview' ? (
         <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2'} gap-4 w-full max-w-full`}>
-          <Card className="w-full education-container-gradient">
+          <Card className="w-full wellbeing-container-gradient">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-amber opacity-80" />
+                <BookOpen className="h-5 w-5 text-blueteal" />
                 Education Center
               </CardTitle>
               <CardDescription>Learn about introvert psychology</CardDescription>
@@ -85,7 +85,7 @@ const Wellbeing = () => {
                 </p>
                 <Button 
                   onClick={() => setActiveSection('education')}
-                  className="gap-2 bg-white/70 hover:bg-white text-amber"
+                  className="gap-2 bg-white/70 hover:bg-white text-blueteal"
                 >
                   <BookOpen className="h-4 w-4" />
                   Explore Education Center
