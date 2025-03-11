@@ -15,6 +15,7 @@ interface EventsListProps {
   onUpdateEvent: (event: SocialEvent) => void;
   onDeleteEvent: (eventId: string) => void;
   selectedEventId?: string;
+  onShowAddForm: () => void; // New prop to trigger form display
 }
 
 const EventsList = ({
@@ -24,6 +25,7 @@ const EventsList = ({
   onUpdateEvent,
   onDeleteEvent,
   selectedEventId,
+  onShowAddForm, // Add the new prop
 }: EventsListProps) => {
   // Group events by time
   const today = new Date();
@@ -62,16 +64,7 @@ const EventsList = ({
           </p>
         </div>
         <Button
-          onClick={() => onAddEvent({ 
-            id: '',
-            name: '',
-            date: new Date(), 
-            location: '',
-            eventType: 'casual gathering',
-            peopleCount: 'small group (5-15)',
-            energyCost: 5,
-            notes: ''
-          })}
+          onClick={onShowAddForm} // Change to show form instead of creating event
           className="bg-periwinkle hover:bg-periwinkle-dark"
         >
           <PlusCircle className="h-4 w-4 mr-2" />
@@ -81,7 +74,7 @@ const EventsList = ({
 
       <CardContent>
         {events.length === 0 ? (
-          <EmptyEventsList onAddEvent={onAddEvent} />
+          <EmptyEventsList onAddEvent={onShowAddForm} /> // Change to show form
         ) : (
           <div className="space-y-4">
             {todayEvents.length > 0 && (

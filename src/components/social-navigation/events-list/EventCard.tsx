@@ -29,7 +29,7 @@ const EventCard = ({ event, onSelect, onEdit, onDelete, isSelected, isPast }: Ev
               size="icon" 
               className="h-8 w-8"
               onClick={(e) => {
-                e.stopPropagation();
+                e.stopPropagation(); // Prevent card click when edit button is clicked
                 onEdit(event);
               }}
             >
@@ -40,7 +40,7 @@ const EventCard = ({ event, onSelect, onEdit, onDelete, isSelected, isPast }: Ev
               size="icon" 
               className="h-8 w-8 text-destructive"
               onClick={(e) => {
-                e.stopPropagation();
+                e.stopPropagation(); // Prevent card click when delete button is clicked
                 if (confirm("Are you sure you want to delete this event?")) {
                   onDelete(event.id as string);
                 }

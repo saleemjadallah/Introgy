@@ -25,6 +25,17 @@ const EventsTab = ({
 }: EventsTabProps) => {
   const { addActivity } = useSocialBattery();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<SocialEvent | null>(null);
+  
+  const handleShowAddForm = () => {
+    setShowAddForm(true);
+    setEditingEvent(null);
+  };
+  
+  const handleEditEvent = (event: SocialEvent) => {
+    setEditingEvent(event);
+    setShowAddForm(true);
+  };
   
   const handleAddEvent = (event: SocialEvent) => {
     const newEvent = onAddEvent(event);
@@ -43,18 +54,35 @@ const EventsTab = ({
     return newEvent;
   };
   
+  const handleUpdateEvent = (event: SocialEvent) => {
+    onUpdateEvent(event);
+    setShowAddForm(false);
+    setEditingEvent(null);
+  };
+  
+  const handleCancel = () => {
+    setShowAddForm(false);
+    setEditingEvent(null);
+  };
+  
   return (
     <>
       {showAddForm ? (
         <Card className="navigation-container-gradient">
           <CardHeader>
-            <CardTitle>Create New Event</CardTitle>
-            <CardDescription>Add details about an upcoming social event you'll attend</CardDescription>
+            <CardTitle>{editingEvent ? "Edit Event" : "Create New Event"}</CardTitle>
+            <CardDescription>
+              {editingEvent 
+                ? "Update details for this event" 
+                : "Add details about an upcoming social event you'll attend"
+              }
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <EventForm 
-              onSubmit={handleAddEvent}
-              onCancel={() => setShowAddForm(false)}
+              initialEvent={editingEvent || undefined}
+              onSubmit={editingEvent ? handleUpdateEvent : handleAddEvent}
+              onCancel={handleCancel}
             />
           </CardContent>
         </Card>
@@ -63,9 +91,10 @@ const EventsTab = ({
           events={events}
           onEventSelect={onEventSelect}
           onAddEvent={handleAddEvent}
-          onUpdateEvent={onUpdateEvent}
+          onUpdateEvent={handleEditEvent} // Changed to show edit form
           onDeleteEvent={onDeleteEvent}
           selectedEventId={selectedEventId}
+          onShowAddForm={handleShowAddForm}
         />
       )}
     </>
