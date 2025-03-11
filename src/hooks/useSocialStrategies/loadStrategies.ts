@@ -3,6 +3,7 @@ import { socialStrategiesData } from "@/data/socialStrategiesData";
 import { Strategy } from "@/types/social-strategies";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Json } from "@/integrations/supabase/types";
 
 // Helper to convert database strategy to our application type
 const convertDbStrategyToApp = (dbStrategy: any): Strategy => {
@@ -10,19 +11,42 @@ const convertDbStrategyToApp = (dbStrategy: any): Strategy => {
     id: dbStrategy.id,
     title: dbStrategy.title,
     description: dbStrategy.description,
-    scenarioType: dbStrategy.scenarioType,
+    scenarioType: dbStrategy.scenariotype,
     type: dbStrategy.type,
-    energyLevel: dbStrategy.energyLevel,
-    prepTime: dbStrategy.prepTime,
+    energyLevel: dbStrategy.energylevel,
+    prepTime: dbStrategy.preptime,
     steps: dbStrategy.steps,
-    examplePhrases: dbStrategy.examplePhrases || [],
+    examplePhrases: dbStrategy.examplephrases || [],
     challenges: dbStrategy.challenges,
     tags: dbStrategy.tags,
-    personalNote: dbStrategy.personalNote || null,
-    isFavorite: dbStrategy.isFavorite,
+    personalNote: dbStrategy.personalnote || null,
+    isFavorite: dbStrategy.isfavorite,
     rating: dbStrategy.rating || null,
-    createdAt: new Date(dbStrategy.createdAt),
-    updatedAt: new Date(dbStrategy.updatedAt)
+    createdAt: new Date(dbStrategy.createdat),
+    updatedAt: new Date(dbStrategy.updatedat)
+  };
+};
+
+// Helper to convert our application type to database format
+const convertAppStrategyToDb = (strategy: Strategy, userId: string) => {
+  return {
+    id: strategy.id,
+    user_id: userId,
+    title: strategy.title,
+    description: strategy.description,
+    scenariotype: strategy.scenarioType,
+    type: strategy.type,
+    energylevel: strategy.energyLevel,
+    preptime: strategy.prepTime,
+    steps: strategy.steps as Json,
+    examplephrases: (strategy.examplePhrases || []) as Json,
+    challenges: strategy.challenges as Json,
+    tags: strategy.tags as Json,
+    personalnote: strategy.personalNote || null,
+    isfavorite: strategy.isFavorite,
+    rating: strategy.rating || null,
+    createdat: new Date(),
+    updatedat: new Date()
   };
 };
 
@@ -47,24 +71,21 @@ export const loadStrategiesFromStorage = async (): Promise<Strategy[]> => {
         return savedStrategies.map(convertDbStrategyToApp);
       } else {
         // No strategies found in Supabase, initialize with mock data
-        const initialStrategies = socialStrategiesData.map(strategy => ({
-          ...strategy,
-          user_id: session.session?.user.id,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }));
+        const initialStrategiesForDb = socialStrategiesData.map(strategy => 
+          convertAppStrategyToDb(strategy, session.session.user.id)
+        );
         
         const { error: insertError } = await supabase
           .from('social_strategies')
-          .insert(initialStrategies);
+          .insert(initialStrategiesForDb);
           
         if (insertError) {
           console.error("Error seeding strategies:", insertError);
           throw insertError;
         }
         
-        console.log("Saved initial strategies to Supabase:", initialStrategies.length);
-        return initialStrategies;
+        console.log("Saved initial strategies to Supabase:", initialStrategiesForDb.length);
+        return socialStrategiesData;
       }
     } else {
       // User is not logged in, fallback to localStorage
@@ -107,11 +128,9 @@ export const saveStrategiesToStorage = async (strategies: Strategy[]): Promise<v
     
     if (session && session.session) {
       // Handle batch upsert for Supabase
-      const strategiesForDb = strategies.map(strategy => ({
-        ...strategy,
-        user_id: session.session?.user.id,
-        updatedAt: new Date()
-      }));
+      const strategiesForDb = strategies.map(strategy => 
+        convertAppStrategyToDb(strategy, session.session.user.id)
+      );
       
       // Delete existing strategies first
       const { error: deleteError } = await supabase
