@@ -294,7 +294,18 @@ const SuggestionsTab = ({ suggestions, onSchedule, onSkip }) => {
 };
 
 // Component for displaying conversation starters
-const StartersTab = ({ starters, relationships, onGenerateMore, onCopy }) => {
+// Fix: Add proper type for relationships prop
+const StartersTab = ({ 
+  starters, 
+  relationships, 
+  onGenerateMore, 
+  onCopy 
+}: { 
+  starters: any[], 
+  relationships: Relationship[], 
+  onGenerateMore: (relationshipId: string) => void, 
+  onCopy: (text: string) => void 
+}) => {
   const getRelationshipGroups = () => {
     if (!starters || starters.length === 0) return {};
     
