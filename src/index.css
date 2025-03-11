@@ -7,106 +7,25 @@
 @layer base {
   :root {
     --background: 240 22% 95%;  /* Soft lavender-gray #F0F0F7 */
-    --foreground: 221 52% 15%;  /* Changed to Deep navy #121F36 */
-
+    --foreground: 221 52% 15%;  /* Deep navy #121F36 */
     --card: 0 0% 100%;  /* Pure white #FFFFFF */
-    --card-foreground: 221 52% 15%;  /* Changed to Deep navy #121F36 */
-
+    --card-foreground: 221 52% 15%;  /* Deep navy #121F36 */
     --popover: 0 0% 100%;  /* Pure white #FFFFFF */
-    --popover-foreground: 221 52% 15%;  /* Changed to Deep navy #121F36 */
-
-    --primary: 221 52% 15%;  /* Changed to Deep navy #121F36 */
+    --popover-foreground: 221 52% 15%;  /* Deep navy #121F36 */
+    --primary: 221 52% 15%;  /* Deep navy #121F36 */
     --primary-foreground: 210 40% 98%;
-
     --secondary: 160 20% 93%;  /* Light sage-mint #E8F1EE */
-    --secondary-foreground: 221 52% 15%;  /* Changed to Deep navy #121F36 */
-
+    --secondary-foreground: 221 52% 15%;  /* Deep navy #121F36 */
     --muted: 210 40% 96.1%;
-    --muted-foreground: 214 15% 46%;  /* Changed to Slate blue #627286 */
-
-    --accent: 248 21% 45%;  /* Changed to Dusky purple #5D5A8C */
+    --muted-foreground: 214 15% 46%;  /* Slate blue #627286 */
+    --accent: 248 21% 45%;  /* Dusky purple #5D5A8C */
     --accent-foreground: 210 40% 98%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 218 27% 88%;  /* Light periwinkle #D8DEE9 */
     --input: 218 27% 88%;  /* Light periwinkle #D8DEE9 */
-    --ring: 221 52% 15%;  /* Changed to Deep navy #121F36 */
-
+    --ring: 221 52% 15%;  /* Deep navy #121F36 */
     --radius: 0.5rem;
-
-    --sidebar-background: 240 22% 95%;  /* Match main background */
-    --sidebar-foreground: 221 52% 15%;  /* Changed to Deep navy #121F36 */
-    --sidebar-primary: 221 52% 15%;  /* Changed to Deep navy #121F36 */
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 221 52% 15%;  /* Changed to Deep navy #121F36 */
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-    
-    --container-secondary: 212 75% 98%;  /* Very pale blue #F5F8FC */
-    
-    /* Text colors */
-    --text-primary: 221 52% 15%;  /* Deep navy #121F36 */
-    --text-secondary: 214 15% 46%;  /* Slate blue #627286 */
-    --text-accent: 248 21% 45%;  /* Dusky purple #5D5A8C */
-    
-    /* Interactive Element Colors */
-    --interactive-primary: 174 43% 43%;  /* Soft teal #3E9D9D */
-    --interactive-secondary: 238 36% 63%;  /* Muted periwinkle #7B7FC4 */
-    --interactive-success: 142 23% 59%;  /* Soft sage green #7DAA92 */
-    
-    /* Footer Navigation Colors */
-    --footer-inactive: 219 17% 60%;  /* Medium gray #8A94A6 */
-    --footer-active: 192 53% 35%;  /* Deep teal #2A7D8B */
-  }
-
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-
-    --sidebar-background: 240 10% 3.9%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 0 0% 98%;
-    --sidebar-primary-foreground: 240 5.9% 10%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 240 4.9% 83.9%;
-
-    --container-secondary: 212 15% 12%;
-    
-    /* Text colors */
-    --text-primary: 0 0% 98%;
-    --text-secondary: 240 5% 64.9%;
-    --text-accent: 0 0% 98%;
-    
-    /* Interactive Element Colors */
-    --interactive-primary: 160 20% 93%;
-    --interactive-secondary: 238 16% 23%;
-    --interactive-success: 142 13% 29%;
-    
-    /* Footer Navigation Colors */
-    --footer-inactive: 219 7% 20%;
-    --footer-active: 192 33% 75%;
   }
 }
 
@@ -118,19 +37,11 @@
   body {
     @apply bg-background text-foreground font-poppins;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
-    color: #121F36; /* Explicitly set default text color */
+    color: #121F36;
   }
   
   html {
     @apply scroll-smooth;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    color: #121F36; /* Deep navy */
-  }
-  
-  p {
-    color: #627286; /* Slate blue */
   }
 }
 

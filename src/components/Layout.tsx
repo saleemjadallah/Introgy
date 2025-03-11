@@ -1,24 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { Moon, Sun, Battery, Users, Brain, LineChart, Home, Bell, User } from "lucide-react";
+import { Battery, Users, Brain, LineChart, Home, Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/profile/UserAvatar";
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
-import { useTheme } from "@/components/providers/ThemeProvider";
 
 const Layout = () => {
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
 
   const NavItem = ({ to, icon: Icon, label }: { to: string; icon: React.ElementType; label: string }) => {
     const isActive = location.pathname === to;
@@ -46,9 +36,6 @@ const Layout = () => {
           <h1 className="text-xl font-semibold">Introgy</h1>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={toggleTheme}>
-            {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-          </Button>
           <Button 
             variant="ghost" 
             size="icon" 
