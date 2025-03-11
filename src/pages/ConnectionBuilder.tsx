@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { Brain, MessageCircle, Heart, Shield } from "lucide-react";
+import { Brain, MessageCircle, Heart, Shield, Sparkle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import CommunicationPreferences from "@/components/connection-builder/CommunicationPreferences";
@@ -75,7 +76,7 @@ const ConnectionBuilder = () => {
         <Card className={`shadow-sm connection-container-gradient ${activeFeature === 'meaningful-interactions' ? 'border-primary' : ''}`}>
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <Sparkles className="h-5 w-5 flex-shrink-0 text-mauve" />
+              <Sparkle className="h-5 w-5 flex-shrink-0 text-mauve" />
               <span>Meaningful Interaction Tools</span>
             </CardTitle>
             <CardDescription className="text-sm mt-1.5">Tools for deeper connections</CardDescription>
