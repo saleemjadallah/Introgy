@@ -1,19 +1,55 @@
+import { RelationshipTypes } from './relationships';
+import { ScheduledInteraction } from './interactions';
 
-// Time range for preferred interaction times
+export interface ScheduleItem {
+  id: string;
+  title: string;
+  description?: string;
+  date: Date;
+  isCompleted: boolean;
+  isPriority: boolean;
+  relationshipIds: string[];
+  type: 'interaction' | 'birthday' | 'anniversary' | 'custom';
+  energyCost: number;
+  duration: number;
+  recurrence?: RecurrencePattern;
+}
+
+export interface RecurrencePattern {
+  type: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  days?: number[];
+  weeks?: number[];
+  months?: number[];
+  years?: number[];
+}
+
+export interface InteractionSchedule {
+  id: string;
+  name: string;
+  description?: string;
+  relationshipTypes: RelationshipTypes[];
+  frequency: {
+    times: number;
+    period: 'day' | 'week' | 'month' | 'year';
+  };
+  interactions: ScheduledInteraction[];
+  isActive: boolean;
+  createdAt: Date;
+  lastUpdated: Date;
+}
+
 export interface TimeRange {
   start: string;        // HH:MM format
   end: string;          // HH:MM format
   priority: number;     // 1-3 priority level
 }
 
-// Quiet periods where no interactions should be scheduled
 export interface QuietPeriod {
   start: string;        // YYYY-MM-DD
   end: string;          // YYYY-MM-DD
   reason: string;
 }
 
-// Schedule settings for the connection scheduler
 export interface ScheduleSettings {
   maxDailyInteractions: number;
   preferredDays: number[];        // 0-6 for days of week
@@ -23,20 +59,17 @@ export interface ScheduleSettings {
   reminderStyle: 'gentle' | 'direct' | 'minimal';
 }
 
-// Custom frequency for a relationship
 export interface CustomFrequency {
   unit: 'days' | 'weeks' | 'months';
   value: number;
   flexibility: number;           // days of flexibility
 }
 
-// Frequency for a category of relationships
 export interface CategoryFrequency {
   unit: 'days' | 'weeks' | 'months';
   value: number;
 }
 
-// Relationship frequency settings
 export interface RelationshipFrequency {
   relationshipId: string;
   categoryDefault: boolean;     // uses category default if true
@@ -47,16 +80,11 @@ export interface RelationshipFrequency {
   overdueDays: number;
 }
 
-// Default frequency for a category
 export interface CategoryDefault {
   category: string;             // family, close friends, etc.
   frequency: CategoryFrequency;
 }
 
-// Import the ScheduledInteraction interface to avoid the circular dependency
-import { ScheduledInteraction } from './interactions';
-
-// Main connection scheduler data structure
 export interface ConnectionScheduler {
   userId: string;
   scheduleSettings: ScheduleSettings;
