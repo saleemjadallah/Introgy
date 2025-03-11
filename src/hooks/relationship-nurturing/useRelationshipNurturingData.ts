@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { 
@@ -98,7 +97,20 @@ export function useRelationshipNurturingData() {
 
         // Convert health data and load suggestions for each
         const convertedHealth = await Promise.all(
-          healthData.map(health => convertDbHealth(health, supabase))
+          healthData.map(async health => {
+            // Get suggestions for this health record
+            const { data: suggestions, error: suggestionsError } = await supabase
+              .from('relationship_health_suggestions')
+              .select('*')
+              .eq('health_id', health.id);
+              
+            if (suggestionsError) throw suggestionsError;
+            
+            return {
+              ...convertDbHealth(health, supabase),
+              suggestions: suggestions || []
+            };
+          })
         );
         
         // Load connection suggestions from Supabase
