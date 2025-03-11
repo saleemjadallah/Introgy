@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useMeaningfulInteractions } from '@/hooks/useMeaningfulInteractions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,32 +43,38 @@ const MeaningfulInteractionTools = () => {
       </div>
       
       <Tabs defaultValue="questions" onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-4 mb-4 overflow-x-auto">
-          <TabsTrigger value="questions" className="px-1 sm:px-3">
-            <span className="hidden sm:inline">Deep Questions</span>
-            <span className="sm:hidden">
-              <MessageCircle className="h-4 w-4" />
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="messages" className="px-1 sm:px-3">
-            <span className="hidden sm:inline">Message Generator</span>
-            <span className="sm:hidden">
-              <Send className="h-4 w-4" />
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="rituals" className="px-1 sm:px-3">
-            <span className="hidden sm:inline">Connection Rituals</span>
-            <span className="sm:hidden">
-              <RefreshCw className="h-4 w-4" />
-            </span>
-          </TabsTrigger>
-          <TabsTrigger value="experiences" className="px-1 sm:px-3">
-            <span className="hidden sm:inline">Shared Experiences</span>
-            <span className="sm:hidden">
-              <Share2 className="h-4 w-4" />
-            </span>
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-auto pb-2 mb-2 -mx-1 px-1">
+          <TabsList className="inline-flex w-full sm:w-auto mb-2">
+            <TabsTrigger value="questions" className="px-2 sm:px-3 flex-1 sm:flex-initial">
+              <span className="hidden sm:inline">Deep Questions</span>
+              <span className="sm:hidden flex items-center flex-col text-[10px]">
+                <MessageCircle className="h-4 w-4 mb-1" />
+                <span>Questions</span>
+              </span>
+            </TabsTrigger>
+            <TabsTrigger value="messages" className="px-2 sm:px-3 flex-1 sm:flex-initial">
+              <span className="hidden sm:inline">Message Generator</span>
+              <span className="sm:hidden flex items-center flex-col text-[10px]">
+                <Send className="h-4 w-4 mb-1" />
+                <span>Messages</span>
+              </span>
+            </TabsTrigger>
+            <TabsTrigger value="rituals" className="px-2 sm:px-3 flex-1 sm:flex-initial">
+              <span className="hidden sm:inline">Connection Rituals</span>
+              <span className="sm:hidden flex items-center flex-col text-[10px]">
+                <RefreshCw className="h-4 w-4 mb-1" />
+                <span>Rituals</span>
+              </span>
+            </TabsTrigger>
+            <TabsTrigger value="experiences" className="px-2 sm:px-3 flex-1 sm:flex-initial">
+              <span className="hidden sm:inline">Shared Experiences</span>
+              <span className="sm:hidden flex items-center flex-col text-[10px]">
+                <Share2 className="h-4 w-4 mb-1" />
+                <span>Experiences</span>
+              </span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
         
         <TabsContent value="questions" className="space-y-4">
           <DeepQuestionsTab />
@@ -110,14 +116,23 @@ const DeepQuestionsTab = () => {
   const [personalizedQuestions, setPersonalizedQuestions] = useState<DeepQuestion[]>([]);
   const [showSaved, setShowSaved] = useState(false);
   
-  // Apply filters
+  // Create a debounced version of applying filters
+  const debouncedApplyFilters = React.useCallback(() => {
+    const handler = setTimeout(() => {
+      setQuestionFilters({
+        categories: selectedCategories.length > 0 ? selectedCategories : undefined,
+        depthLevels: selectedDepthLevels.length > 0 ? selectedDepthLevels : undefined,
+        relationshipTypes: selectedRelationshipTypes.length > 0 ? selectedRelationshipTypes : undefined,
+        searchTerm: searchTerm || undefined
+      });
+    }, 300); // 300ms debounce
+    
+    return () => clearTimeout(handler);
+  }, [selectedCategories, selectedDepthLevels, selectedRelationshipTypes, searchTerm]);
+  
+  // Apply filters with debounce
   const applyFilters = () => {
-    setQuestionFilters({
-      categories: selectedCategories.length > 0 ? selectedCategories : undefined,
-      depthLevels: selectedDepthLevels.length > 0 ? selectedDepthLevels : undefined,
-      relationshipTypes: selectedRelationshipTypes.length > 0 ? selectedRelationshipTypes : undefined,
-      searchTerm: searchTerm || undefined
-    });
+    debouncedApplyFilters();
   };
   
   // Reset filters
@@ -129,20 +144,40 @@ const DeepQuestionsTab = () => {
     setQuestionFilters({});
   };
   
-  // Generate personalized questions
+  // Generate personalized questions with loading indicator and async execution
+  const [isGenerating, setIsGenerating] = useState(false);
+  
   const handleGenerateQuestions = () => {
-    if (selectedRelationshipTypes.length === 0) {
+    if (selectedRelationshipTypes.length === 0 || isGenerating) {
       return;
     }
     
-    const generatedQuestions = generatePersonalizedQuestions(
-      selectedRelationshipTypes[0],
-      [],
-      selectedDepthLevels.length > 0 ? Math.max(...selectedDepthLevels) : 2,
-      3
-    );
+    setIsGenerating(true);
     
-    setPersonalizedQuestions(generatedQuestions);
+    // Execute in the next frame to prevent UI freeze
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        try {
+          const generatedQuestions = generatePersonalizedQuestions(
+            selectedRelationshipTypes[0],
+            [],
+            selectedDepthLevels.length > 0 ? Math.max(...selectedDepthLevels) : 2,
+            3
+          );
+          
+          setPersonalizedQuestions(generatedQuestions);
+        } catch (err) {
+          console.error("Error generating questions:", err);
+          toast({
+            title: "Error",
+            description: "Could not generate questions. Please try again.",
+            variant: "destructive"
+          });
+        } finally {
+          setIsGenerating(false);
+        }
+      }, 100);
+    });
   };
   
   // Filter toggle component
@@ -156,12 +191,18 @@ const DeepQuestionsTab = () => {
               key={category}
               variant={selectedCategories.includes(category) ? "default" : "outline"}
               className="cursor-pointer"
-              onClick={() => {
-                setSelectedCategories(prev => 
-                  prev.includes(category) 
-                    ? prev.filter(c => c !== category) 
-                    : [...prev, category]
-                );
+              onClick={(e) => {
+                // Prevent multiple rapid clicks
+                e.preventDefault();
+                e.currentTarget.blur();
+                // Use requestAnimationFrame to avoid UI freezing
+                requestAnimationFrame(() => {
+                  setSelectedCategories(prev => 
+                    prev.includes(category) 
+                      ? prev.filter(c => c !== category) 
+                      : [...prev, category]
+                  );
+                });
               }}
             >
               {category.replace('-', ' ')}
@@ -178,12 +219,16 @@ const DeepQuestionsTab = () => {
               key={level}
               variant={selectedDepthLevels.includes(level) ? "default" : "outline"}
               className="cursor-pointer"
-              onClick={() => {
-                setSelectedDepthLevels(prev => 
-                  prev.includes(level) 
-                    ? prev.filter(l => l !== level) 
-                    : [...prev, level]
-                );
+              onClick={(e) => {
+                e.preventDefault();
+                e.currentTarget.blur();
+                requestAnimationFrame(() => {
+                  setSelectedDepthLevels(prev => 
+                    prev.includes(level) 
+                      ? prev.filter(l => l !== level) 
+                      : [...prev, level]
+                  );
+                });
               }}
             >
               {label}
@@ -200,12 +245,16 @@ const DeepQuestionsTab = () => {
               key={type}
               variant={selectedRelationshipTypes.includes(type) ? "default" : "outline"}
               className="cursor-pointer"
-              onClick={() => {
-                setSelectedRelationshipTypes(prev => 
-                  prev.includes(type) 
-                    ? prev.filter(t => t !== type) 
-                    : [...prev, type]
-                );
+              onClick={(e) => {
+                e.preventDefault();
+                e.currentTarget.blur();
+                requestAnimationFrame(() => {
+                  setSelectedRelationshipTypes(prev => 
+                    prev.includes(type) 
+                      ? prev.filter(t => t !== type) 
+                      : [...prev, type]
+                  );
+                });
               }}
             >
               {type.replace('-', ' ')}
@@ -281,8 +330,25 @@ const DeepQuestionsTab = () => {
           variant="outline" 
           size="sm" 
           className="flex items-center gap-1 ml-2"
-          onClick={() => {
-            navigator.clipboard.writeText(question.text);
+          onClick={(e) => {
+            e.currentTarget.blur(); // Prevent focus staying on button
+            // Use setTimeout to make copy operation async
+            setTimeout(() => {
+              try {
+                navigator.clipboard.writeText(question.text)
+                  .then(() => {
+                    toast({
+                      description: "Question copied to clipboard",
+                      duration: 1500
+                    });
+                  })
+                  .catch(err => {
+                    console.error("Could not copy text: ", err);
+                  });
+              } catch (err) {
+                console.error("Copy operation failed: ", err);
+              }
+            }, 0);
           }}
         >
           <Copy className="h-3 w-3" /> Copy
@@ -305,7 +371,9 @@ const DeepQuestionsTab = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
+                    e.preventDefault(); // Prevent form submission
                     applyFilters();
+                    e.currentTarget.blur(); // Remove focus from input on mobile
                   }
                 }}
               />
@@ -314,37 +382,63 @@ const DeepQuestionsTab = () => {
           <div className="flex gap-2 sm:w-auto">
             <Button 
               variant="outline" 
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-1"
+              size={isMobile ? "sm" : "default"}
+              onClick={(e) => {
+                e.currentTarget.blur(); // Remove focus after click
+                setShowFilters(!showFilters);
+              }}
+              className="flex items-center gap-1 flex-1"
             >
-              <Filter className="h-4 w-4" /> Filters
+              <Filter className="h-4 w-4" /> 
+              <span className={isMobile ? "sr-only" : ""}>Filters</span>
             </Button>
             <Button 
-              variant="outline" 
-              onClick={() => setShowSaved(!showSaved)}
-              className="flex items-center gap-1"
+              variant="outline"
+              size={isMobile ? "sm" : "default"}
+              onClick={(e) => {
+                e.currentTarget.blur(); // Remove focus after click
+                setShowSaved(!showSaved);
+              }}
+              className="flex items-center gap-1 flex-1"
             >
               <Bookmark className="h-4 w-4" /> 
-              {showSaved ? 'Show All' : 'Saved'}
+              <span className={isMobile ? "sr-only" : ""}>
+                {showSaved ? 'All' : 'Saved'}
+              </span>
             </Button>
           </div>
         </div>
         
         <FiltersSection />
         
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 sm:gap-4">
           <Button 
-            onClick={handleGenerateQuestions}
-            disabled={selectedRelationshipTypes.length === 0 || isLoading}
-            className="flex items-center gap-1"
+            onClick={(e) => {
+              e.currentTarget.blur(); // Remove focus to prevent accidental double-clicks
+              handleGenerateQuestions();
+            }}
+            disabled={selectedRelationshipTypes.length === 0 || isLoading || isGenerating}
+            className="flex items-center gap-1 w-full sm:w-auto"
+            size={isMobile ? "sm" : "default"}
           >
-            <MessageCircle className="h-4 w-4" /> 
-            Generate Personalized Questions
+            {isGenerating ? (
+              <>
+                <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-1" />
+                <span className={isMobile ? "sr-only" : ""}>Generating...</span>
+                <span className="sm:hidden">Generating...</span>
+              </>
+            ) : (
+              <>
+                <MessageCircle className="h-4 w-4" /> 
+                <span className={isMobile ? "sr-only" : ""}>Generate Personalized Questions</span>
+                <span className="sm:hidden">Generate</span>
+              </>
+            )}
           </Button>
           
-          <div className="text-sm text-muted-foreground">
+          <div className="text-xs sm:text-sm text-muted-foreground text-center sm:text-right">
             {!showSaved ? 
-              `${questions.length} questions` : 
+              `${questions.length} questions available` : 
               `${savedQuestions.length} saved questions`}
           </div>
         </div>
@@ -474,7 +568,13 @@ const MessageGeneratorTab = () => {
       className={`hover:border-primary/50 cursor-pointer transition-colors ${
         selectedTemplate?.id === template.id ? 'border-primary' : ''
       }`}
-      onClick={() => handleSelectTemplate(template)}
+      onClick={(e) => {
+        e.currentTarget.blur(); // Remove focus after click
+        // Use requestAnimationFrame to avoid UI blocking
+        requestAnimationFrame(() => {
+          handleSelectTemplate(template);
+        });
+      }}
     >
       <CardHeader className="pb-2 px-3 sm:px-6">
         <div className="flex justify-between items-start">
@@ -640,17 +740,44 @@ const MessageGeneratorTab = () => {
                     variant="outline" 
                     size="sm"
                     className="flex items-center gap-1"
-                    onClick={() => {
-                      navigator.clipboard.writeText(generatedMessage);
+                    onClick={(e) => {
+                      e.currentTarget.blur(); // Remove focus after click
+                      // Use setTimeout to make operation async
+                      setTimeout(() => {
+                        try {
+                          navigator.clipboard.writeText(generatedMessage)
+                            .then(() => {
+                              toast({
+                                description: "Message copied to clipboard",
+                                duration: 1500
+                              });
+                            })
+                            .catch(err => {
+                              console.error("Could not copy text: ", err);
+                            });
+                        } catch (err) {
+                          console.error("Copy operation failed: ", err);
+                        }
+                      }, 0);
                     }}
                   >
-                    <Copy className="h-3 w-3" /> Copy
+                    <Copy className="h-3 w-3" /> 
+                    <span className={isMobile ? "sr-only" : ""}>Copy</span>
                   </Button>
                   <Button 
                     size="sm"
                     className="flex items-center gap-1"
+                    onClick={(e) => {
+                      e.currentTarget.blur(); // Remove focus after click
+                      toast({
+                        description: "Message ready to use",
+                        duration: 1500
+                      });
+                    }}
                   >
-                    <Send className="h-3 w-3" /> Use Message
+                    <Send className="h-3 w-3" /> 
+                    <span className={isMobile ? "sr-only" : ""}>Use Message</span>
+                    <span className="sm:hidden">Use</span>
                   </Button>
                 </CardFooter>
               </Card>
@@ -922,17 +1049,44 @@ const SharedExperiencesTab = () => {
   const [timeFilter, setTimeFilter] = useState<number | null>(null);
   const [recommendedExperiences, setRecommendedExperiences] = useState<SharedExperience[]>([]);
   
-  // Get experience recommendations
+  // Get experience recommendations with optimized handling
+  const [isGettingRecommendations, setIsGettingRecommendations] = useState(false);
+  
   const handleGetRecommendations = () => {
-    // Default to "friend" if no relationship type is selected
-    const recommendations = getExperienceRecommendations(
-      'friend',
-      energyFilter || 3,
-      timeFilter || 60,
-      3
-    );
+    if (isGettingRecommendations) return;
     
-    setRecommendedExperiences(recommendations);
+    setIsGettingRecommendations(true);
+    
+    // Execute asynchronously to avoid UI freeze
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        try {
+          // Default to "friend" if no relationship type is selected
+          const recommendations = getExperienceRecommendations(
+            'friend',
+            energyFilter || 3,
+            timeFilter || 60,
+            3
+          );
+          
+          setRecommendedExperiences(recommendations);
+          
+          toast({
+            description: "Recommendations generated",
+            duration: 1500
+          });
+        } catch (err) {
+          console.error("Error getting recommendations:", err);
+          toast({
+            title: "Error",
+            description: "Could not generate recommendations",
+            variant: "destructive"
+          });
+        } finally {
+          setIsGettingRecommendations(false);
+        }
+      }, 100);
+    });
   };
   
   // Experience card component
@@ -1053,8 +1207,16 @@ const SharedExperiencesTab = () => {
                   value={energyFilter !== null ? [energyFilter] : [5]} 
                   min={1} 
                   max={5} 
-                  step={1} 
-                  onValueChange={(value) => setEnergyFilter(value[0])}
+                  step={1}
+                  // Using a debounced value change to prevent rapid state updates
+                  onValueChange={(value) => {
+                    // Only update if different to prevent unnecessary rerenders
+                    if (value[0] !== energyFilter) {
+                      requestAnimationFrame(() => {
+                        setEnergyFilter(value[0]);
+                      });
+                    }
+                  }}
                 />
               </div>
               
@@ -1074,16 +1236,33 @@ const SharedExperiencesTab = () => {
                   value={timeFilter !== null ? [timeFilter] : [120]} 
                   min={15} 
                   max={120} 
-                  step={15} 
-                  onValueChange={(value) => setTimeFilter(value[0])}
+                  step={15}
+                  onValueChange={(value) => {
+                    // Only update if different to prevent unnecessary rerenders
+                    if (value[0] !== timeFilter) {
+                      requestAnimationFrame(() => {
+                        setTimeFilter(value[0]);
+                      });
+                    }
+                  }}
                 />
               </div>
               
               <Button
                 onClick={handleGetRecommendations}
+                disabled={isGettingRecommendations}
                 className="w-full flex items-center gap-1"
               >
-                <Heart className="h-4 w-4" /> Get Personalized Recommendations
+                {isGettingRecommendations ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-1" />
+                    Generating Recommendations...
+                  </>
+                ) : (
+                  <>
+                    <Heart className="h-4 w-4" /> Get Personalized Recommendations
+                  </>
+                )}
               </Button>
             </div>
           </div>
