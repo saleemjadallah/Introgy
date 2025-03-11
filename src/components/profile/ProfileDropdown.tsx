@@ -7,9 +7,7 @@ import {
   Settings, 
   LogOut, 
   HelpCircle, 
-  Award, 
-  Moon, 
-  Sun, 
+  Award,
   Shield,
   Bell,
   BellOff
@@ -28,9 +26,6 @@ interface ProfileDropdownProps {
 
 export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
   const { user, signOut, isAuthenticated } = useAuth();
-  const [darkMode, setDarkMode] = useState(
-    document.documentElement.classList.contains("dark")
-  );
   const [notifications, setNotifications] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
@@ -49,15 +44,6 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [onClose]);
-
-  const toggleDarkMode = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    document.documentElement.classList.toggle("dark", newMode);
-    toast(newMode ? "Dark mode enabled" : "Light mode enabled", {
-      duration: 2000,
-    });
-  };
 
   const toggleNotifications = () => {
     setNotifications(!notifications);
@@ -100,14 +86,6 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
           </div>
           
           <div className="p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {darkMode ? <Moon size={18} /> : <Sun size={18} />}
-                <span className="text-sm">Dark Mode</span>
-              </div>
-              <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
-            </div>
-            
             <Link to="/faq" className="flex items-center gap-2 text-sm p-2 hover:bg-accent rounded-md">
               <HelpCircle size={18} />
               <span>FAQ & Help</span>
@@ -156,14 +134,6 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
           </div>
           
           <div className="p-2 space-y-1">
-            <div className="flex items-center justify-between p-2">
-              <div className="flex items-center gap-2 text-sm">
-                {darkMode ? <Moon size={18} /> : <Sun size={18} />}
-                <span>Dark Mode</span>
-              </div>
-              <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
-            </div>
-            
             <div className="flex items-center justify-between p-2">
               <div className="flex items-center gap-2 text-sm">
                 {notifications ? <Bell size={18} /> : <BellOff size={18} />}
