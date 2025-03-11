@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { 
@@ -15,38 +14,38 @@ export function useConversationStarters(
   toast: any,
   setConversationStarters?: (starters: IntelligentConversationStarter[]) => void
 ) {
-  // Generate more conversation starters - uses Supabase Edge Function
   const generateMoreConversationStarters = useCallback(async (relationshipId: string) => {
     if (!setConversationStarters) return;
     
     try {
       const relationship = relationships.find(r => r.id === relationshipId);
-      if (!relationship) {
-        return;
-      }
+      if (!relationship) return;
       
       if (isAuthenticated) {
-        // Use Supabase Edge Function to generate starters
-        const { data, error } = await supabase.functions.invoke('generate-conversation-starters', {
+        // Call our AI content generation edge function
+        const { data, error } = await supabase.functions.invoke('generate-ai-content', {
           body: { 
-            relationshipId,
-            relationshipName: relationship.name,
-            interests: relationship.interests,
-            pastTopics: relationship.conversationTopics.map(t => t.topic),
-            batteryLevel
+            type: 'conversation_starters',
+            context: {
+              relationshipId,
+              relationshipName: relationship.name,
+              interests: relationship.interests,
+              pastTopics: relationship.conversationTopics.map(t => t.topic),
+              batteryLevel
+            }
           }
         });
         
         if (error) throw error;
         
-        if (data && data.starters && data.starters.length > 0) {
-          // Save the generated starters to Supabase
-          const newStarters = data.starters.map((starter: any) => ({
-            relationship_id: relationshipId, 
+        if (data?.content && Array.isArray(data.content)) {
+          // Map the AI-generated starters to our database format
+          const newStarters = data.content.map(starter => ({
+            relationship_id: relationshipId,
             topic: starter.topic,
             starter: starter.content,
             context: starter.context,
-            confidence_score: Math.random() * 0.3 + 0.7, // Random high score for demo
+            confidence_score: 0.85,
             source: starter.source || 'interest',
             user_id: ''
           }));
@@ -62,6 +61,7 @@ export function useConversationStarters(
             });
           }
           
+          // Save to database
           const { data: insertedData, error: insertError } = await supabase
             .from('intelligent_conversation_starters')
             .insert(newStarters)
@@ -84,32 +84,9 @@ export function useConversationStarters(
           
           toast({
             title: 'New conversation starters generated',
-            description: `${mappedStarters.length} new starters created for ${relationship.name}.`
+            description: `${mappedStarters.length} new starters created for ${relationship.name}`
           });
-        } else {
-          throw new Error('No starters were generated');
         }
-      } else {
-        // Use mock generation in non-authenticated mode
-        setTimeout(() => {
-          // Create a mock new starter
-          const newStarter: IntelligentConversationStarter = {
-            id: uuidv4(),
-            relationshipId,
-            topic: 'Recent local events',
-            starter: `I just heard about that new ${relationship.interests[0]} event happening next weekend. Have you seen anything about it?`,
-            context: `Based on shared interest in ${relationship.interests[0]}`,
-            confidenceScore: 0.87,
-            source: 'interest'
-          };
-          
-          setConversationStarters([...conversationStarters, newStarter]);
-          
-          toast({
-            title: 'New conversation starter generated',
-            description: 'AI has generated a new conversation starter based on shared interests.'
-          });
-        }, 1500);
       }
     } catch (error) {
       console.error('Error generating conversation starters:', error);
@@ -120,8 +97,7 @@ export function useConversationStarters(
       });
     }
   }, [relationships, conversationStarters, isAuthenticated, batteryLevel, setConversationStarters, toast]);
-  
-  // Copy conversation starter to clipboard
+
   const copyConversationStarter = useCallback((text: string) => {
     navigator.clipboard.writeText(text);
     
