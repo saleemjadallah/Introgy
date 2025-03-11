@@ -1,13 +1,12 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { CommunicationProfile } from '@/types/communication-preferences';
-import { useAICommunicationAssistant } from '@/hooks/useAICommunicationAssistant';
 import AIProfileAssistant from './AIProfileAssistant';
-import AIEnhancementsDialog from './AIEnhancementsDialog';
-import AIPhrasesDialog from './AIPhrasesDialog';
-import { ArrowLeft, Sparkles, MessageCircle } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
+import WizardToolbar from './ai-assistant/WizardToolbar';
+import EnhancementsDialog from './ai-assistant/dialogs/EnhancementsDialog';
+import PhrasesDialog from './ai-assistant/dialogs/PhrasesDialog';
 
 interface AIProfileWizardProps {
   initialProfile?: Partial<CommunicationProfile>;
@@ -53,12 +52,10 @@ const AIProfileWizard = ({
   
   const handleComplete = () => {
     if (generatedProfile) {
-      // Convert any non-standard types to match expected format
       const completeProfile: CommunicationProfile = {
         ...generatedProfile as CommunicationProfile,
         lastUpdated: new Date()
       };
-      
       onComplete(completeProfile);
     }
   };
@@ -82,52 +79,30 @@ const AIProfileWizard = ({
           />
         </CardContent>
         
-        <CardFooter className="flex justify-between border-t pt-6">
-          <Button variant="outline" onClick={onCancel}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
-          
-          <div className="flex gap-2">
-            {generatedProfile && (
-              <Button 
-                variant="outline"
-                onClick={() => setShowPhrasesDialog(true)}
-                disabled={!phrases}
-              >
-                <MessageCircle className="mr-2 h-4 w-4" />
-                Communication Phrases
-              </Button>
-            )}
-            
-            <Button 
-              onClick={handleComplete}
-              disabled={!generatedProfile}
-            >
-              <Sparkles className="mr-2 h-4 w-4" />
-              Save AI Profile
-            </Button>
-          </div>
+        <CardFooter>
+          <WizardToolbar 
+            onCancel={onCancel}
+            onComplete={handleComplete}
+            onShowPhrases={() => setShowPhrasesDialog(true)}
+            generatedProfile={generatedProfile}
+            phrases={phrases}
+          />
         </CardFooter>
       </Card>
       
-      {enhancements && (
-        <AIEnhancementsDialog
-          isOpen={showEnhancementsDialog}
-          onClose={() => setShowEnhancementsDialog(false)}
-          enhancements={enhancements}
-          profile={generatedProfile || initialProfile!}
-          onApplyEnhancements={handleApplyEnhancements}
-        />
-      )}
+      <EnhancementsDialog
+        isOpen={showEnhancementsDialog}
+        onClose={() => setShowEnhancementsDialog(false)}
+        enhancements={enhancements}
+        profile={generatedProfile || initialProfile!}
+        onApplyEnhancements={handleApplyEnhancements}
+      />
       
-      {phrases && (
-        <AIPhrasesDialog
-          isOpen={showPhrasesDialog}
-          onClose={() => setShowPhrasesDialog(false)}
-          phrases={phrases}
-        />
-      )}
+      <PhrasesDialog
+        isOpen={showPhrasesDialog}
+        onClose={() => setShowPhrasesDialog(false)}
+        phrases={phrases}
+      />
     </>
   );
 };
