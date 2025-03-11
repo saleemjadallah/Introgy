@@ -1,18 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { 
-  ConnectionScheduler,
-  CategoryDefault,
-  RelationshipFrequency,
-  ScheduleSettings 
-} from '@/types/relationship-nurturing';
-import { 
-  DbSchedulerSettings, 
-  DbRelationshipFrequency, 
-  DbCategoryDefault 
-} from '@/types/relationship-nurturing/scheduler';
+import { ConnectionScheduler } from '@/types/relationship-nurturing';
+import { DbSchedulerSettings, DbRelationshipFrequency, DbCategoryDefault } from '@/types/relationship-nurturing/scheduler';
 import { mockScheduler } from '@/data/relationshipNurturingData';
 
 // Helper to convert database scheduler settings to app format
@@ -26,15 +16,15 @@ const convertDbSchedulerToApp = (
     scheduleSettings: {
       maxDailyInteractions: settings.max_daily_interactions,
       preferredDays: settings.preferred_days,
-      preferredTimeRanges: settings.preferred_time_ranges,
-      quietPeriods: settings.quiet_periods,
+      preferredTimeRanges: JSON.parse(settings.preferred_time_ranges as string),
+      quietPeriods: JSON.parse(settings.quiet_periods as string),
       batchSimilar: settings.batch_similar,
       reminderStyle: settings.reminder_style,
     },
     relationshipFrequencies: frequencies.map(freq => ({
       relationshipId: freq.relationship_id,
       categoryDefault: freq.category_default,
-      customFrequency: freq.custom_frequency,
+      customFrequency: freq.custom_frequency ? JSON.parse(freq.custom_frequency as string) : null,
       lastInteraction: freq.last_interaction || '',
       nextScheduled: freq.next_scheduled || '',
       isOverdue: freq.is_overdue,
@@ -42,7 +32,7 @@ const convertDbSchedulerToApp = (
     })),
     categoryDefaults: categoryDefaults.map(cat => ({
       category: cat.category,
-      frequency: cat.frequency
+      frequency: JSON.parse(cat.frequency as string)
     })),
     scheduledInteractions: []
   };
@@ -59,8 +49,8 @@ const convertAppSchedulerToDb = (scheduler: ConnectionScheduler): {
       user_id: scheduler.userId,
       max_daily_interactions: scheduler.scheduleSettings.maxDailyInteractions,
       preferred_days: scheduler.scheduleSettings.preferredDays,
-      preferred_time_ranges: scheduler.scheduleSettings.preferredTimeRanges,
-      quiet_periods: scheduler.scheduleSettings.quietPeriods,
+      preferred_time_ranges: JSON.stringify(scheduler.scheduleSettings.preferredTimeRanges),
+      quiet_periods: JSON.stringify(scheduler.scheduleSettings.quietPeriods),
       batch_similar: scheduler.scheduleSettings.batchSimilar,
       reminder_style: scheduler.scheduleSettings.reminderStyle
     },
@@ -68,7 +58,7 @@ const convertAppSchedulerToDb = (scheduler: ConnectionScheduler): {
       user_id: scheduler.userId,
       relationship_id: freq.relationshipId,
       category_default: freq.categoryDefault,
-      custom_frequency: freq.customFrequency,
+      custom_frequency: freq.customFrequency ? JSON.stringify(freq.customFrequency) : null,
       last_interaction: freq.lastInteraction || null,
       next_scheduled: freq.nextScheduled || null,
       is_overdue: freq.isOverdue,
@@ -77,7 +67,7 @@ const convertAppSchedulerToDb = (scheduler: ConnectionScheduler): {
     categoryDefaults: scheduler.categoryDefaults.map(cat => ({
       user_id: scheduler.userId,
       category: cat.category,
-      frequency: cat.frequency
+      frequency: JSON.stringify(cat.frequency)
     }))
   };
 };
