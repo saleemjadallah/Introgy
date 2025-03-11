@@ -35,7 +35,7 @@ const ConnectionRitualsTab: React.FC<ConnectionRitualsTabProps> = ({ rituals }) 
               </p>
               <p className="text-sm flex items-center gap-2 mt-1">
                 <span className="font-semibold">Frequency:</span> 
-                {ritual.frequency}
+                {`${ritual.frequency.value} ${ritual.frequency.unit} (±${ritual.frequency.flexibility} days)`}
               </p>
             </div>
           </CardContent>
