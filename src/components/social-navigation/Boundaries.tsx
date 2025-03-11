@@ -24,10 +24,10 @@ const Boundaries = () => {
   };
 
   return (
-    <Card>
+    <Card className="navigation-container-gradient">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Bell className="h-5 w-5" />
+          <Bell className="h-5 w-5 text-periwinkle" />
           Personal Boundaries
         </CardTitle>
         <CardDescription>

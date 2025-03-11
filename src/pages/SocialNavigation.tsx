@@ -62,11 +62,11 @@ const SocialNavigation = () => {
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 navigation-container-gradient">
-          <TabsTrigger value="events" className="data-[state=active]:bg-white/60">
+          <TabsTrigger value="events" className="data-[state=active]:bg-white/60 hover:text-white">
             <Calendar className="h-4 w-4 mr-2 text-periwinkle" />
             Events
           </TabsTrigger>
-          <TabsTrigger value="preparation" disabled={!activeEvent} className="data-[state=active]:bg-white/60">
+          <TabsTrigger value="preparation" disabled={!activeEvent} className="data-[state=active]:bg-white/60 hover:text-white">
             <Users className="h-4 w-4 mr-2 text-periwinkle" />
             Preparation
           </TabsTrigger>
