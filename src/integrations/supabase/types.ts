@@ -9,6 +9,112 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      connection_suggestions: {
+        Row: {
+          created_at: string | null
+          energy_level_required: number
+          expected_response: Database["public"]["Enums"]["connection_expected_response"]
+          id: string
+          interaction_type: string
+          priority: Database["public"]["Enums"]["connection_suggestion_priority"]
+          reason_for_suggestion: string | null
+          relationship_id: string | null
+          relationship_name: string
+          suggested: boolean
+          suggested_date: string
+          suggested_time: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          energy_level_required: number
+          expected_response: Database["public"]["Enums"]["connection_expected_response"]
+          id?: string
+          interaction_type: string
+          priority: Database["public"]["Enums"]["connection_suggestion_priority"]
+          reason_for_suggestion?: string | null
+          relationship_id?: string | null
+          relationship_name: string
+          suggested?: boolean
+          suggested_date: string
+          suggested_time: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          energy_level_required?: number
+          expected_response?: Database["public"]["Enums"]["connection_expected_response"]
+          id?: string
+          interaction_type?: string
+          priority?: Database["public"]["Enums"]["connection_suggestion_priority"]
+          reason_for_suggestion?: string | null
+          relationship_id?: string | null
+          relationship_name?: string
+          suggested?: boolean
+          suggested_date?: string
+          suggested_time?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connection_suggestions_relationship_id_fkey"
+            columns: ["relationship_id"]
+            isOneToOne: false
+            referencedRelation: "relationships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      intelligent_conversation_starters: {
+        Row: {
+          confidence_score: number | null
+          context: string | null
+          created_at: string | null
+          id: string
+          relationship_id: string | null
+          source: Database["public"]["Enums"]["conversation_source"]
+          starter: string
+          topic: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          context?: string | null
+          created_at?: string | null
+          id?: string
+          relationship_id?: string | null
+          source: Database["public"]["Enums"]["conversation_source"]
+          starter: string
+          topic: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          confidence_score?: number | null
+          context?: string | null
+          created_at?: string | null
+          id?: string
+          relationship_id?: string | null
+          source?: Database["public"]["Enums"]["conversation_source"]
+          starter?: string
+          topic?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intelligent_conversation_starters_relationship_id_fkey"
+            columns: ["relationship_id"]
+            isOneToOne: false
+            referencedRelation: "relationships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       meaningful_interactions: {
         Row: {
           content: Json
@@ -39,6 +145,48 @@ export type Database = {
           type?: string
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      message_templates: {
+        Row: {
+          category: string
+          context: Database["public"]["Enums"]["message_context"]
+          created_at: string | null
+          energy_required: number
+          id: string
+          name: string
+          personalizable: boolean
+          template: string
+          tone: Database["public"]["Enums"]["message_tone"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category: string
+          context: Database["public"]["Enums"]["message_context"]
+          created_at?: string | null
+          energy_required: number
+          id?: string
+          name: string
+          personalizable?: boolean
+          template: string
+          tone: Database["public"]["Enums"]["message_tone"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string
+          context?: Database["public"]["Enums"]["message_context"]
+          created_at?: string | null
+          energy_required?: number
+          id?: string
+          name?: string
+          personalizable?: boolean
+          template?: string
+          tone?: Database["public"]["Enums"]["message_tone"]
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -152,6 +300,144 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "relationship_contexts_relationship_id_fkey"
+            columns: ["relationship_id"]
+            isOneToOne: false
+            referencedRelation: "relationships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      relationship_health: {
+        Row: {
+          created_at: string | null
+          frequency: number
+          id: string
+          last_assessment: string
+          overall_score: number
+          quality: number
+          reciprocity: number
+          relationship_id: string | null
+          relationship_name: string
+          trend: Database["public"]["Enums"]["relationship_trend"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          frequency: number
+          id?: string
+          last_assessment: string
+          overall_score: number
+          quality: number
+          reciprocity: number
+          relationship_id?: string | null
+          relationship_name: string
+          trend: Database["public"]["Enums"]["relationship_trend"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          frequency?: number
+          id?: string
+          last_assessment?: string
+          overall_score?: number
+          quality?: number
+          reciprocity?: number
+          relationship_id?: string | null
+          relationship_name?: string
+          trend?: Database["public"]["Enums"]["relationship_trend"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relationship_health_relationship_id_fkey"
+            columns: ["relationship_id"]
+            isOneToOne: false
+            referencedRelation: "relationships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      relationship_health_suggestions: {
+        Row: {
+          created_at: string | null
+          health_id: string | null
+          id: string
+          suggestion: string
+        }
+        Insert: {
+          created_at?: string | null
+          health_id?: string | null
+          id?: string
+          suggestion: string
+        }
+        Update: {
+          created_at?: string | null
+          health_id?: string | null
+          id?: string
+          suggestion?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relationship_health_suggestions_health_id_fkey"
+            columns: ["health_id"]
+            isOneToOne: false
+            referencedRelation: "relationship_health"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      relationship_insights: {
+        Row: {
+          created_at: string | null
+          date_generated: string
+          description: string
+          id: string
+          is_new: boolean
+          recommendation: string
+          relationship_id: string | null
+          relationship_name: string
+          severity: Database["public"]["Enums"]["insight_severity"]
+          title: string
+          type: Database["public"]["Enums"]["insight_type"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          date_generated: string
+          description: string
+          id?: string
+          is_new?: boolean
+          recommendation: string
+          relationship_id?: string | null
+          relationship_name: string
+          severity: Database["public"]["Enums"]["insight_severity"]
+          title: string
+          type: Database["public"]["Enums"]["insight_type"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          date_generated?: string
+          description?: string
+          id?: string
+          is_new?: boolean
+          recommendation?: string
+          relationship_id?: string | null
+          relationship_name?: string
+          severity?: Database["public"]["Enums"]["insight_severity"]
+          title?: string
+          type?: Database["public"]["Enums"]["insight_type"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relationship_insights_relationship_id_fkey"
             columns: ["relationship_id"]
             isOneToOne: false
             referencedRelation: "relationships"
@@ -432,6 +718,28 @@ export type Database = {
         | "video"
         | "in-person"
         | "social"
+      connection_expected_response:
+        | "fast"
+        | "medium"
+        | "slow"
+        | "delayed"
+        | "uncertain"
+      connection_suggestion_priority: "1" | "2" | "3" | "4" | "5"
+      conversation_source:
+        | "interest"
+        | "previous_conversation"
+        | "past_conversation"
+        | "life_event"
+        | "current_event"
+        | "shared_experience"
+      insight_severity: "low" | "medium" | "high"
+      insight_type:
+        | "connection_gap"
+        | "interaction_pattern"
+        | "energy_impact"
+        | "conversation_suggestion"
+        | "relationship_health"
+        | "other"
       interaction_type:
         | "call"
         | "message"
@@ -440,11 +748,19 @@ export type Database = {
         | "email"
         | "social"
         | "other"
+      message_context:
+        | "check_in"
+        | "life_event"
+        | "follow_up"
+        | "celebration"
+        | "reconnect"
+      message_tone: "casual" | "warm" | "professional"
       relationship_category:
         | "family"
         | "friend"
         | "professional"
         | "acquaintance"
+      relationship_trend: "improving" | "declining" | "stable"
     }
     CompositeTypes: {
       [_ in never]: never

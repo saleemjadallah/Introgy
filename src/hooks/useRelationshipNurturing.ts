@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { 
@@ -15,8 +16,9 @@ import { useToast } from '@/hooks/use-toast';
 import { useSocialBattery } from '@/hooks/useSocialBattery';
 import { addDays, format, isAfter, isBefore, parseISO, subDays } from 'date-fns';
 import { ConnectionScheduler, ScheduledInteraction } from '@/types/relationship-nurturing';
+import { supabase } from '@/integrations/supabase/client';
 
-// Import mock data 
+// Import mock data for fallback when not authenticated
 import { 
   mockRelationships,
   mockScheduler,
@@ -25,7 +27,8 @@ import {
   mockMessageTemplates,
   mockConnectionSuggestions,
   mockIntelligentConversationStarters,
-  mockRelationshipHealth
+  mockRelationshipHealth,
+  determineEnergyCost
 } from '@/data/relationshipNurturingData';
 
 export function useRelationshipNurturing() {
@@ -36,6 +39,7 @@ export function useRelationshipNurturing() {
   const [stats, setStats] = useState<NurturingStats | null>(null);
   const [activeRelationship, setActiveRelationship] = useState<Relationship | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { batteryLevel } = useSocialBattery();
   const { toast } = useToast();
   
@@ -45,66 +49,191 @@ export function useRelationshipNurturing() {
   const [connectionSuggestions, setConnectionSuggestions] = useState<ConnectionSuggestion[]>([]);
   const [conversationStarters, setConversationStarters] = useState<IntelligentConversationStarter[]>([]);
   const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>([]);
-
-  // Load data from localStorage or use mock data
+  
+  // Check if user is authenticated
   useEffect(() => {
-    const loadNurturingData = () => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      setIsAuthenticated(!!data.session);
+      
+      // Set up auth state change listener
+      const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+        setIsAuthenticated(!!session);
+      });
+      
+      return () => {
+        authListener.subscription.unsubscribe();
+      };
+    };
+    
+    checkAuth();
+  }, []);
+
+  // Load data from Supabase or use mock data if not authenticated
+  useEffect(() => {
+    const loadNurturingData = async () => {
+      setIsLoading(true);
+      
       try {
-        // Load scheduler data
-        const savedScheduler = localStorage.getItem('nurturingScheduler');
-        const schedulerData = savedScheduler ? JSON.parse(savedScheduler) : mockScheduler;
-        setScheduler(schedulerData);
-
-        // Load relationships
-        const savedRelationships = localStorage.getItem('nurturingRelationships');
-        const relationshipsData = savedRelationships ? JSON.parse(savedRelationships) : mockRelationships;
-        setRelationships(relationshipsData);
-
-        // Generate scheduled interactions if none exist
-        const interactions = schedulerData.scheduledInteractions.length > 0 
-          ? schedulerData.scheduledInteractions 
-          : generateSuggestedInteractions(relationshipsData, schedulerData);
-        
-        setScheduledInteractions(interactions);
-
-        // Calculate today's interactions
-        const today = format(new Date(), 'yyyy-MM-dd');
-        const todaysInteractions = interactions.filter(i => i.scheduledDate === today);
-        setTodayInteractions(todaysInteractions);
-
-        // Load Intelligent Nurturing Assistant data
-        setInsights(mockRelationshipInsights as RelationshipInsight[]);
-        setRelationshipHealth(mockRelationshipHealth as RelationshipHealth[]);
-        setConnectionSuggestions(mockConnectionSuggestions as ConnectionSuggestion[]);
-        setConversationStarters(mockIntelligentConversationStarters as IntelligentConversationStarter[]);
-        
-        // Convert message templates to match expected format
-        const convertedTemplates = mockMessageTemplates.map(template => ({
-          ...template,
-          title: template.name, // Map name to title
-          body: template.template, // Map template to body
-          appropriate_for: [template.category], // Use category as appropriate_for
-          energy_required: template.energyRequired // Map energyRequired to energy_required
-        }));
-        
-        setMessageTemplates(convertedTemplates as MessageTemplate[]);
-
-        // Calculate stats
-        calculateStats(interactions, relationshipsData);
+        if (isAuthenticated) {
+          // Load relationships from Supabase
+          const { data: relationshipsData, error: relationshipsError } = await supabase
+            .from('relationships')
+            .select('*');
+            
+          if (relationshipsError) throw relationshipsError;
+          
+          // Load insights from Supabase
+          const { data: insightsData, error: insightsError } = await supabase
+            .from('relationship_insights')
+            .select('*');
+            
+          if (insightsError) throw insightsError;
+          
+          // Load relationship health from Supabase
+          const { data: healthData, error: healthError } = await supabase
+            .from('relationship_health')
+            .select('*');
+            
+          if (healthError) throw healthError;
+          
+          // Load health suggestions for each health assessment
+          for (const health of healthData) {
+            const { data: suggestionsData, error: suggestionsError } = await supabase
+              .from('relationship_health_suggestions')
+              .select('suggestion')
+              .eq('health_id', health.id);
+              
+            if (suggestionsError) throw suggestionsError;
+            
+            health.suggestions = suggestionsData.map(item => item.suggestion);
+          }
+          
+          // Load connection suggestions from Supabase
+          const { data: suggestionsData, error: suggestionsError } = await supabase
+            .from('connection_suggestions')
+            .select('*');
+            
+          if (suggestionsError) throw suggestionsError;
+          
+          // Load conversation starters from Supabase
+          const { data: startersData, error: startersError } = await supabase
+            .from('intelligent_conversation_starters')
+            .select('*');
+            
+          if (startersError) throw startersError;
+          
+          // Load message templates from Supabase
+          const { data: templatesData, error: templatesError } = await supabase
+            .from('message_templates')
+            .select('*');
+            
+          if (templatesError) throw templatesError;
+          
+          // Convert data to application types
+          setRelationships(relationshipsData as Relationship[]);
+          setInsights(insightsData as RelationshipInsight[]);
+          setRelationshipHealth(healthData as RelationshipHealth[]);
+          setConnectionSuggestions(suggestionsData as ConnectionSuggestion[]);
+          setConversationStarters(startersData as IntelligentConversationStarter[]);
+          
+          // Convert message templates to match expected format
+          const convertedTemplates = templatesData.map(template => ({
+            ...template,
+            title: template.name,
+            body: template.template,
+            appropriate_for: [template.category],
+            energy_required: template.energy_required
+          }));
+          
+          setMessageTemplates(convertedTemplates as MessageTemplate[]);
+          
+          // For now, still use mock scheduler data until we implement that in Supabase
+          setScheduler(mockScheduler);
+          
+          // Generate scheduled interactions if none exist
+          const interactions = mockScheduler.scheduledInteractions.length > 0 
+            ? mockScheduler.scheduledInteractions 
+            : generateSuggestedInteractions(relationshipsData as Relationship[], mockScheduler);
+          
+          setScheduledInteractions(interactions);
+          
+          // Calculate today's interactions
+          const today = format(new Date(), 'yyyy-MM-dd');
+          const todaysInteractions = interactions.filter(i => i.scheduledDate === today);
+          setTodayInteractions(todaysInteractions);
+          
+          // Calculate stats
+          calculateStats(interactions, relationshipsData as Relationship[]);
+        } else {
+          // Use mock data when not authenticated
+          setRelationships(mockRelationships);
+          setInsights(mockRelationshipInsights);
+          setRelationshipHealth(mockRelationshipHealth);
+          setConnectionSuggestions(mockConnectionSuggestions);
+          setConversationStarters(mockIntelligentConversationStarters);
+          
+          // Convert message templates to match expected format
+          const convertedTemplates = mockMessageTemplates.map(template => ({
+            ...template,
+            title: template.name,
+            body: template.template,
+            appropriate_for: [template.category],
+            energy_required: template.energyRequired
+          }));
+          
+          setMessageTemplates(convertedTemplates as MessageTemplate[]);
+          
+          // Set scheduler and interactions
+          setScheduler(mockScheduler);
+          
+          // Generate scheduled interactions
+          const interactions = generateSuggestedInteractions(mockRelationships, mockScheduler);
+          setScheduledInteractions(interactions);
+          
+          // Calculate today's interactions
+          const today = format(new Date(), 'yyyy-MM-dd');
+          const todaysInteractions = interactions.filter(i => i.scheduledDate === today);
+          setTodayInteractions(todaysInteractions);
+          
+          // Calculate stats
+          calculateStats(interactions, mockRelationships);
+        }
       } catch (error) {
         console.error('Error loading nurturing data:', error);
         toast({
           title: 'Failed to load relationship data',
-          description: 'Something went wrong when loading your relationships. Please try again later.',
+          description: 'Something went wrong when loading your relationships. Using mock data for now.',
           variant: 'destructive',
         });
+        
+        // Fallback to mock data
+        setRelationships(mockRelationships);
+        setInsights(mockRelationshipInsights);
+        setRelationshipHealth(mockRelationshipHealth);
+        setConnectionSuggestions(mockConnectionSuggestions);
+        setConversationStarters(mockIntelligentConversationStarters);
+        setMessageTemplates(mockMessageTemplates as MessageTemplate[]);
+        setScheduler(mockScheduler);
+        
+        // Generate scheduled interactions
+        const interactions = generateSuggestedInteractions(mockRelationships, mockScheduler);
+        setScheduledInteractions(interactions);
+        
+        // Calculate today's interactions
+        const today = format(new Date(), 'yyyy-MM-dd');
+        const todaysInteractions = interactions.filter(i => i.scheduledDate === today);
+        setTodayInteractions(todaysInteractions);
+        
+        // Calculate stats
+        calculateStats(interactions, mockRelationships);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadNurturingData();
-  }, [toast]);
+  }, [toast, isAuthenticated]);
 
   // Calculate statistics for the dashboard
   const calculateStats = (interactions: ScheduledInteraction[], relations: Relationship[]) => {
@@ -159,13 +288,44 @@ export function useRelationshipNurturing() {
     });
   };
 
-  // Save data to localStorage
-  const saveData = () => {
+  // Save data to Supabase or localStorage
+  const saveData = async () => {
     try {
-      if (scheduler) {
-        localStorage.setItem('nurturingScheduler', JSON.stringify(scheduler));
+      if (isAuthenticated) {
+        // If authenticated, save to Supabase
+        // This would be implemented for each data type
+        // For now, we'll only implement a few examples
+        
+        // Save insights
+        for (const insight of insights) {
+          if (!insight.id.includes('-')) {
+            // New insight doesn't have a UUID yet
+            const { error } = await supabase
+              .from('relationship_insights')
+              .insert(insight);
+              
+            if (error) throw error;
+          } else {
+            // Update existing insight
+            const { error } = await supabase
+              .from('relationship_insights')
+              .update(insight)
+              .eq('id', insight.id);
+              
+            if (error) throw error;
+          }
+        }
+        
+        // Save conversation starters
+        // This is just an example - similar logic would be used for other data types
+        
+      } else {
+        // If not authenticated, save to localStorage as before
+        if (scheduler) {
+          localStorage.setItem('nurturingScheduler', JSON.stringify(scheduler));
+        }
+        localStorage.setItem('nurturingRelationships', JSON.stringify(relationships));
       }
-      localStorage.setItem('nurturingRelationships', JSON.stringify(relationships));
     } catch (error) {
       console.error('Error saving nurturing data:', error);
       toast({
@@ -177,7 +337,7 @@ export function useRelationshipNurturing() {
   };
 
   // Add a new scheduled interaction
-  const scheduleInteraction = (interaction: Omit<ScheduledInteraction, 'id'>) => {
+  const scheduleInteraction = async (interaction: Omit<ScheduledInteraction, 'id'>) => {
     const newInteraction: ScheduledInteraction = {
       ...interaction,
       id: uuidv4()
@@ -201,7 +361,7 @@ export function useRelationshipNurturing() {
       }
 
       // Persist changes
-      saveData();
+      await saveData();
     }
 
     toast({
@@ -213,7 +373,7 @@ export function useRelationshipNurturing() {
   };
 
   // Update an existing scheduled interaction
-  const updateInteraction = (interactionId: string, updates: Partial<ScheduledInteraction>) => {
+  const updateInteraction = async (interactionId: string, updates: Partial<ScheduledInteraction>) => {
     const updatedInteractions = scheduledInteractions.map(interaction => {
       if (interaction.id === interactionId) {
         return { ...interaction, ...updates };
@@ -237,7 +397,7 @@ export function useRelationshipNurturing() {
       setScheduler(updatedScheduler);
 
       // Persist changes
-      saveData();
+      await saveData();
     }
 
     toast({
@@ -247,7 +407,7 @@ export function useRelationshipNurturing() {
   };
 
   // Mark an interaction as completed
-  const completeInteraction = (interactionId: string, notes?: string) => {
+  const completeInteraction = async (interactionId: string, notes?: string) => {
     const completedDate = format(new Date(), 'yyyy-MM-dd');
 
     const updatedInteractions = scheduledInteractions.map(interaction => {
@@ -298,7 +458,7 @@ export function useRelationshipNurturing() {
       }
 
       // Persist changes
-      saveData();
+      await saveData();
     }
 
     // Recalculate stats
@@ -311,7 +471,7 @@ export function useRelationshipNurturing() {
   };
 
   // Skip an interaction
-  const skipInteraction = (interactionId: string, reason?: string) => {
+  const skipInteraction = async (interactionId: string, reason?: string) => {
     const updatedInteractions = scheduledInteractions.map(interaction => {
       if (interaction.id === interactionId) {
         return { 
@@ -339,7 +499,7 @@ export function useRelationshipNurturing() {
       setScheduler(updatedScheduler);
 
       // Persist changes
-      saveData();
+      await saveData();
     }
 
     toast({
@@ -349,7 +509,7 @@ export function useRelationshipNurturing() {
   };
 
   // Reschedule an interaction
-  const rescheduleInteraction = (interactionId: string, newDate: string, reason?: string) => {
+  const rescheduleInteraction = async (interactionId: string, newDate: string, reason?: string) => {
     const updatedInteractions = scheduledInteractions.map(interaction => {
       if (interaction.id === interactionId) {
         return { 
@@ -378,7 +538,7 @@ export function useRelationshipNurturing() {
       setScheduler(updatedScheduler);
 
       // Persist changes
-      saveData();
+      await saveData();
     }
 
     toast({
@@ -471,7 +631,7 @@ export function useRelationshipNurturing() {
   };
 
   // Generate new suggested interactions
-  const generateInteractions = () => {
+  const generateInteractions = async () => {
     if (!scheduler || !relationships.length) return [];
 
     const newInteractions = generateSuggestedInteractions(relationships, scheduler);
@@ -490,7 +650,7 @@ export function useRelationshipNurturing() {
     setScheduler(updatedScheduler);
 
     // Persist changes
-    saveData();
+    await saveData();
 
     toast({
       title: 'Interaction schedule generated',
@@ -501,7 +661,7 @@ export function useRelationshipNurturing() {
   };
 
   // Update schedule settings
-  const updateScheduleSettings = (settings: Partial<ConnectionScheduler['scheduleSettings']>) => {
+  const updateScheduleSettings = async (settings: Partial<ConnectionScheduler['scheduleSettings']>) => {
     if (!scheduler) return;
 
     const updatedScheduler = {
@@ -513,7 +673,7 @@ export function useRelationshipNurturing() {
     };
 
     setScheduler(updatedScheduler);
-    saveData();
+    await saveData();
 
     toast({
       title: 'Settings updated',
@@ -524,15 +684,69 @@ export function useRelationshipNurturing() {
   // Intelligent Nurturing Assistant functions
   
   // Mark an insight as read (not new)
-  const markInsightAsRead = (insightId: string) => {
-    setInsights(insights.map(insight => 
+  const markInsightAsRead = async (insightId: string) => {
+    const updatedInsights = insights.map(insight => 
       insight.id === insightId ? { ...insight, isNew: false } : insight
-    ));
+    );
+    
+    setInsights(updatedInsights);
+    
+    // If authenticated, update in Supabase
+    if (isAuthenticated) {
+      try {
+        const { error } = await supabase
+          .from('relationship_insights')
+          .update({ is_new: false })
+          .eq('id', insightId);
+          
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error updating insight:', error);
+        toast({
+          title: 'Update failed',
+          description: 'There was an issue updating the insight status.',
+          variant: 'destructive'
+        });
+      }
+    } else {
+      // Save to localStorage if not authenticated
+      await saveData();
+    }
   };
 
   // Mark all insights as read
-  const markAllInsightsAsRead = () => {
-    setInsights(insights.map(insight => ({ ...insight, isNew: false })));
+  const markAllInsightsAsRead = async () => {
+    const updatedInsights = insights.map(insight => ({ ...insight, isNew: false }));
+    setInsights(updatedInsights);
+    
+    // If authenticated, update in Supabase
+    if (isAuthenticated) {
+      try {
+        // Get all the insight IDs that are currently new
+        const insightIds = insights
+          .filter(insight => insight.isNew)
+          .map(insight => insight.id);
+          
+        if (insightIds.length > 0) {
+          const { error } = await supabase
+            .from('relationship_insights')
+            .update({ is_new: false })
+            .in('id', insightIds);
+            
+          if (error) throw error;
+        }
+      } catch (error) {
+        console.error('Error updating insights:', error);
+        toast({
+          title: 'Update failed',
+          description: 'There was an issue updating the insight statuses.',
+          variant: 'destructive'
+        });
+      }
+    } else {
+      // Save to localStorage if not authenticated
+      await saveData();
+    }
     
     toast({
       title: 'All insights marked as read',
@@ -541,7 +755,7 @@ export function useRelationshipNurturing() {
   };
   
   // Apply a suggested connection
-  const applySuggestion = (suggestionId: string) => {
+  const applySuggestion = async (suggestionId: string) => {
     const suggestion = connectionSuggestions.find(s => s.id === suggestionId);
     if (!suggestion) return;
     
@@ -551,7 +765,7 @@ export function useRelationshipNurturing() {
       relationshipName: suggestion.relationshipName,
       scheduledDate: suggestion.suggestedDate,
       suggestedTimeSlots: [suggestion.suggestedTime],
-      interactionType: suggestion.interactionType,
+      interactionType: suggestion.interactionType as InteractionType,
       duration: 
         suggestion.interactionType === 'meet' ? 90 : 
         suggestion.interactionType === 'call' ? 30 : 
@@ -564,20 +778,58 @@ export function useRelationshipNurturing() {
     };
     
     // Schedule the interaction
-    scheduleInteraction(interaction);
+    await scheduleInteraction(interaction);
     
     // Remove the suggestion
-    setConnectionSuggestions(connectionSuggestions.filter(s => s.id !== suggestionId));
+    const updatedSuggestions = connectionSuggestions.filter(s => s.id !== suggestionId);
+    setConnectionSuggestions(updatedSuggestions);
     
-    toast({
-      title: 'Suggestion applied',
-      description: `Scheduled connection with ${suggestion.relationshipName} for ${format(parseISO(suggestion.suggestedDate), 'MMM d')} at ${suggestion.suggestedTime}.`
-    });
+    // If authenticated, update in Supabase
+    if (isAuthenticated) {
+      try {
+        const { error } = await supabase
+          .from('connection_suggestions')
+          .delete()
+          .eq('id', suggestionId);
+          
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error deleting suggestion:', error);
+        // Toast message already shown by scheduleInteraction
+      }
+    } else {
+      // Save to localStorage if not authenticated
+      await saveData();
+    }
   };
   
   // Skip a suggested connection
-  const skipSuggestion = (suggestionId: string) => {
-    setConnectionSuggestions(connectionSuggestions.filter(s => s.id !== suggestionId));
+  const skipSuggestion = async (suggestionId: string) => {
+    // Remove the suggestion
+    const updatedSuggestions = connectionSuggestions.filter(s => s.id !== suggestionId);
+    setConnectionSuggestions(updatedSuggestions);
+    
+    // If authenticated, update in Supabase
+    if (isAuthenticated) {
+      try {
+        const { error } = await supabase
+          .from('connection_suggestions')
+          .delete()
+          .eq('id', suggestionId);
+          
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error deleting suggestion:', error);
+        toast({
+          title: 'Update failed',
+          description: 'There was an issue removing the suggestion.',
+          variant: 'destructive'
+        });
+      }
+    } else {
+      // Save to localStorage if not authenticated
+      await saveData();
+    }
     
     toast({
       title: 'Suggestion skipped',
@@ -585,38 +837,102 @@ export function useRelationshipNurturing() {
     });
   };
   
-  // Generate more conversation starters
-  const generateMoreConversationStarters = (relationshipId: string) => {
+  // Generate more conversation starters - uses Supabase Edge Function
+  const generateMoreConversationStarters = async (relationshipId: string) => {
     setIsLoading(true);
     
-    // In a real app, this would be an AI call
-    // For now, simulate with a timeout
-    setTimeout(() => {
+    try {
       const relationship = relationships.find(r => r.id === relationshipId);
       if (!relationship) {
         setIsLoading(false);
         return;
       }
       
-      // Create a mock new starter
-      const newStarter: IntelligentConversationStarter = {
-        id: uuidv4(),
-        relationshipId,
-        topic: 'Recent local events',
-        starter: `I just heard about that new ${relationship.interests[0]} event happening next weekend. Have you seen anything about it?`,
-        context: `Based on shared interest in ${relationship.interests[0]}`,
-        confidenceScore: 0.87,
-        source: 'interest'
-      };
-      
-      setConversationStarters([...conversationStarters, newStarter]);
-      setIsLoading(false);
-      
+      if (isAuthenticated) {
+        // Use Supabase Edge Function to generate starters
+        const { data, error } = await supabase.functions.invoke('generate-conversation-starters', {
+          body: { 
+            relationshipId,
+            relationshipName: relationship.name,
+            interests: relationship.interests,
+            pastTopics: relationship.conversationTopics.map(t => t.topic),
+            batteryLevel
+          }
+        });
+        
+        if (error) throw error;
+        
+        if (data && data.starters && data.starters.length > 0) {
+          // Save the generated starters to Supabase
+          const newStarters = data.starters.map((starter: any) => ({
+            relationship_id: relationshipId, 
+            topic: starter.topic,
+            starter: starter.content,
+            context: starter.context,
+            confidence_score: Math.random() * 0.3 + 0.7, // Random high score for demo
+            source: starter.source || 'interest',
+            user_id: (await supabase.auth.getUser()).data.user?.id
+          }));
+          
+          const { data: insertedData, error: insertError } = await supabase
+            .from('intelligent_conversation_starters')
+            .insert(newStarters)
+            .select();
+            
+          if (insertError) throw insertError;
+          
+          // Add new starters to state
+          const mappedStarters = insertedData.map(s => ({
+            id: s.id,
+            relationshipId: s.relationship_id,
+            topic: s.topic,
+            starter: s.starter,
+            context: s.context,
+            confidenceScore: s.confidence_score,
+            source: s.source
+          })) as IntelligentConversationStarter[];
+          
+          setConversationStarters([...conversationStarters, ...mappedStarters]);
+          
+          toast({
+            title: 'New conversation starters generated',
+            description: `${mappedStarters.length} new starters created for ${relationship.name}.`
+          });
+        } else {
+          throw new Error('No starters were generated');
+        }
+      } else {
+        // Use mock generation in non-authenticated mode
+        setTimeout(() => {
+          // Create a mock new starter
+          const newStarter: IntelligentConversationStarter = {
+            id: uuidv4(),
+            relationshipId,
+            topic: 'Recent local events',
+            starter: `I just heard about that new ${relationship.interests[0]} event happening next weekend. Have you seen anything about it?`,
+            context: `Based on shared interest in ${relationship.interests[0]}`,
+            confidenceScore: 0.87,
+            source: 'interest'
+          };
+          
+          setConversationStarters([...conversationStarters, newStarter]);
+          
+          toast({
+            title: 'New conversation starter generated',
+            description: 'AI has generated a new conversation starter based on shared interests.'
+          });
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Error generating conversation starters:', error);
       toast({
-        title: 'New conversation starter generated',
-        description: 'AI has generated a new conversation starter based on shared interests.'
+        title: 'Generation failed',
+        description: 'Could not generate new conversation starters. Please try again.',
+        variant: 'destructive'
       });
-    }, 1500);
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   // Copy conversation starter to clipboard
@@ -630,12 +946,12 @@ export function useRelationshipNurturing() {
   };
   
   // Take action on an insight
-  const takeActionOnInsight = (insightId: string) => {
+  const takeActionOnInsight = async (insightId: string) => {
     const insight = insights.find(i => i.id === insightId);
     if (!insight) return;
     
     // Mark the insight as read
-    markInsightAsRead(insightId);
+    await markInsightAsRead(insightId);
     
     // Different actions based on insight type
     switch (insight.type) {
@@ -651,10 +967,61 @@ export function useRelationshipNurturing() {
           interactionType: 'call',
           reasonForSuggestion: insight.recommendation,
           energyLevelRequired: 4,
-          priority: 3,
-          expectedResponse: 'fast'
+          priority: 3 as any, // Type assertion needed for enum conversion
+          expectedResponse: 'fast' as any // Type assertion needed for enum conversion
         };
-        setConnectionSuggestions([...connectionSuggestions, newSuggestion]);
+        
+        if (isAuthenticated) {
+          try {
+            // Save to Supabase
+            const { data, error } = await supabase
+              .from('connection_suggestions')
+              .insert({
+                relationship_id: insight.relationshipId,
+                relationship_name: insight.relationshipName,
+                suggested: true,
+                suggested_date: format(addDays(new Date(), 3), 'yyyy-MM-dd'),
+                suggested_time: '18:30',
+                interaction_type: 'call',
+                reason_for_suggestion: insight.recommendation,
+                energy_level_required: 4,
+                priority: '3', // String format for enum
+                expected_response: 'fast', // String format for enum
+                user_id: (await supabase.auth.getUser()).data.user?.id
+              })
+              .select();
+              
+            if (error) throw error;
+            
+            if (data && data.length > 0) {
+              const suggestion = {
+                id: data[0].id,
+                relationshipId: data[0].relationship_id,
+                relationshipName: data[0].relationship_name,
+                suggested: data[0].suggested,
+                suggestedDate: data[0].suggested_date,
+                suggestedTime: data[0].suggested_time,
+                interactionType: data[0].interaction_type,
+                reasonForSuggestion: data[0].reason_for_suggestion,
+                energyLevelRequired: data[0].energy_level_required,
+                priority: data[0].priority as any,
+                expectedResponse: data[0].expected_response as any
+              };
+              
+              setConnectionSuggestions([...connectionSuggestions, suggestion]);
+            }
+          } catch (error) {
+            console.error('Error creating suggestion:', error);
+            toast({
+              title: 'Action failed',
+              description: 'Could not create a connection suggestion.',
+              variant: 'destructive'
+            });
+          }
+        } else {
+          // Use local state if not authenticated
+          setConnectionSuggestions([...connectionSuggestions, newSuggestion]);
+        }
         break;
         
       case 'conversation_suggestion':
@@ -668,7 +1035,50 @@ export function useRelationshipNurturing() {
           confidenceScore: 0.9,
           source: 'life_event'
         };
-        setConversationStarters([...conversationStarters, newStarter]);
+        
+        if (isAuthenticated) {
+          try {
+            // Save to Supabase
+            const { data, error } = await supabase
+              .from('intelligent_conversation_starters')
+              .insert({
+                relationship_id: insight.relationshipId,
+                topic: insight.title,
+                starter: insight.recommendation,
+                context: insight.description,
+                confidence_score: 0.9,
+                source: 'life_event',
+                user_id: (await supabase.auth.getUser()).data.user?.id
+              })
+              .select();
+              
+            if (error) throw error;
+            
+            if (data && data.length > 0) {
+              const starter = {
+                id: data[0].id,
+                relationshipId: data[0].relationship_id,
+                topic: data[0].topic,
+                starter: data[0].starter,
+                context: data[0].context,
+                confidenceScore: data[0].confidence_score,
+                source: data[0].source
+              };
+              
+              setConversationStarters([...conversationStarters, starter]);
+            }
+          } catch (error) {
+            console.error('Error creating conversation starter:', error);
+            toast({
+              title: 'Action failed',
+              description: 'Could not create a conversation starter.',
+              variant: 'destructive'
+            });
+          }
+        } else {
+          // Use local state if not authenticated
+          setConversationStarters([...conversationStarters, newStarter]);
+        }
         break;
         
       default:
@@ -691,6 +1101,7 @@ export function useRelationshipNurturing() {
     stats,
     isLoading,
     activeRelationship,
+    isAuthenticated,
     
     // Base nurturing functions
     scheduleInteraction,
