@@ -1,138 +1,190 @@
 
-import React, { Suspense, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import DeepQuestionsTab from './meaningful-interactions/DeepQuestionsTab';
+import MessageTemplatesTab from './meaningful-interactions/MessageTemplatesTab';
+import ConnectionRitualsTab from './meaningful-interactions/ConnectionRitualsTab';
+import SharedExperiencesTab from './meaningful-interactions/SharedExperiencesTab';
+import { DeepQuestion, MessageTemplate, ConnectionRitual, SharedExperience } from '@/types/meaningful-interactions';
 import { useAIMeaningfulInteractions } from '@/hooks/useAIMeaningfulInteractions';
-import { MessageSquare, MessageSquareText, Heart, Image } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Card, CardContent } from '@/components/ui/card';
+import { Pencil, MessageSquare, Users, Sparkles } from "lucide-react";
+import { v4 as uuidv4 } from 'uuid';
 
-const DeepQuestionsTab = React.lazy(() => import('./meaningful-interactions/DeepQuestionsTab'));
-const MessageTemplatesTab = React.lazy(() => import('./meaningful-interactions/MessageTemplatesTab'));
-const ConnectionRitualsTab = React.lazy(() => import('./meaningful-interactions/ConnectionRitualsTab'));
-const SharedExperiencesTab = React.lazy(() => import('./meaningful-interactions/SharedExperiencesTab'));
-
-const MeaningfulInteractionTools: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('questions');
-  const isMobile = useIsMobile();
-  const { 
-    generateInteraction, 
-    fetchStoredInteractions,
-    isLoading 
-  } = useAIMeaningfulInteractions();
-
-  const [interactions, setInteractions] = useState({
+const MeaningfulInteractionTools = () => {
+  const [activeTab, setActiveTab] = useState("questions");
+  const [interactionData, setInteractionData] = useState<{
+    questions: DeepQuestion[];
+    templates: MessageTemplate[];
+    rituals: ConnectionRitual[];
+    experiences: SharedExperience[];
+  }>({
     questions: [],
     templates: [],
     rituals: [],
     experiences: []
   });
 
-  useEffect(() => {
-    const loadInteractions = async () => {
-      const data = await fetchStoredInteractions();
-      if (data && data.length > 0) {
-        const grouped = data.reduce((acc, item) => {
-          // Make sure to initialize each array if it doesn't exist
-          if (!acc[item.type + 's']) {
-            acc[item.type + 's'] = [];
-          }
-          acc[item.type + 's'] = [...acc[item.type + 's'], item];
-          return acc;
-        }, {
-          questions: [],
-          templates: [],
-          rituals: [],
-          experiences: []
-        });
-        setInteractions(grouped);
-      }
-    };
+  const { generateInteraction, isLoading } = useAIMeaningfulInteractions();
+
+  const generateQuestion = async () => {
+    const context = "building deeper connections with friends";
+    const data = await generateInteraction('question', context);
     
-    loadInteractions();
-  }, []);
+    if (data) {
+      const newQuestion: DeepQuestion = {
+        id: uuidv4(),
+        text: data.content,
+        category: "Personal Growth",
+        depthLevel: 2,
+        topics: ["connection", "friendship"],
+        relationshipTypes: ["friend", "family"],
+        energyRequired: 3,
+        followUps: []
+      };
+      
+      setInteractionData(prev => ({
+        ...prev,
+        questions: [newQuestion, ...prev.questions]
+      }));
+    }
+  };
 
-  const LoadingFallback = () => (
-    <div className="flex justify-center items-center p-12">
-      <div className="space-y-2 text-center">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-        <p className="text-muted-foreground">Loading content...</p>
-      </div>
-    </div>
-  );
+  const generateTemplate = async () => {
+    const context = "expressing gratitude to a friend";
+    const data = await generateInteraction('template', context);
+    
+    if (data) {
+      const newTemplate: MessageTemplate = {
+        id: uuidv4(),
+        purpose: "Gratitude Expression",
+        baseTemplate: data.content,
+        variables: [],
+        tone: "warm",
+        energyRequired: 2,
+        relationshipStage: "established"
+      };
+      
+      setInteractionData(prev => ({
+        ...prev,
+        templates: [newTemplate, ...prev.templates]
+      }));
+    }
+  };
 
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
+  const generateRitual = async () => {
+    const context = "maintaining friendship connections";
+    const data = await generateInteraction('ritual', context);
+    
+    if (data) {
+      const newRitual: ConnectionRitual = {
+        id: uuidv4(),
+        name: "Friendship Check-in",
+        description: data.content,
+        frequency: { unit: "weeks", value: 2, flexibility: 2 },
+        interactionType: "call",
+        duration: 30,
+        structure: "Casual conversation with specific topics",
+        prompts: [],
+        energyCost: 3,
+        relationshipTypes: ["friend"]
+      };
+      
+      setInteractionData(prev => ({
+        ...prev,
+        rituals: [newRitual, ...prev.rituals]
+      }));
+    }
+  };
+
+  const generateExperience = async () => {
+    const context = "shared experiences with friends";
+    const data = await generateInteraction('experience', context);
+    
+    if (data) {
+      const newExperience: SharedExperience = {
+        id: uuidv4(),
+        title: "Shared Experience",
+        category: "Activity",
+        description: data.content,
+        interestTags: ["friendship", "connection"],
+        timeRequired: 60,
+        energyRequired: 3,
+        discussionPrompts: [],
+        relationshipTypes: ["friend", "family"]
+      };
+      
+      setInteractionData(prev => ({
+        ...prev,
+        experiences: [newExperience, ...prev.experiences]
+      }));
+    }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col space-y-2">
-        <h2 className="text-2xl font-bold">Meaningful Interaction Tools</h2>
+      <div className="space-y-2">
+        <h2 className="text-2xl font-bold tracking-tight">Meaningful Interaction Tools</h2>
         <p className="text-muted-foreground">
-          AI-powered tools to create more meaningful connections with the people in your life
+          AI-powered tools to create deeper connections with less effort
         </p>
       </div>
-      
-      <Tabs defaultValue="questions" onValueChange={handleTabChange} className="w-full">
-        <TabsList className={`grid grid-cols-4 mb-4 ${isMobile ? 'h-auto p-2 gap-1' : ''}`}>
-          <TabsTrigger value="questions" className={`${isMobile ? 'flex flex-col items-center gap-1 py-2 h-auto' : ''}`}>
+
+      <Tabs defaultValue="questions" onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="grid grid-cols-4">
+          <TabsTrigger value="questions" className="flex items-center gap-1.5">
+            <Pencil className="h-4 w-4" />
+            <span className="hidden sm:inline">Deep Questions</span>
+          </TabsTrigger>
+          <TabsTrigger value="templates" className="flex items-center gap-1.5">
             <MessageSquare className="h-4 w-4" />
-            <span className={isMobile ? "text-xs mt-1" : "ml-2"}>Questions</span>
+            <span className="hidden sm:inline">Message Templates</span>
           </TabsTrigger>
-          <TabsTrigger value="templates" className={`${isMobile ? 'flex flex-col items-center gap-1 py-2 h-auto' : ''}`}>
-            <MessageSquareText className="h-4 w-4" />
-            <span className={isMobile ? "text-xs mt-1" : "ml-2"}>Templates</span>
+          <TabsTrigger value="rituals" className="flex items-center gap-1.5">
+            <Users className="h-4 w-4" />
+            <span className="hidden sm:inline">Connection Rituals</span>
           </TabsTrigger>
-          <TabsTrigger value="rituals" className={`${isMobile ? 'flex flex-col items-center gap-1 py-2 h-auto' : ''}`}>
-            <Heart className="h-4 w-4" />
-            <span className={isMobile ? "text-xs mt-1" : "ml-2"}>Rituals</span>
-          </TabsTrigger>
-          <TabsTrigger value="experiences" className={`${isMobile ? 'flex flex-col items-center gap-1 py-2 h-auto' : ''}`}>
-            <Image className="h-4 w-4" />
-            <span className={isMobile ? "text-xs mt-1" : "ml-2"}>Experiences</span>
+          <TabsTrigger value="experiences" className="flex items-center gap-1.5">
+            <Sparkles className="h-4 w-4" />
+            <span className="hidden sm:inline">Shared Experiences</span>
           </TabsTrigger>
         </TabsList>
-        
-        <Suspense fallback={<LoadingFallback />}>
-          <TabsContent value="questions" className="space-y-4">
-            {activeTab === 'questions' && 
+
+        <Card>
+          <CardContent className="pt-6">
+            <TabsContent value="questions" className="mt-0">
               <DeepQuestionsTab 
-                questions={interactions.questions} 
-                onGenerate={() => generateInteraction('question', 'deep personal reflection')}
-                isLoading={isLoading}
+                questions={interactionData.questions} 
+                onGenerate={generateQuestion}
+                isLoading={isLoading && activeTab === "questions"}
               />
-            }
-          </TabsContent>
-          
-          <TabsContent value="templates" className="space-y-4">
-            {activeTab === 'templates' && 
+            </TabsContent>
+
+            <TabsContent value="templates" className="mt-0">
               <MessageTemplatesTab 
-                templates={interactions.templates}
-                onGenerate={() => generateInteraction('template', 'meaningful connection')}
-                isLoading={isLoading}
+                templates={interactionData.templates} 
+                onGenerate={generateTemplate}
+                isLoading={isLoading && activeTab === "templates"}
               />
-            }
-          </TabsContent>
-          
-          <TabsContent value="rituals" className="space-y-4">
-            {activeTab === 'rituals' && 
+            </TabsContent>
+
+            <TabsContent value="rituals" className="mt-0">
               <ConnectionRitualsTab 
-                rituals={interactions.rituals}
-                onGenerate={() => generateInteraction('ritual', 'regular meaningful connection')}
-                isLoading={isLoading}
+                rituals={interactionData.rituals} 
+                onGenerate={generateRitual}
+                isLoading={isLoading && activeTab === "rituals"}
               />
-            }
-          </TabsContent>
-          
-          <TabsContent value="experiences" className="space-y-4">
-            {activeTab === 'experiences' && 
+            </TabsContent>
+
+            <TabsContent value="experiences" className="mt-0">
               <SharedExperiencesTab 
-                experiences={interactions.experiences}
-                onGenerate={() => generateInteraction('experience', 'shared meaningful activity')}
-                isLoading={isLoading}
+                experiences={interactionData.experiences} 
+                onGenerate={generateExperience}
+                isLoading={isLoading && activeTab === "experiences"}
               />
-            }
-          </TabsContent>
-        </Suspense>
+            </TabsContent>
+          </CardContent>
+        </Card>
       </Tabs>
     </div>
   );
