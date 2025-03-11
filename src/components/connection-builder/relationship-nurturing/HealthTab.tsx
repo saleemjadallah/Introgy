@@ -3,13 +3,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { format } from 'date-fns';
-import { RelationshipHealth } from '@/types/relationship-nurturing';
+import { RelationshipHealth, NurturingStats } from '@/types/relationship-nurturing';
+import RelationshipStatsChart from './RelationshipStatsChart';
 
 interface HealthTabProps {
   healthData: RelationshipHealth[];
+  stats?: NurturingStats | null;
 }
 
-export const HealthTab = ({ healthData }: HealthTabProps) => {
+export const HealthTab = ({ healthData, stats }: HealthTabProps) => {
   const getTrendColor = (trend: string) => {
     switch (trend) {
       case 'improving': return 'text-green-600';
@@ -31,6 +33,12 @@ export const HealthTab = ({ healthData }: HealthTabProps) => {
         <h3 className="text-lg sm:text-xl font-medium">Relationship Health</h3>
         <p className="text-xs sm:text-sm text-muted-foreground">AI analysis of relationship health based on interaction patterns</p>
       </div>
+      
+      {stats && (
+        <div className="mb-6">
+          <RelationshipStatsChart stats={stats} />
+        </div>
+      )}
       
       <div className="space-y-4">
         {!healthData || healthData.length === 0 ? (

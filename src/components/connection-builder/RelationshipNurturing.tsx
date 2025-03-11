@@ -18,6 +18,7 @@ export const RelationshipNurturing = () => {
     connectionSuggestions,
     conversationStarters,
     relationships = [], // Provide default empty array
+    stats,
     isLoading,
     markInsightAsRead,
     markAllInsightsAsRead,
@@ -111,7 +112,7 @@ export const RelationshipNurturing = () => {
         </TabsContent>
         
         <TabsContent value="health" className="space-y-4">
-          <HealthTab healthData={relationshipHealth} />
+          <HealthTab healthData={relationshipHealth} stats={stats} />
         </TabsContent>
       </Tabs>
     </div>
