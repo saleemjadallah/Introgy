@@ -1,3 +1,4 @@
+
 import React, { Suspense, useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAIMeaningfulInteractions } from '@/hooks/useAIMeaningfulInteractions';
@@ -28,11 +29,22 @@ const MeaningfulInteractionTools: React.FC = () => {
   useEffect(() => {
     const loadInteractions = async () => {
       const data = await fetchStoredInteractions();
-      const grouped = data.reduce((acc, item) => {
-        acc[item.type + 's'] = [...(acc[item.type + 's'] || []), item];
-        return acc;
-      }, {});
-      setInteractions(grouped);
+      if (data && data.length > 0) {
+        const grouped = data.reduce((acc, item) => {
+          // Make sure to initialize each array if it doesn't exist
+          if (!acc[item.type + 's']) {
+            acc[item.type + 's'] = [];
+          }
+          acc[item.type + 's'] = [...acc[item.type + 's'], item];
+          return acc;
+        }, {
+          questions: [],
+          templates: [],
+          rituals: [],
+          experiences: []
+        });
+        setInteractions(grouped);
+      }
     };
     
     loadInteractions();
