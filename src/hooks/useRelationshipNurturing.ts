@@ -977,7 +977,7 @@ export function useRelationshipNurturing() {
           suggested: true,
           suggestedDate: format(addDays(new Date(), 3), 'yyyy-MM-dd'),
           suggestedTime: '18:30',
-          interactionType: 'call',
+          interactionType: 'call' as InteractionType,
           reasonForSuggestion: insight.recommendation,
           energyLevelRequired: 4,
           priority: 3,
@@ -1001,4 +1001,79 @@ export function useRelationshipNurturing() {
                 priority: '3', // String format for enum
                 expected_response: 'fast', // String format for enum
                 user_id: (await supabase.auth.getUser()).data.user?.id
-              })
+              });
+              
+            if (error) throw error;
+            
+            // If successfully created, update with the new data
+            if (data) {
+              const convertedSuggestion = data[0] ? convertDbSuggestion(data[0]) : newSuggestion;
+              setConnectionSuggestions([...connectionSuggestions, convertedSuggestion]);
+            } else {
+              // If no data returned, still update the local state
+              setConnectionSuggestions([...connectionSuggestions, newSuggestion]);
+            }
+          } catch (error) {
+            console.error('Error creating suggestion:', error);
+            // Add to local state anyway for a better UX
+            setConnectionSuggestions([...connectionSuggestions, newSuggestion]);
+          }
+        } else {
+          // Just add to local state
+          setConnectionSuggestions([...connectionSuggestions, newSuggestion]);
+        }
+        
+        toast({
+          title: 'Action taken',
+          description: 'Converted the insight into a connection suggestion.'
+        });
+        break;
+        
+      case 'interaction_pattern':
+      case 'energy_impact':
+      case 'conversation_suggestion':
+      case 'relationship_health':
+      default:
+        // For other insight types, just mark as read for now
+        toast({
+          title: 'Insight noted',
+          description: 'The insight has been marked as read.'
+        });
+        break;
+    }
+  };
+
+  return {
+    scheduler,
+    relationships,
+    scheduledInteractions,
+    todayInteractions,
+    stats,
+    isLoading,
+    activeRelationship,
+    
+    // Scheduler functions
+    scheduleInteraction,
+    updateInteraction,
+    completeInteraction,
+    skipInteraction,
+    rescheduleInteraction,
+    generateInteractions,
+    updateScheduleSettings,
+    getRelationshipContext,
+    
+    // Intelligent Nurturing Assistant
+    insights,
+    relationshipHealth,
+    connectionSuggestions,
+    conversationStarters,
+    messageTemplates,
+    markInsightAsRead,
+    markAllInsightsAsRead,
+    applySuggestion,
+    skipSuggestion,
+    generateMoreConversationStarters,
+    copyConversationStarter,
+    takeActionOnInsight
+  };
+}
