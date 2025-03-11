@@ -53,6 +53,9 @@ export interface CategoryDefault {
   frequency: CategoryFrequency;
 }
 
+// Import the ScheduledInteraction interface to avoid the circular dependency
+import { ScheduledInteraction } from './interactions';
+
 // Main connection scheduler data structure
 export interface ConnectionScheduler {
   userId: string;
