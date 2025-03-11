@@ -12,6 +12,7 @@ interface ChatInterfaceProps {
   onEndSimulation: () => void;
   scenario: Scenario | null;
   isActive: boolean;
+  isProcessing?: boolean;
 }
 
 const ChatInterface = ({ 
@@ -19,10 +20,10 @@ const ChatInterface = ({
   onSendMessage, 
   onEndSimulation,
   scenario,
-  isActive
+  isActive,
+  isProcessing = false
 }: ChatInterfaceProps) => {
   const [inputValue, setInputValue] = useState("");
-  const [isThinking, setIsThinking] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [hint, setHint] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -30,19 +31,14 @@ const ChatInterface = ({
   // Auto-scroll to bottom of messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isProcessing]);
   
   const handleSendMessage = () => {
-    if (!inputValue.trim() || !isActive) return;
+    if (!inputValue.trim() || !isActive || isProcessing) return;
     
     onSendMessage(inputValue);
     setInputValue("");
-    setIsThinking(true);
     setShowHint(false);
-    
-    setTimeout(() => {
-      setIsThinking(false);
-    }, 1000);
   };
   
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -53,14 +49,40 @@ const ChatInterface = ({
   };
   
   const generateHint = () => {
-    // In production, this would call an API to generate context-aware hints
-    const hints = [
-      "Try asking an open-ended question to keep the conversation flowing.",
-      "Consider acknowledging their last statement before sharing your perspective.",
-      "You could share a related personal experience to build rapport.",
-      "This might be a good moment to practice active listening by paraphrasing what you've heard.",
-      "Remember to maintain a friendly, interested tone in your response."
-    ];
+    // Generate context-aware hints based on the scenario type
+    const hintsMap = {
+      professional: [
+        "Try using more formal language appropriate for this professional setting.",
+        "Consider acknowledging their expertise or position in your response.",
+        "This might be a good time to ask about specific goals or timelines.",
+        "Try to focus on solutions rather than problems in this professional context.",
+        "Consider how your response might impact the professional relationship."
+      ],
+      social: [
+        "This is a casual setting - try asking about their interests or hobbies.",
+        "Consider sharing a related personal anecdote to build rapport.",
+        "This might be a good moment to find common ground on a shared interest.",
+        "Try using more casual, friendly language in this social context.",
+        "Consider asking an open-ended question about their weekend or recent activities."
+      ],
+      challenging: [
+        "Remember to acknowledge their feelings first before stating your perspective.",
+        "Try using 'I' statements rather than 'you' statements to avoid sounding accusatory.",
+        "Consider offering a specific compromise that meets both your needs.",
+        "This might be a good moment to set a boundary clearly but respectfully.",
+        "Try to focus on the specific issue rather than generalizing the problem."
+      ],
+      daily: [
+        "Everyday interactions benefit from warm, friendly language.",
+        "Consider how you can make this mundane interaction more personal.",
+        "Try asking a question that shows interest in them as a person.",
+        "Consider if humor might lighten this everyday interaction.",
+        "This is a good opportunity to practice active listening by acknowledging what they've said."
+      ]
+    };
+    
+    const scenarioType = scenario?.type || "social";
+    const hints = hintsMap[scenarioType as keyof typeof hintsMap] || hintsMap.social;
     
     setHint(hints[Math.floor(Math.random() * hints.length)]);
     setShowHint(true);
@@ -102,7 +124,7 @@ const ChatInterface = ({
           </div>
         ))}
         
-        {isThinking && (
+        {isProcessing && (
           <div className="flex max-w-[80%] mr-auto">
             <div className="bg-muted rounded-lg px-4 py-2 flex items-center space-x-2">
               <div className="w-2 h-2 rounded-full bg-current animate-bounce" />
@@ -138,12 +160,13 @@ const ChatInterface = ({
               onKeyDown={handleKeyDown}
               placeholder="Type your response..."
               className="flex-1 min-h-[80px] resize-none"
+              disabled={isProcessing}
             />
             <div className="flex flex-col gap-2">
               <Button 
                 onClick={handleSendMessage} 
                 size="icon" 
-                disabled={!inputValue.trim()}
+                disabled={!inputValue.trim() || isProcessing}
               >
                 <SendHorizontal className="h-4 w-4" />
               </Button>
@@ -152,6 +175,7 @@ const ChatInterface = ({
                 variant="outline"
                 size="icon"
                 type="button"
+                disabled={isProcessing}
               >
                 <Lightbulb className="h-4 w-4" />
               </Button>
@@ -164,13 +188,14 @@ const ChatInterface = ({
               size="sm" 
               onClick={onEndSimulation}
               className="text-xs"
+              disabled={isProcessing}
             >
               <Pause className="h-3 w-3 mr-1" />
               End Simulation
             </Button>
             
             <span className="text-xs text-muted-foreground">
-              Press Enter to send
+              {isProcessing ? "AI is responding..." : "Press Enter to send"}
             </span>
           </div>
         </div>

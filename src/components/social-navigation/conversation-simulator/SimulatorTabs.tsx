@@ -18,6 +18,7 @@ interface SimulatorTabsProps {
   feedback: SimulationFeedbackType | null;
   batteryLevel: number;
   canStartSimulation: boolean;
+  isProcessing?: boolean;
   onScenarioSelect: (scenario: Scenario) => void;
   onStartSimulation: () => void;
   onSendMessage: (content: string) => void;
@@ -34,6 +35,7 @@ const SimulatorTabs: React.FC<SimulatorTabsProps> = ({
   feedback,
   batteryLevel,
   canStartSimulation,
+  isProcessing = false,
   onScenarioSelect,
   onStartSimulation,
   onSendMessage,
@@ -103,6 +105,7 @@ const SimulatorTabs: React.FC<SimulatorTabsProps> = ({
                 onEndSimulation={onEndSimulation}
                 scenario={activeScenario}
                 isActive={simulationInProgress}
+                isProcessing={isProcessing}
               />
             </TabsContent>
           )}

@@ -15,6 +15,7 @@ const ConversationSimulator = () => {
     simulationInProgress,
     messages,
     feedback,
+    isProcessing,
     setActiveTab,
     handleScenarioSelect,
     handleStartSimulation,
@@ -47,6 +48,7 @@ const ConversationSimulator = () => {
           feedback={feedback}
           batteryLevel={batteryLevel}
           canStartSimulation={canStartSimulation}
+          isProcessing={isProcessing}
           onScenarioSelect={handleScenarioSelect}
           onStartSimulation={handleStartSimulation}
           onSendMessage={handleSendMessage}
