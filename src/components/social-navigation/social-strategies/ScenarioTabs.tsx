@@ -3,6 +3,7 @@ import React from "react";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScenarioCategory } from "@/types/social-strategies";
 import { Briefcase, PartyPopper, User, House, Bus, Video, BookOpen } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ScenarioTabsProps {
   scenarioTypes: ScenarioCategory[];
@@ -10,6 +11,8 @@ interface ScenarioTabsProps {
 }
 
 const ScenarioTabs = ({ scenarioTypes, onSelectScenario }: ScenarioTabsProps) => {
+  const isMobile = useIsMobile();
+  
   const scenarioIcons = {
     "professional": <Briefcase className="h-4 w-4" />,
     "social-gatherings": <PartyPopper className="h-4 w-4" />,
@@ -17,6 +20,23 @@ const ScenarioTabs = ({ scenarioTypes, onSelectScenario }: ScenarioTabsProps) =>
     "family-events": <House className="h-4 w-4" />,
     "public-spaces": <Bus className="h-4 w-4" />,
     "digital-communication": <Video className="h-4 w-4" />
+  };
+
+  // Function to get shortened display name for mobile
+  const getDisplayName = (scenarioId: string, name: string) => {
+    if (!isMobile) return name;
+    
+    // Shortened names for mobile view
+    const mobileNames = {
+      "professional": "Work",
+      "social-gatherings": "Social",
+      "one-on-one": "1-on-1",
+      "family-events": "Family",
+      "public-spaces": "Public",
+      "digital-communication": "Digital"
+    };
+    
+    return mobileNames[scenarioId] || name;
   };
 
   return (
@@ -32,7 +52,9 @@ const ScenarioTabs = ({ scenarioTypes, onSelectScenario }: ScenarioTabsProps) =>
             <div>
               {scenarioIcons[scenario.id] || <BookOpen className="h-4 w-4" />}
             </div>
-            <span className="text-xs">{scenario.name}</span>
+            <span className={`${isMobile ? 'text-[10px]' : 'text-xs'}`}>
+              {getDisplayName(scenario.id, scenario.name)}
+            </span>
           </TabsTrigger>
         ))}
       </TabsList>

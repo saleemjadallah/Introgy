@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { ScenarioCategory } from "@/types/social-strategies";
 import { Briefcase, PartyPopper, User, House, Bus, Video, BookOpen } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ScenarioTypeGridProps {
   scenarioTypes: ScenarioCategory[];
@@ -10,6 +11,8 @@ interface ScenarioTypeGridProps {
 }
 
 const ScenarioTypeGrid = ({ scenarioTypes, onSelectScenario }: ScenarioTypeGridProps) => {
+  const isMobile = useIsMobile();
+  
   const scenarioIcons = {
     "professional": <Briefcase className="h-5 w-5" />,
     "social-gatherings": <PartyPopper className="h-5 w-5" />,
@@ -17,6 +20,23 @@ const ScenarioTypeGrid = ({ scenarioTypes, onSelectScenario }: ScenarioTypeGridP
     "family-events": <House className="h-5 w-5" />,
     "public-spaces": <Bus className="h-5 w-5" />,
     "digital-communication": <Video className="h-5 w-5" />
+  };
+
+  // Function to get shortened display name for mobile
+  const getDisplayName = (scenarioId: string, name: string) => {
+    if (!isMobile) return name;
+    
+    // Shortened names for mobile view
+    const mobileNames = {
+      "professional": "Work",
+      "social-gatherings": "Social",
+      "one-on-one": "1-on-1",
+      "family-events": "Family",
+      "public-spaces": "Public",
+      "digital-communication": "Digital"
+    };
+    
+    return mobileNames[scenarioId] || name;
   };
 
   return (
@@ -35,7 +55,9 @@ const ScenarioTypeGrid = ({ scenarioTypes, onSelectScenario }: ScenarioTypeGridP
             <div className="p-3 rounded-full bg-primary/10 text-primary">
               {scenarioIcons[scenario.id] || <BookOpen className="h-5 w-5" />}
             </div>
-            <span className="text-sm font-medium">{scenario.name}</span>
+            <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium`}>
+              {getDisplayName(scenario.id, scenario.name)}
+            </span>
           </Button>
         ))}
       </div>
