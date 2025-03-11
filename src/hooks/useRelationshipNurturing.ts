@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { 
-  ConnectionScheduler, 
-  ScheduledInteraction, 
   Relationship,
   NurturingStats,
   InteractionType,
@@ -16,6 +14,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useSocialBattery } from '@/hooks/useSocialBattery';
 import { addDays, format, isAfter, isBefore, parseISO, subDays } from 'date-fns';
+import { ConnectionScheduler, ScheduledInteraction } from '@/types/relationship-nurturing';
 
 // Import mock data 
 import { 
