@@ -1,4 +1,5 @@
 
+import { describe, it, expect } from 'vitest';
 import { addDays, format } from 'date-fns';
 import { calculateNextInteractionDate } from '../interactionUtils';
 import { RelationshipFrequency, CategoryDefault, Relationship } from '@/types/relationship-nurturing';

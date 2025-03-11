@@ -1,4 +1,5 @@
 
+import { describe, it, expect } from 'vitest';
 import { format, addDays, subDays } from 'date-fns';
 import { calculateStats } from '../statsCalculator';
 import { 
