@@ -13,7 +13,7 @@ export function useInteractionGeneration(
   relationships: Relationship[],
   scheduler: ConnectionScheduler | null,
   setScheduledInteractions: (interactions: ScheduledInteraction[]) => void,
-  setTodayInteractions: (interactions: ScheduledInteraction[]) => void,
+  setTodayInteractions: React.Dispatch<React.SetStateAction<ScheduledInteraction[]>>,
   toast: any
 ) {
   const generateInteractions = useCallback(async () => {

@@ -10,7 +10,7 @@ import {
 export function useInteractionOperations(
   scheduledInteractions: ScheduledInteraction[],
   setScheduledInteractions: (interactions: ScheduledInteraction[]) => void,
-  setTodayInteractions: (interactions: ScheduledInteraction[]) => void,
+  setTodayInteractions: React.Dispatch<React.SetStateAction<ScheduledInteraction[]>>,
   toast: any
 ) {
   const scheduleInteraction = useCallback(async (interaction: Omit<ScheduledInteraction, 'id'>) => {
