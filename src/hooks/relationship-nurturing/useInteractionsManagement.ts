@@ -9,7 +9,7 @@ import {
   RelationshipFrequency
 } from '@/types/relationship-nurturing';
 import { addDays, format, isAfter, isBefore, parseISO, subDays } from 'date-fns';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 export function useInteractionsManagement(
   relationships: Relationship[],
