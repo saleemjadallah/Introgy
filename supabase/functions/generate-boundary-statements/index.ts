@@ -10,6 +10,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface BoundaryStatement {
+  statement: string;
+  explanation: string;
+  situationFit: string;
+  tone: string;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -17,39 +24,41 @@ serve(async (req) => {
   }
 
   try {
-    const { scenario, context = "", personalStyle = "assertive" } = await req.json();
+    const { scenario, context = "", personalStyle = "assertive", specificConcerns = [] } = await req.json();
     
     if (!scenario) {
       throw new Error("Missing required parameter: scenario");
     }
 
-    // Create a prompt for the Hugging Face model
-    const prompt = `Generate 3 polite but clear boundary statements for the following scenario:
+    // Enhanced prompt for more nuanced and contextual responses
+    const prompt = `As an AI specialized in interpersonal communication and boundary setting, generate 3 polite but clear boundary statements for the following scenario:
 
 Scenario: ${scenario}
 ${context ? `Additional Context: ${context}` : ''}
-Personal Communication Style: ${personalStyle}
+Communication Style: ${personalStyle}
+${specificConcerns.length > 0 ? `Specific Concerns to Address: ${specificConcerns.join(', ')}` : ''}
 
 For each boundary statement:
-1. Provide a direct statement that clearly establishes the boundary
-2. Make it polite but firm
-3. Offer an alternative if appropriate
+1. Make it direct but respectful
+2. Consider the provided context and communication style
+3. Include constructive alternatives when appropriate
+4. Ensure the tone matches the situation's formality
+5. Focus on "I" statements and clear communication
 
-Format each statement as a separate item in a JSON array with the following structure:
+Format each statement as a separate item in a JSON array with this structure:
 [
   {
-    "statement": "The boundary statement text here",
-    "explanation": "Brief explanation of why this works well",
-    "situationFit": "When this statement works best (formal, casual, urgent, etc.)"
+    "statement": "The actual boundary statement",
+    "explanation": "Why this approach is effective",
+    "situationFit": "Best context for using this statement (formal, casual, urgent, etc.)",
+    "tone": "The communication tone (firm, gentle, professional, etc.)"
   }
 ]`;
 
-    console.log("Calling Hugging Face API for boundary statements...");
+    console.log("Calling Hugging Face API with enhanced prompt...");
     
-    // Initialize the Hugging Face inference client
     const hf = new HfInference(HUGGING_FACE_API_KEY);
     
-    // Call Hugging Face API with a text generation model
     const response = await hf.textGeneration({
       model: "mistralai/Mistral-7B-Instruct-v0.2",
       inputs: prompt,
@@ -57,20 +66,21 @@ Format each statement as a separate item in a JSON array with the following stru
         max_new_tokens: 1024,
         temperature: 0.7,
         top_p: 0.95,
-        repetition_penalty: 1.1
+        repetition_penalty: 1.1,
+        do_sample: true
       }
     });
 
-    console.log("Hugging Face API response received");
+    console.log("Received response from Hugging Face API");
     
     if (!response || !response.generated_text) {
       console.error("Empty or invalid response from Hugging Face API");
-      throw new Error("Failed to generate content from Hugging Face API");
+      throw new Error("Failed to generate boundary statements");
     }
 
-    let statements = [];
+    let statements: BoundaryStatement[] = [];
     try {
-      // Try to parse JSON from the response
+      // Enhanced JSON parsing with better error handling
       const content = response.generated_text.trim();
       const jsonStartIndex = content.indexOf('[');
       const jsonEndIndex = content.lastIndexOf(']') + 1;
@@ -78,28 +88,38 @@ Format each statement as a separate item in a JSON array with the following stru
       if (jsonStartIndex >= 0 && jsonEndIndex > jsonStartIndex) {
         const jsonString = content.substring(jsonStartIndex, jsonEndIndex);
         statements = JSON.parse(jsonString);
+        
+        // Validate statement structure
+        if (!Array.isArray(statements) || !statements.every(s => 
+          typeof s.statement === 'string' && 
+          typeof s.explanation === 'string' && 
+          typeof s.situationFit === 'string' &&
+          typeof s.tone === 'string')) {
+          throw new Error("Invalid statement structure");
+        }
       } else {
-        // Fallback to parsing the text if not properly formatted
-        throw new Error("Unable to parse JSON from response");
+        throw new Error("No valid JSON found in response");
       }
     } catch (error) {
-      console.error("Error parsing Hugging Face response:", error);
-      // Create a basic set of fallback statements
+      console.error("Error parsing response:", error);
       statements = [
         {
-          statement: "I appreciate the invitation, but I need to decline at this time.",
+          statement: "I appreciate your request, but I need to respectfully decline.",
           explanation: "A simple, direct statement that works in most situations",
-          situationFit: "Casual"
+          situationFit: "General purpose",
+          tone: "Polite but firm"
         },
         {
-          statement: "Thank you for thinking of me, but I'm not comfortable with that request.",
-          explanation: "Acknowledges the other person while clearly stating your boundary",
-          situationFit: "General purpose"
+          statement: "While I value our relationship, I need to set a boundary here.",
+          explanation: "Acknowledges the relationship while establishing limits",
+          situationFit: "Close relationships",
+          tone: "Gentle but clear"
         },
         {
-          statement: "I value our relationship, but I need to set a boundary on this matter.",
-          explanation: "Affirms the relationship while establishing the boundary",
-          situationFit: "Close relationships"
+          statement: "Thank you for understanding that I need to prioritize my wellbeing in this situation.",
+          explanation: "Focuses on self-care while remaining courteous",
+          situationFit: "Personal matters",
+          tone: "Compassionate"
         }
       ];
     }
