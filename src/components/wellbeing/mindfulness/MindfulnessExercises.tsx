@@ -19,6 +19,9 @@ const MindfulnessExercises = () => {
     getTimeOfDay 
   } = useMindfulnessPractices();
   
+  // Mock battery level - in a real app this would come from the social battery context
+  const batteryLevel = 70; // Default to 70% battery
+  
   return (
     <div className="space-y-4 w-full max-w-full">
       <Tabs 
@@ -48,6 +51,8 @@ const MindfulnessExercises = () => {
         <TabsContent value="recommended">
           <RecommendedTab 
             timeOfDay={getTimeOfDay()}
+            batteryLevel={batteryLevel}
+            completedPractices={completedPractices}
             onSelectPractice={handleSelectPractice}
           />
         </TabsContent>
