@@ -1,6 +1,5 @@
-
 import React from "react";
-import { Brain, Coffee, Utensils, Moon, BookOpen, Droplet, TreePine, Paintbrush, Tv, Cat, Flower2, Headphones, ChefHat, Power, Stars, FolderClosed, Wind, Yoga, Library } from "lucide-react";
+import { Brain, Coffee, Utensils, Moon, BookOpen, Droplet, TreePine, Paintbrush, Tv, Cat, Flower2, Headphones, ChefHat, Power, Stars, FolderClosed, Wind, Pilcrow, Library } from "lucide-react";
 
 export interface RechargeActivityData {
   name: string;
@@ -114,7 +113,7 @@ export const getRechargeActivities = (): RechargeActivityData[] => [
   },
   {
     name: "Gentle Stretching",
-    icon: <Yoga className="h-5 w-5" />,
+    icon: <Pilcrow className="h-5 w-5" />,
     description: "Physical release of tension",
     time: "15 minutes"
   },
