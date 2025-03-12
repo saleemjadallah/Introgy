@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { 
@@ -25,7 +24,7 @@ import {
   convertDbStarter,
   convertDbTemplate
 } from '@/utils/relationshipTypeConverters';
-import { usePremium } from '@/contexts/premium/PremiumContext';
+import { usePremium } from '@/contexts/premium';
 
 // Import mock data for fallback when not authenticated
 import { 

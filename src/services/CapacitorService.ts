@@ -1,4 +1,3 @@
-
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { App } from '@capacitor/app';
@@ -97,7 +96,7 @@ class CapacitorService {
   async getDeviceId() {
     if (!this.isNative) return null;
     const info = await Device.getId();
-    return info.uuid;
+    return info.identifier; // Changed from uuid to identifier which is the correct property
   }
 
   // Local Notifications

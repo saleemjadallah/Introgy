@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +23,7 @@ import {
 } from "@/types/activity";
 import { Plus, Lock } from "lucide-react";
 import { toast } from "sonner";
-import { usePremium } from "@/contexts/premium/PremiumContext";
+import { usePremium } from "@/contexts/premium";
 import { useNavigate } from "react-router-dom";
 
 const CustomActivityForm = ({ 

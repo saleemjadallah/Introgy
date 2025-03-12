@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { 
   RechargeActivity, 
@@ -15,7 +14,7 @@ import { Trash2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { saveCustomActivities } from "@/types/activity";
 import { toast } from "sonner";
-import { usePremium } from "@/contexts/premium/PremiumContext";
+import { usePremium } from "@/contexts/premium";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface ActivityListsProps {

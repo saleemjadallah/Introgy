@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import WisdomSubmissionForm from "./WisdomSubmissionForm";
@@ -6,7 +5,7 @@ import WisdomLibrary from "./WisdomLibrary";
 import { WisdomItem } from "@/types/community-wisdom";
 import { useToast } from "@/hooks/use-toast";
 import { generateSeedWisdom } from "./wisdomSeedData";
-import { usePremium } from "@/contexts/premium/PremiumContext";
+import { usePremium } from "@/contexts/premium";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";

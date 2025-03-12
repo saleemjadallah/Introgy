@@ -1,4 +1,3 @@
-
 import { LineChart, BookOpen, Users, Battery, Book, ChevronDown, AlertCircle, User, MessageSquare, MountainSnow } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -13,7 +12,7 @@ import MindfulnessExercises from "@/components/wellbeing/mindfulness/Mindfulness
 import EducationCenter from "@/components/wellbeing/education/EducationCenter";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { usePremium } from "@/contexts/premium/PremiumContext"; 
+import { usePremium } from "@/contexts/premium";
 import { Star } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useNavigate } from "react-router-dom";

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import IntrovertGlossary from "@/components/wellbeing/IntrovertGlossary";
@@ -11,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useWellbeingContent } from "@/hooks/useWellbeingContent";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { usePremium } from "@/contexts/premium/PremiumContext";
+import { usePremium } from "@/contexts/premium";
 import { PremiumFeatureGuard } from "@/components/premium/PremiumFeatureGuard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Star } from "lucide-react";

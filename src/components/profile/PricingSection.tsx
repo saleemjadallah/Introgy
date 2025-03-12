@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/auth";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { usePremium } from "@/contexts/premium/PremiumContext";
+import { usePremium } from "@/contexts/premium";
 import { pricingFeatures } from "./pricing/pricingFeatureData";
 import LoadingPricingSection from "./pricing/LoadingPricingSection";
 import MobilePricingLayout from "./pricing/MobilePricingLayout";
@@ -23,11 +22,9 @@ const PricingSection = () => {
   const [showCanceledMessage, setShowCanceledMessage] = useState(false);
 
   useEffect(() => {
-    // Check if payment was canceled
     const canceled = searchParams.get('canceled');
     if (canceled === 'true') {
       setShowCanceledMessage(true);
-      // Auto-hide the message after 5 seconds
       const timer = setTimeout(() => {
         setShowCanceledMessage(false);
       }, 5000);
@@ -35,7 +32,6 @@ const PricingSection = () => {
     }
   }, [searchParams]);
 
-  // Mock subscription function
   const handleSubscribe = async (planType: 'monthly' | 'yearly') => {
     if (!user) {
       toast.error("You need to be logged in to upgrade to premium");
@@ -44,7 +40,6 @@ const PricingSection = () => {
     
     try {
       setIsUpgrading(true);
-      // In production, this would connect to Stripe first
       await upgradeToPremium(planType);
     } catch (error) {
       console.error("Error during subscription:", error);
@@ -54,12 +49,10 @@ const PricingSection = () => {
     }
   };
 
-  // Show loading state while checking subscription status
   if (isLoading) {
     return <LoadingPricingSection />;
   }
 
-  // Main content
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center flex-wrap gap-2">

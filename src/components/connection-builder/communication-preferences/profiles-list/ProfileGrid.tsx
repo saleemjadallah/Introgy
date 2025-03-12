@@ -1,7 +1,6 @@
-
 import { CommunicationProfile } from '@/types/communication-preferences';
 import ProfileCard from './ProfileCard';
-import { usePremium } from '@/contexts/premium/PremiumContext';
+import { usePremium } from '@/contexts/premium';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Star } from 'lucide-react';

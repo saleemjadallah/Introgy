@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Brain, MessageCircle, Heart, Shield, Sparkle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +7,7 @@ import RelationshipNurturing from "@/components/connection-builder/RelationshipN
 import MeaningfulInteractionTools from "@/components/connection-builder/MeaningfulInteractionTools";
 import BoundaryManager from "@/components/connection-builder/boundary-manager/BoundaryManager";
 import { PremiumFeatureGuard } from "@/components/premium/PremiumFeatureGuard";
-import { usePremium } from "@/contexts/premium/PremiumContext";
+import { usePremium } from "@/contexts/premium";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
 

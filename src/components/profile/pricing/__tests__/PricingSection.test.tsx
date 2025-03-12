@@ -1,9 +1,8 @@
-
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { vi } from "vitest";
 import PricingSection from "../../PricingSection";
-import { usePremium } from "@/contexts/premium/PremiumContext";
+import { usePremium } from '@/contexts/premium';
 import { useAuth } from "@/contexts/auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 
