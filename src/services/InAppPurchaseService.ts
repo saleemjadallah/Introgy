@@ -54,11 +54,6 @@ class InAppPurchaseService {
         this.platform = 'android';
       }
       
-      // In a real implementation, here we would:
-      // 1. Initialize the native plugin
-      // 2. Set up listeners for purchase events
-      // 3. Restore purchases
-      
       // For development, we'll simulate some basic products
       this.productCache = this.getMockProducts();
     }
@@ -70,7 +65,7 @@ class InAppPurchaseService {
       return this.getMockProducts();
     }
     
-    // In a real implementation, we would query the device's app store
+    // Since we don't have a real plugin right now, use mock data
     if (this.productCache.length === 0) {
       // For development, simulate a delay
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -100,12 +95,8 @@ class InAppPurchaseService {
       return mockPurchase;
     }
 
-    // In a real implementation, we would:
-    // 1. Call the native plugin to initiate purchase
-    // 2. Handle the purchase flow
-    // 3. Return the purchase info when complete
-    
-    console.log('Initiating purchase for product:', productId);
+    // Since we don't have a real plugin, simulate a purchase for now
+    console.log('Simulating purchase for product:', productId);
     
     // For development, simulate a successful purchase
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -127,18 +118,25 @@ class InAppPurchaseService {
   // Verify purchase with backend
   async verifyPurchase(purchase: Purchase, userId: string): Promise<VerificationResult> {
     try {
-      // Call our edge function to verify the purchase
-      const { data, error } = await supabase.functions.invoke('verify-purchase', {
-        body: {
-          userId,
-          receipt: purchase.receipt || purchase.transactionId,
-          productId: purchase.productId,
-          platform: purchase.platform || this.platform
-        }
+      // In a real implementation, we would call our edge function to verify
+      // Since we don't have the plugin installed, simulate a successful verification
+      console.log('Simulating purchase verification for', purchase.productId);
+      
+      const planType = purchase.productId.includes('yearly') ? 'yearly' : 'monthly';
+      const expiresAt = new Date();
+      if (planType === 'yearly') {
+        expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+      } else {
+        expiresAt.setMonth(expiresAt.getMonth() + 1);
+      }
+      
+      // Store the purchase in the database
+      const { data, error } = await supabase.rpc('upgrade_to_premium', { 
+        plan_type: planType 
       });
       
       if (error) {
-        console.error('Purchase verification error:', error);
+        console.error('Error storing purchase in database:', error);
         return {
           success: false,
           planType: 'monthly',
@@ -147,8 +145,12 @@ class InAppPurchaseService {
         };
       }
       
-      console.log('Purchase verification result:', data);
-      return data as VerificationResult;
+      return {
+        success: true,
+        planType: planType,
+        expiresAt: expiresAt.toISOString(),
+        error: undefined
+      };
     } catch (err) {
       console.error('Error during purchase verification:', err);
       return {
@@ -167,13 +169,39 @@ class InAppPurchaseService {
       return [];
     }
     
-    // In a real implementation, we would call the native plugin
-    // to restore purchases from the app store
+    // Since we don't have a real plugin, just simulate for now
+    console.log('Simulating restore purchases');
     
-    console.log('Restoring purchases');
-    
-    // For development, return empty array
-    return [];
+    try {
+      // Check if user has an active subscription in the database
+      const { data, error } = await supabase
+        .from('premium_subscriptions')
+        .select('*')
+        .eq('is_active', true)
+        .gt('expires_at', new Date().toISOString())
+        .single();
+      
+      if (error || !data) {
+        console.log('No active subscription found');
+        return [];
+      }
+      
+      // Create a simulated purchase based on the found subscription
+      const restoredPurchase: Purchase = {
+        productId: data.plan_type === 'yearly' ? PRODUCT_IDS.PREMIUM_YEARLY : PRODUCT_IDS.PREMIUM_MONTHLY,
+        transactionId: `restored-${Date.now()}`,
+        timestamp: new Date(data.created_at).getTime(),
+        platform: this.platform as 'ios' | 'android'
+      };
+      
+      // Notify listeners about the restored purchase
+      this.listeners.forEach(listener => listener(restoredPurchase));
+      
+      return [restoredPurchase];
+    } catch (err) {
+      console.error('Error restoring purchases:', err);
+      return [];
+    }
   }
 
   // Add a purchase listener
