@@ -1,9 +1,11 @@
+
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { App } from '@capacitor/app';
 import { Device } from '@capacitor/device';
 import { LocalNotifications, ScheduleOptions } from '@capacitor/local-notifications';
 import { Preferences } from '@capacitor/preferences';
+import { SplashScreen } from '@capacitor/splash-screen'; // Added import
 
 /**
  * A service that provides a unified interface to Capacitor plugins.
@@ -53,6 +55,17 @@ class CapacitorService {
     } catch (error) {
       console.error('Error initializing Capacitor plugins:', error);
     }
+  }
+
+  // SplashScreen methods
+  async showSplashScreen(): Promise<void> {
+    if (!this.isNative) return;
+    await SplashScreen.show();
+  }
+
+  async hideSplashScreen(): Promise<void> {
+    if (!this.isNative) return;
+    await SplashScreen.hide();
   }
 
   // App-related methods

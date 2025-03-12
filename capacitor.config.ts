@@ -1,4 +1,3 @@
-
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
@@ -13,14 +12,17 @@ const config: CapacitorConfig = {
   },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 2000,
+      launchShowDuration: 3000, // Increased from 2000 to 3000ms
       launchAutoHide: true,
       backgroundColor: "#121212",
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",
-      showSpinner: false,
+      showSpinner: true, // Added spinner for better UX
+      spinnerColor: "#627286", // Using the app's text-secondary color
       splashFullScreen: true,
-      splashImmersive: true
+      splashImmersive: true,
+      layoutName: "launch_screen", // Custom layout name
+      useDialog: false // Use native splash screen instead of a dialog (Android)
     },
     StatusBar: {
       style: "dark",

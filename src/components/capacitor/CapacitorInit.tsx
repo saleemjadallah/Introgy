@@ -7,6 +7,16 @@ const CapacitorInit = () => {
   const { user } = useAuth();
 
   useEffect(() => {
+    // Hide the splash screen after app is ready
+    const hideSplash = async () => {
+      // Wait for the UI to be fully loaded
+      setTimeout(async () => {
+        await capacitorService.hideSplashScreen();
+      }, 500);
+    };
+    
+    hideSplash();
+    
     // Set status bar style based on system theme
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       capacitorService.setStatusBarStyleDark();
