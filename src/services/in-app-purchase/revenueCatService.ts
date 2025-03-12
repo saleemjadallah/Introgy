@@ -59,16 +59,21 @@ class RevenueCatService {
 
   async purchasePackage(options: PurchasePackageOptions) {
     try {
-      // Create a default subscription option if one is not provided
-      const defaultSubscriptionOption: SubscriptionOption = {
+      // Create a default subscription option that includes all required properties
+      const enhancedSubscriptionOption: SubscriptionOption = {
         id: options.aPackage.product.identifier,
         storeProductId: options.aPackage.product.identifier,
         productId: options.aPackage.product.identifier,
-        pricingPhases: []
+        pricingPhases: [],
+        tags: [],
+        isBasePlan: true,
+        billingPeriod: options.aPackage.packageType === 'ANNUAL' ? 'P1Y' : 'P1M',
+        isPrepaid: false,
+        presentedOfferingIdentifier: options.presentedOfferingIdentifier
       };
       
-      // Create a valid options object with all required properties for RevenueCat
-      const purchaseOptions: PurchasePackageOptions = {
+      // Convert our options to what RevenueCat expects
+      const revenueCatOptions = {
         aPackage: {
           ...options.aPackage,
           product: {
@@ -78,9 +83,8 @@ class RevenueCatService {
             productCategory: PRODUCT_CATEGORY.SUBSCRIPTION,
             productType: PRODUCT_TYPE.AUTO_RENEWABLE_SUBSCRIPTION,
             subscriptionPeriod: options.aPackage.packageType === 'ANNUAL' ? 'P1Y' : 'P1M',
-            // Use proper SubscriptionOption type instead of boolean
-            defaultOption: options.aPackage.product.defaultOption || defaultSubscriptionOption,
-            subscriptionOptions: options.aPackage.product.subscriptionOptions || [],
+            defaultOption: enhancedSubscriptionOption,
+            subscriptionOptions: [enhancedSubscriptionOption],
             // Ensure introPrice is always defined
             introPrice: options.aPackage.product.introPrice || DEFAULT_INTRO_PRICE
           }
@@ -88,9 +92,10 @@ class RevenueCatService {
         presentedOfferingIdentifier: options.presentedOfferingIdentifier
       };
       
-      console.log('Purchasing package with options:', JSON.stringify(purchaseOptions));
-      // Pass the options to RevenueCat for purchase
-      const purchaseResult = await Purchases.purchasePackage(purchaseOptions);
+      console.log('Purchasing package with options:', JSON.stringify(revenueCatOptions));
+      
+      // Use any to bypass type checking since we're deliberately adapting our types to RevenueCat's
+      const purchaseResult = await Purchases.purchasePackage(revenueCatOptions as any);
       return purchaseResult;
     } catch (error) {
       console.error('Error purchasing package from RevenueCat:', error);

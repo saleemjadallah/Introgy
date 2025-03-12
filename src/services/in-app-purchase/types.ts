@@ -5,7 +5,7 @@ export const PRODUCT_IDS = {
 };
 
 export const ENTITLEMENTS = {
-  PREMIUM: 'premium'
+  PREMIUM: 'entl311fdc504f'
 };
 
 export type ProductType = 'monthly' | 'yearly';
@@ -107,12 +107,22 @@ export enum PRODUCT_TYPE {
   PREPAID_SUBSCRIPTION = "PREPAID_SUBSCRIPTION"
 }
 
-// Define SubscriptionOption interface to match RevenueCat's expectations
+// Define SubscriptionOption interface to better match RevenueCat's expectations
 export interface SubscriptionOption {
   id: string;
   storeProductId: string;
   productId: string;
   pricingPhases: any[];
+  
+  // Additional properties required by RevenueCat
+  tags?: string[];
+  isBasePlan?: boolean;
+  billingPeriod?: string;
+  isPrepaid?: boolean;
+  fullPricePhase?: any;
+  freePhase?: any;
+  introPhase?: any;
+  presentedOfferingIdentifier?: string;
 }
 
 export interface RevenueCatPackage {
@@ -158,7 +168,7 @@ export interface RevenueCatProduct {
   productCategory: PRODUCT_CATEGORY;
   productType: PRODUCT_TYPE;
   subscriptionPeriod: string;
-  defaultOption?: SubscriptionOption; // Changed from boolean to SubscriptionOption
+  defaultOption?: SubscriptionOption; 
   presentedOfferingIdentifier?: string;
   subscriptionOptions?: SubscriptionOption[];
 }

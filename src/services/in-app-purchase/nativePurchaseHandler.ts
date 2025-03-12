@@ -55,12 +55,17 @@ export async function purchaseNative(
       throw new Error(`Package not found for product ID: ${productId}`);
     }
     
-    // Create a default subscription option
-    const defaultSubscriptionOption: SubscriptionOption = {
+    // Create a fully-specified subscription option
+    const enhancedSubscriptionOption: SubscriptionOption = {
       id: productId,
       storeProductId: productId,
       productId: productId,
-      pricingPhases: []
+      pricingPhases: [],
+      tags: [],
+      isBasePlan: true,
+      billingPeriod: productId.includes('yearly') ? 'P1Y' : 'P1M',
+      isPrepaid: false,
+      presentedOfferingIdentifier: offerings.offerings.current.identifier
     };
     
     // Ensure product has the correct type properties before purchase
@@ -72,8 +77,8 @@ export async function purchaseNative(
         productType: PRODUCT_TYPE.AUTO_RENEWABLE_SUBSCRIPTION,
         discounts: packageToPurchase.product.discounts || [],
         subscriptionPeriod: productId.includes('yearly') ? 'P1Y' : 'P1M',
-        defaultOption: defaultSubscriptionOption,
-        subscriptionOptions: [],
+        defaultOption: enhancedSubscriptionOption,
+        subscriptionOptions: [enhancedSubscriptionOption],
         // Always provide a valid introPrice
         introPrice: packageToPurchase.product.introPrice || DEFAULT_INTRO_PRICE
       }
@@ -85,7 +90,8 @@ export async function purchaseNative(
       presentedOfferingIdentifier: offerings.offerings.current.identifier
     };
     
-    const purchaseResultData = await revenueCatService.purchasePackage(options);
+    // Use any to bypass type checking since we're deliberately adapting our types
+    const purchaseResultData = await revenueCatService.purchasePackage(options as any);
     
     // The result has a different structure than our types indicated
     const purchaseResult = purchaseResultData as unknown as { customerInfo: CustomerInfo; productIdentifier: string };
