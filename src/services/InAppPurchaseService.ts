@@ -1,4 +1,3 @@
-
 import { Capacitor } from '@capacitor/core';
 import { 
   Product, 
@@ -6,11 +5,10 @@ import {
   VerificationResult, 
   PurchaseListener,
   CustomerInfo,
-  PurchasesOfferings,
-  PurchasesPackage,
-  PurchasePackageOptions,
-  PurchasesStoreProduct,
-  PurchasingData
+  RevenueCatOfferings,
+  RevenueCatPackage,
+  PurchaseResult,
+  PurchasePackageOptions
 } from './in-app-purchase/types';
 import { getMockProducts, ENTITLEMENTS, OFFERINGS } from './in-app-purchase/mockProducts';
 import { verifyPurchase, processCustomerInfo } from './in-app-purchase/purchaseVerification';
@@ -86,7 +84,6 @@ class InAppPurchaseService {
     this.listeners.forEach(listener => listener(purchase));
   }
 
-  // Convert RevenueCat customer info to our Purchase type
   private convertCustomerInfoToPurchases(customerInfo: CustomerInfo): Purchase[] {
     try {
       if (!customerInfo.activeSubscriptions || customerInfo.activeSubscriptions.length === 0) {
@@ -123,18 +120,16 @@ class InAppPurchaseService {
       
       // Fetch offerings from RevenueCat
       const offeringsResult = await Purchases.getOfferings();
+      const offerings = offeringsResult as unknown as { offerings: RevenueCatOfferings };
       
-      // Cast to actual RevenueCat type
-      const offerings = offeringsResult as unknown as PurchasesOfferings;
-      
-      if (!offerings.current) {
+      if (!offerings.offerings || !offerings.offerings.current) {
         console.log('No RevenueCat offerings available, using mock products');
         this.productCache = getMockProducts();
         return this.productCache;
       }
       
       // Convert RevenueCat products to our Product type
-      const products: Product[] = offerings.current.availablePackages.map(pkg => {
+      const products: Product[] = offerings.offerings.current.availablePackages.map(pkg => {
         const product = pkg.product;
         return {
           id: product.identifier,
@@ -182,18 +177,16 @@ class InAppPurchaseService {
       
       // Get the offerings first
       const offeringsResult = await Purchases.getOfferings();
+      const offerings = offeringsResult as unknown as { offerings: RevenueCatOfferings };
       
-      // Cast to actual RevenueCat type
-      const offerings = offeringsResult as unknown as PurchasesOfferings;
-      
-      if (!offerings.current) {
+      if (!offerings.offerings || !offerings.offerings.current) {
         throw new Error('No RevenueCat offerings available');
       }
       
       // Find the package containing the product
-      let packageToPurchase: PurchasesPackage | undefined;
+      let packageToPurchase: RevenueCatPackage | undefined;
       
-      for (const pkg of offerings.current.availablePackages) {
+      for (const pkg of offerings.offerings.current.availablePackages) {
         if (pkg.product.identifier === productId) {
           packageToPurchase = pkg;
           break;
@@ -204,17 +197,16 @@ class InAppPurchaseService {
         throw new Error(`Package not found for product ID: ${productId}`);
       }
       
-      // Purchase the package using the correct options structure
+      // Purchase the package using the correct options structure to match the RevenueCat expectations
       const options: PurchasePackageOptions = {
-        aPackage: {
-          identifier: packageToPurchase.identifier
-        }
+        aPackage: packageToPurchase,
+        presentedOfferingIdentifier: offerings.offerings.current.identifier
       };
       
       const purchaseResult = await Purchases.purchasePackage(options);
       
       // The result has a different structure than our types indicated
-      const purchaseData = purchaseResult as unknown as PurchasingData;
+      const purchaseData = purchaseResult as unknown as PurchaseResult;
       
       console.log('RevenueCat purchase successful:', purchaseData.productIdentifier);
       
@@ -223,7 +215,7 @@ class InAppPurchaseService {
         productId: purchaseData.productIdentifier,
         transactionId: `revenuecat-${Date.now()}`,
         timestamp: Date.now(),
-        platform: this.platform === 'web' ? undefined : this.platform
+        platform: this.platform === 'web' ? undefined : (this.platform as 'ios' | 'android')
       };
       
       // Notify listeners
