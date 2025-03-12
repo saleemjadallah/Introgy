@@ -8,6 +8,7 @@ import {
   RevenueCatPackage,
   PurchasesIntroPrice,
   PRODUCT_CATEGORY,
+  PRODUCT_TYPE,
   DEFAULT_INTRO_PRICE
 } from './types';
 
@@ -66,7 +67,7 @@ class RevenueCatService {
             // Ensure all required properties are present
             discounts: options.aPackage.product.discounts || [],
             productCategory: PRODUCT_CATEGORY.SUBSCRIPTION,
-            productType: 'subscription',
+            productType: PRODUCT_TYPE.AUTO_RENEWABLE_SUBSCRIPTION, // Using proper enum type
             subscriptionPeriod: options.aPackage.packageType === 'ANNUAL' ? 'P1Y' : 'P1M',
             defaultOption: options.aPackage.product.defaultOption || true,
             subscriptionOptions: options.aPackage.product.subscriptionOptions || [],

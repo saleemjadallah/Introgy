@@ -98,6 +98,15 @@ export enum PRODUCT_CATEGORY {
   NON_SUBSCRIPTION = "NON_SUBSCRIPTION"
 }
 
+// Add enum for product type to match RevenueCat expectations
+export enum PRODUCT_TYPE {
+  CONSUMABLE = "CONSUMABLE",
+  NON_CONSUMABLE = "NON_CONSUMABLE",
+  AUTO_RENEWABLE_SUBSCRIPTION = "AUTO_RENEWABLE_SUBSCRIPTION",
+  NON_RENEWABLE_SUBSCRIPTION = "NON_RENEWABLE_SUBSCRIPTION",
+  PREPAID_SUBSCRIPTION = "PREPAID_SUBSCRIPTION"
+}
+
 export interface RevenueCatPackage {
   identifier: string;
   packageType: PACKAGE_TYPE;
@@ -139,7 +148,7 @@ export interface RevenueCatProduct {
   introPriceCycles?: number;
   discounts: any[];
   productCategory: PRODUCT_CATEGORY;
-  productType: string;
+  productType: PRODUCT_TYPE;  // Updated from string to enum type
   subscriptionPeriod: string;
   defaultOption: boolean;
   presentedOfferingIdentifier?: string;

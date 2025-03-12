@@ -8,6 +8,7 @@ import {
   PACKAGE_TYPE,
   ENTITLEMENTS,
   PRODUCT_CATEGORY,
+  PRODUCT_TYPE,
   VerificationResult,
   DEFAULT_INTRO_PRICE
 } from './types';
@@ -59,7 +60,7 @@ export async function purchaseNative(
       product: {
         ...packageToPurchase.product,
         productCategory: PRODUCT_CATEGORY.SUBSCRIPTION,
-        productType: 'subscription',
+        productType: PRODUCT_TYPE.AUTO_RENEWABLE_SUBSCRIPTION, // Using proper enum type
         discounts: packageToPurchase.product.discounts || [],
         subscriptionPeriod: productId.includes('yearly') ? 'P1Y' : 'P1M',
         defaultOption: true,
