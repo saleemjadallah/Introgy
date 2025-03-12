@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ArrowLeft } from "lucide-react";
 
 interface OtpVerificationFormProps {
   phone: string;
@@ -35,16 +36,18 @@ export const OtpVerificationForm = ({
             maxLength={6}
             required
             inputMode="numeric"
+            autoFocus
+            className="text-center text-lg tracking-widest"
           />
           <p className="text-xs text-muted-foreground">
-            Enter the verification code sent to {phone}
+            Enter the 6-digit verification code sent to {phone}
           </p>
         </div>
         
         {error && <p className="text-sm text-destructive">{error}</p>}
         
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Verifying..." : "Verify"}
+        <Button type="submit" className="w-full" disabled={isLoading || otp.length !== 6}>
+          {isLoading ? "Verifying..." : "Verify Code"}
         </Button>
         
         <Button 

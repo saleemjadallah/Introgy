@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -75,33 +74,46 @@ export const googleSignIn = async (redirectTo: string) => {
 };
 
 export const phoneOtpSignIn = async (phone: string) => {
-  const { error } = await supabase.auth.signInWithOtp({
-    phone,
-  });
+  try {
+    console.log("Sending OTP to:", phone);
+    const { error } = await supabase.auth.signInWithOtp({
+      phone,
+    });
 
-  if (error) {
-    console.error("OTP error:", error);
+    if (error) {
+      console.error("OTP error:", error);
+      throw error;
+    }
+    
+    console.log("OTP sent successfully to:", phone);
+    return true;
+  } catch (error) {
+    console.error("Failed to send OTP:", error);
     throw error;
   }
-  
-  console.log("OTP sent successfully to:", phone);
-  toast.success('Verification code sent to your phone');
-  return true;
 };
 
 export const verifyPhoneOtp = async (phone: string, token: string) => {
-  const { error } = await supabase.auth.verifyOtp({
-    phone,
-    token,
-    type: 'sms'
-  });
+  try {
+    console.log("Verifying OTP:", { phone, token });
+    const { error, data } = await supabase.auth.verifyOtp({
+      phone,
+      token,
+      type: 'sms'
+    });
 
-  if (error) {
+    if (error) {
+      console.error("OTP verification error:", error);
+      throw error;
+    }
+    
+    console.log("OTP verification successful:", data);
+    toast.success('Phone verified successfully');
+    return true;
+  } catch (error) {
+    console.error("OTP verification failed:", error);
     throw error;
   }
-  
-  toast.success('Phone verified successfully');
-  return true;
 };
 
 export const signOut = async () => {

@@ -1,9 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth";
 import { PhoneInputForm } from "./PhoneInputForm";
 import { OtpVerificationForm } from "./OtpVerificationForm";
 import { formatPhoneNumber } from "../utils/phoneUtils";
+import { toast } from "sonner";
 
 type FormState = "PHONE_INPUT" | "OTP_INPUT";
 
@@ -30,9 +31,17 @@ export const PhoneAuthForm = ({ mode }: { mode: "signin" | "signup" }) => {
     }
     
     try {
-      await signInWithOTP(phone);
-      // Explicitly set the form state to OTP_INPUT after successfully sending the verification code
-      setFormState("OTP_INPUT");
+      // Wait for the OTP to be sent successfully
+      const success = await signInWithOTP(phone);
+      console.log("OTP send result:", success);
+      
+      if (success) {
+        // Only change form state if OTP was sent successfully
+        setFormState("OTP_INPUT");
+        toast.success("Verification code sent to your phone");
+      } else {
+        setError("Failed to send verification code. Please try again.");
+      }
     } catch (error) {
       console.error("Error sending OTP:", error);
       setError("Failed to send verification code. Please try again.");
@@ -44,12 +53,14 @@ export const PhoneAuthForm = ({ mode }: { mode: "signin" | "signup" }) => {
     setError("");
     
     if (!otp || otp.length < 6) {
-      setError("Please enter a valid verification code");
+      setError("Please enter a valid 6-digit verification code");
       return;
     }
     
     try {
+      console.log("Verifying OTP:", { phone, otp });
       await verifyOTP(phone, otp);
+      // Success is handled by the auth context (redirect, etc.)
     } catch (error) {
       console.error("Error verifying OTP:", error);
       setError("Invalid verification code. Please try again.");
@@ -57,8 +68,14 @@ export const PhoneAuthForm = ({ mode }: { mode: "signin" | "signup" }) => {
   };
 
   const handleResendOtp = async () => {
+    setError("");
     try {
-      await signInWithOTP(phone);
+      const success = await signInWithOTP(phone);
+      if (success) {
+        toast.success("Verification code resent to your phone");
+      } else {
+        setError("Failed to resend verification code. Please try again.");
+      }
     } catch (error) {
       console.error("Error resending OTP:", error);
       setError("Failed to resend verification code. Please try again.");
@@ -66,7 +83,15 @@ export const PhoneAuthForm = ({ mode }: { mode: "signin" | "signup" }) => {
   };
 
   const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setOtp(e.target.value.replace(/\D/g, ""));
+    // Only allow numeric input, maximum 6 digits
+    const value = e.target.value.replace(/\D/g, "").slice(0, 6);
+    setOtp(value);
+  };
+
+  const handleBackToPhone = () => {
+    setFormState("PHONE_INPUT");
+    setOtp("");
+    setError("");
   };
 
   return (

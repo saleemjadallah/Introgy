@@ -108,14 +108,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signInWithOTP = async (phone: string) => {
+  const signInWithOTP = async (phone: string): Promise<boolean> => {
     try {
       setIsLoading(true);
       return await authService.phoneOtpSignIn(phone);
     } catch (error: any) {
       console.error('OTP error details:', error);
       toast.error(error.message || 'Failed to send verification code');
-      throw error;
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -129,6 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error: any) {
       toast.error(error.message || 'Invalid verification code');
       console.error('OTP verification error:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }

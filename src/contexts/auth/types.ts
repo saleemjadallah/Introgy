@@ -5,10 +5,10 @@ export interface AuthContextProps {
   session: Session | null;
   user: User | null;
   isLoading: boolean;
-  signIn: (credentials: { email?: string; phone?: string; password?: string; }) => Promise<void>;
-  signUp: (credentials: { email?: string; phone?: string; password?: string; displayName?: string; }) => Promise<void>;
+  signIn: (credentials: { email?: string; phone?: string; password?: string }) => Promise<void>;
+  signUp: (credentials: { email?: string; phone?: string; password?: string; displayName?: string }) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  signInWithOTP: (phone: string) => Promise<boolean>;
+  signInWithOTP: (phone: string) => Promise<boolean>; // Returns boolean for success/failure
   verifyOTP: (phone: string, token: string) => Promise<void>;
   signOut: () => Promise<void>;
   isAuthenticated: boolean;
