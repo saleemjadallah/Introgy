@@ -1,3 +1,4 @@
+
 name: Xcode Cloud Build
 
 # This workflow configuration helps Xcode Cloud find the correct project
@@ -7,7 +8,7 @@ settings:
   xcode:
     project: ios/App/App.xcodeproj
     workspace: ios/App/App.xcworkspace
-    scheme: App  # Previously was looking for "Introgy"
+    scheme: App
 
 # Define the build steps
 steps:
@@ -15,8 +16,24 @@ steps:
     build:
       project: ios/App/App.xcodeproj
       workspace: ios/App/App.xcworkspace
-      scheme: App  # This must match an existing scheme
-      destination: 'platform=iOS Simulator,name=iPhone 15'
+      scheme: App
+      configuration: Release
+      destination: 'generic/platform=iOS'
+      sdk: 'iphoneos'
+      archive:
+        path: app.xcarchive
+        exportOptions:
+          method: app-store
+          
+  - name: Upload to TestFlight
+    beta_app_review_info:
+      contact_email: test@example.com
+      contact_first_name: Test
+      contact_last_name: User
+      contact_phone: '+11234567890'
+      demo_account_name: test@example.com
+      demo_account_password: test123
+      notes: "This build is for testing purposes. Contact test@example.com for any issues."
       
 # Pre-build script to ensure permissions are correct and install dependencies
 pre_build_script: ./xcode_cloud_pre_build.sh
