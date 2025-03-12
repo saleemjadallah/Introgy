@@ -21,7 +21,36 @@ const config: CapacitorConfig = {
       showSpinner: false,
       splashFullScreen: true,
       splashImmersive: true
+    },
+    StatusBar: {
+      style: "dark",
+      backgroundColor: "#121212",
+      overlaysWebView: false,
+      animated: true
+    },
+    LocalNotifications: {
+      smallIcon: "ic_stat_icon_config_sample",
+      iconColor: "#488AFF"
+    },
+    App: {
+      appName: "Introgy",
+      appVersion: "1.0.0"
     }
+  },
+  ios: {
+    contentInset: "always",
+    allowsLinkPreview: false,
+    scrollEnabled: true,
+    // Add App Store metadata
+    scheme: "introgy",
+    backgroundColor: "#121212"
+  },
+  android: {
+    allowsLinkPreview: false,
+    backgroundColor: "#121212",
+    overrideUserAgent: "Introgy Android App",
+    captureInput: true,
+    webContentsDebuggingEnabled: false // Set to false for production
   }
 };
 

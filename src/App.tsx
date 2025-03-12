@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { AuthProvider } from "@/contexts/auth";
-import { PremiumProvider } from "@/contexts/premium/PremiumContext";
+import { PremiumProvider } from "@/contexts/premium";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import SocialBattery from "./pages/SocialBattery";
@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import Onboarding from "./pages/Onboarding";
 import { AuthCallback } from "@/components/auth";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import CapacitorInit from "./components/capacitor/CapacitorInit";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ function App() {
         <BrowserRouter>
           <AuthProvider>
             <PremiumProvider>
+              <CapacitorInit />
               <Routes>
                 <Route element={<Layout />}>
                   <Route path="/" element={<Index />} />
