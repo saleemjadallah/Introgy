@@ -35,8 +35,7 @@ export interface PurchaseListener {
   (purchase: Purchase): void;
 }
 
-// Types for interfacing with RevenueCat Capacitor plugin
-// Based on the actual plugin types
+// Types aligned with the actual RevenueCat Capacitor plugin
 export interface CustomerInfo {
   entitlements: {
     all: Record<string, Entitlement>;
@@ -59,26 +58,32 @@ export interface Entitlement {
   originalPurchaseDate: string;
 }
 
-export interface PurchasesOfferings {
-  current: PurchasesOffering | null;
-  all: Record<string, PurchasesOffering>;
+// RevenueCat Capacitor plugin uses a different structure for offerings
+export interface PurchaseResult {
+  customerInfo: CustomerInfo;
+  productIdentifier: string;
 }
 
-export interface PurchasesOffering {
+// These are updated types to match the actual RevenueCat types
+export interface RevenueCatOfferings {
+  current: RevenueCatOffering | null;
+  all: Record<string, RevenueCatOffering>;
+}
+
+export interface RevenueCatOffering {
   identifier: string;
   serverDescription: string;
   metadata: Record<string, string>;
-  availablePackages: PurchasesPackage[];
+  availablePackages: RevenueCatPackage[];
 }
 
-export interface PurchasesPackage {
+export interface RevenueCatPackage {
   identifier: string;
   packageType: string;
-  product: PurchasesStoreProduct;
-  offering: string;
+  product: RevenueCatProduct;
 }
 
-export interface PurchasesStoreProduct {
+export interface RevenueCatProduct {
   identifier: string;
   description: string;
   title: string;
@@ -91,12 +96,11 @@ export interface PurchasesStoreProduct {
   introPriceCycles?: number;
 }
 
-export interface PurchasePackageOptions {
-  identifier: string;
-  offeringIdentifier?: string;
-}
-
-export interface PurchaseResult {
-  customerInfo: CustomerInfo;
-  productIdentifier: string;
+// For purchasing packages
+export interface RevenueCatPurchaseOptions {
+  packageIdentifier: string;
+  upgradeInfo?: {
+    oldSKU?: string;
+    prorationMode?: number;
+  };
 }

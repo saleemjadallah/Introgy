@@ -5,13 +5,11 @@ import {
   Purchase, 
   VerificationResult, 
   PurchaseListener,
-  PurchasesOfferings,
-  PurchasesOffering,
-  PurchasesPackage,
-  PurchasePackageOptions,
   CustomerInfo,
   PurchaseResult,
-  Entitlement
+  RevenueCatOfferings,
+  RevenueCatPackage,
+  RevenueCatPurchaseOptions
 } from './in-app-purchase/types';
 import { getMockProducts, ENTITLEMENTS, OFFERINGS } from './in-app-purchase/mockProducts';
 import { verifyPurchase, processCustomerInfo } from './in-app-purchase/purchaseVerification';
@@ -58,8 +56,9 @@ class InAppPurchaseService {
       });
       
       // Set up a listener for purchase events
-      Purchases.addCustomerInfoUpdateListener((info: CustomerInfo) => {
+      Purchases.addCustomerInfoUpdateListener((info) => {
         console.log('RevenueCat customer info updated:', info);
+        // The info coming directly from the listener is already a CustomerInfo object
         const purchases = this.convertCustomerInfoToPurchases(info);
         purchases.forEach(purchase => this.notifyListeners(purchase));
       });
@@ -122,16 +121,17 @@ class InAppPurchaseService {
       }
       
       // Fetch offerings from RevenueCat
-      const offerings = await Purchases.getOfferings() as PurchasesOfferings;
+      const result = await Purchases.getOfferings();
+      const offerings = result as unknown as { offerings: RevenueCatOfferings };
       
-      if (!offerings || !offerings.current) {
+      if (!offerings.offerings || !offerings.offerings.current) {
         console.log('No RevenueCat offerings available, using mock products');
         this.productCache = getMockProducts();
         return this.productCache;
       }
       
       // Convert RevenueCat products to our Product type
-      const products: Product[] = offerings.current.availablePackages.map(pkg => {
+      const products: Product[] = offerings.offerings.current.availablePackages.map(pkg => {
         const product = pkg.product;
         return {
           id: product.identifier,
@@ -178,34 +178,45 @@ class InAppPurchaseService {
       console.log('Purchasing product with RevenueCat:', productId);
       
       // Get the offerings first
-      const offerings = await Purchases.getOfferings() as PurchasesOfferings;
+      const result = await Purchases.getOfferings();
+      const offerings = result as unknown as { offerings: RevenueCatOfferings };
       
-      if (!offerings || !offerings.current) {
+      if (!offerings.offerings || !offerings.offerings.current) {
         throw new Error('No RevenueCat offerings available');
       }
       
       // Find the package containing the product
-      const packageToPurchase = offerings.current.availablePackages.find(
-        pkg => pkg.product.identifier === productId
-      );
+      let packageToPurchase: RevenueCatPackage | undefined;
+      
+      for (const pkg of offerings.offerings.current.availablePackages) {
+        if (pkg.product.identifier === productId) {
+          packageToPurchase = pkg;
+          break;
+        }
+      }
       
       if (!packageToPurchase) {
         throw new Error(`Package not found for product ID: ${productId}`);
       }
       
-      // Purchase the package
-      const purchaseResult = await Purchases.purchasePackage({
-        identifier: packageToPurchase.identifier
-      }) as PurchaseResult;
+      // Purchase the package using the correct options structure
+      const options: RevenueCatPurchaseOptions = {
+        packageIdentifier: packageToPurchase.identifier
+      };
       
-      console.log('RevenueCat purchase successful:', purchaseResult.productIdentifier);
+      const purchaseResult = await Purchases.purchasePackage(options);
+      
+      // The result has a different structure than our types indicated
+      const result = purchaseResult as unknown as { customerInfo: CustomerInfo; productIdentifier: string };
+      
+      console.log('RevenueCat purchase successful:', result.productIdentifier);
       
       // Create our Purchase object
       const purchase: Purchase = {
-        productId: purchaseResult.productIdentifier,
+        productId: result.productIdentifier,
         transactionId: `revenuecat-${Date.now()}`,
         timestamp: Date.now(),
-        platform: this.platform === 'web' ? undefined : this.platform
+        platform: this.platform === 'web' ? undefined : (this.platform as 'ios' | 'android')
       };
       
       // Notify listeners
@@ -229,10 +240,12 @@ class InAppPurchaseService {
       }
       
       // Get the customer info from RevenueCat
-      const customerInfo = await Purchases.getCustomerInfo() as CustomerInfo;
+      const result = await Purchases.getCustomerInfo();
+      // Need to extract customerInfo from the response
+      const customerInfo = result as unknown as CustomerInfo;
       
       // Process the customer info
-      const verificationResult = this.processCustomerInfo(customerInfo);
+      const verificationResult = processCustomerInfo(customerInfo);
       
       // If verification successful, store in database
       if (verificationResult.success) {
@@ -294,7 +307,7 @@ class InAppPurchaseService {
   async restorePurchases(): Promise<Purchase[]> {
     if (!this.isNative) {
       console.log('Restore attempted in non-native environment');
-      return [];
+      return restorePurchases('web');
     }
     
     try {
@@ -305,7 +318,9 @@ class InAppPurchaseService {
       console.log('Restoring purchases with RevenueCat');
       
       // Restore purchases with RevenueCat
-      const customerInfo = await Purchases.restorePurchases() as CustomerInfo;
+      const result = await Purchases.restorePurchases();
+      // Extract customerInfo from the response
+      const customerInfo = result as unknown as CustomerInfo;
       
       // Convert to our Purchase type
       const purchases = this.convertCustomerInfoToPurchases(customerInfo);
@@ -333,7 +348,8 @@ class InAppPurchaseService {
       }
       
       // Get customer info from RevenueCat
-      const customerInfo = await Purchases.getCustomerInfo() as CustomerInfo;
+      const result = await Purchases.getCustomerInfo();
+      const customerInfo = result as unknown as CustomerInfo;
       
       // Check if the premium entitlement is active
       return !!customerInfo.entitlements.active[ENTITLEMENTS.PREMIUM];
