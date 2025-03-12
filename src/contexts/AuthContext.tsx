@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,7 +26,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set initial session and user
     const setInitialSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -42,7 +40,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setInitialSession();
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, currentSession: Session | null) => {
         console.log("Auth state changed:", event);
@@ -50,7 +47,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(currentSession?.user ?? null);
         setIsLoading(false);
 
-        // Handle auth events
         if (event === 'SIGNED_IN' && currentSession) {
           toast.success('Signed in successfully');
         } else if (event === 'SIGNED_OUT') {
@@ -61,7 +57,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // Cleanup subscription
     return () => {
       subscription.unsubscribe();
     };
@@ -124,7 +119,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       toast.success('Account created! Please verify your account.');
       
-      // Set session for cases where confirmations are disabled
       if (response?.data?.session) {
         navigate('/onboarding');
       }
@@ -173,13 +167,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
+        console.error("OTP error:", error);
         throw error;
       }
       
+      console.log("OTP sent successfully to:", phone);
       toast.success('Verification code sent to your phone');
+      return true;
     } catch (error: any) {
+      console.error('OTP error details:', error);
       toast.error(error.message || 'Failed to send verification code');
-      console.error('OTP error:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }

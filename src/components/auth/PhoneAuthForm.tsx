@@ -31,6 +31,7 @@ export const PhoneAuthForm = ({ mode }: { mode: "signin" | "signup" }) => {
     
     try {
       await signInWithOTP(phone);
+      // Explicitly set the form state to OTP_INPUT after successfully sending the verification code
       setFormState("OTP_INPUT");
     } catch (error) {
       console.error("Error sending OTP:", error);
