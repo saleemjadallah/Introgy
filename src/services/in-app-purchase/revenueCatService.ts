@@ -1,4 +1,3 @@
-
 import { Capacitor } from '@capacitor/core';
 import { Purchases } from '@revenuecat/purchases-capacitor';
 import { 
@@ -6,7 +5,8 @@ import {
   Purchase,
   PurchasePackageOptions,
   RevenueCatPackage,
-  PurchasesIntroPrice
+  PurchasesIntroPrice,
+  PRODUCT_CATEGORY
 } from './types';
 
 class RevenueCatService {
@@ -56,32 +56,20 @@ class RevenueCatService {
   async purchasePackage(options: PurchasePackageOptions) {
     try {
       // Convert our package type to match RevenueCat's expected format
+      
       // Create a proper IntroPrice object if the product has one
-      let introPrice: PurchasesIntroPrice | undefined = undefined;
-      
-      if (options.aPackage.product.introPrice) {
-        introPrice = {
-          price: options.aPackage.product.introPrice,
-          priceString: options.aPackage.product.introPriceString || '',
-          period: options.aPackage.product.introPricePeriod || 'P1M',
-          cycles: options.aPackage.product.introPriceCycles || 1,
-          periodUnit: 'MONTH',
-          periodNumberOfUnits: 1
-        };
-      }
-      
       const purchaseOptions = {
         aPackage: {
           ...options.aPackage,
           product: {
             ...options.aPackage.product,
-            introPrice: introPrice,
-            discounts: [],
-            productCategory: 'subscription',
+            // If product already has the right introPrice type, use it, otherwise keep it undefined
+            discounts: options.aPackage.product.discounts || [],
+            productCategory: PRODUCT_CATEGORY.SUBSCRIPTION,
             productType: 'subscription',
             subscriptionPeriod: options.aPackage.packageType === 'ANNUAL' ? 'P1Y' : 'P1M',
-            defaultOption: true,
-            subscriptionOptions: []
+            defaultOption: options.aPackage.product.defaultOption || true,
+            subscriptionOptions: options.aPackage.product.subscriptionOptions || []
           }
         },
         presentedOfferingIdentifier: options.presentedOfferingIdentifier

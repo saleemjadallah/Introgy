@@ -92,6 +92,12 @@ export enum PACKAGE_TYPE {
   WEEKLY = "WEEKLY"
 }
 
+// Add enum for product category to match RevenueCat expectations
+export enum PRODUCT_CATEGORY {
+  SUBSCRIPTION = "SUBSCRIPTION",
+  NON_SUBSCRIPTION = "NON_SUBSCRIPTION"
+}
+
 export interface RevenueCatPackage {
   identifier: string;
   packageType: PACKAGE_TYPE;
@@ -122,7 +128,7 @@ export interface RevenueCatProduct {
   introPricePeriod?: string;
   introPriceCycles?: number;
   discounts: any[];
-  productCategory: string;
+  productCategory: PRODUCT_CATEGORY;
   productType: string;
   subscriptionPeriod: string;
   defaultOption: boolean;

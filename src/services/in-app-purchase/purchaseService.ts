@@ -7,7 +7,8 @@ import {
   RevenueCatPackage,
   PurchasePackageOptions,
   PACKAGE_TYPE,
-  ENTITLEMENTS
+  ENTITLEMENTS,
+  PRODUCT_CATEGORY
 } from './types';
 import { revenueCatService } from './revenueCatService';
 import { verifyPurchase, processCustomerInfo } from './purchaseVerification';
@@ -121,9 +122,23 @@ class PurchaseService {
         throw new Error(`Package not found for product ID: ${productId}`);
       }
       
+      // Ensure product has the correct type properties before purchase
+      const enhancedPackage: RevenueCatPackage = {
+        ...packageToPurchase,
+        product: {
+          ...packageToPurchase.product,
+          productCategory: PRODUCT_CATEGORY.SUBSCRIPTION,
+          productType: 'subscription',
+          discounts: packageToPurchase.product.discounts || [],
+          subscriptionPeriod: productId.includes('yearly') ? 'P1Y' : 'P1M',
+          defaultOption: true,
+          subscriptionOptions: []
+        }
+      };
+      
       // Purchase the package using the correct options structure
       const options: PurchasePackageOptions = {
-        aPackage: packageToPurchase,
+        aPackage: enhancedPackage,
         presentedOfferingIdentifier: offerings.offerings.current.identifier
       };
       
