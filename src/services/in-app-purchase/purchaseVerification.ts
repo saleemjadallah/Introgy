@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Purchase, VerificationResult, CustomerInfo } from './types';
+import { ENTITLEMENTS } from './mockProducts';
 
 export async function verifyPurchase(
   purchase: Purchase, 
@@ -52,7 +53,7 @@ export async function verifyPurchase(
 export function processCustomerInfo(customerInfo: CustomerInfo): VerificationResult {
   try {
     // Check if the premium entitlement is active
-    const premiumEntitlement = customerInfo.entitlements.active['premium'];
+    const premiumEntitlement = customerInfo.entitlements.active[ENTITLEMENTS.PREMIUM];
     
     if (!premiumEntitlement) {
       return {

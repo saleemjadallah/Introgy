@@ -99,12 +99,11 @@ export interface RevenueCatProduct {
 
 // For purchasing packages - aligned with the actual Capacitor plugin expectations
 export interface RevenueCatPurchaseOptions {
-  packageIdentifier: string; // This is what we were trying to use
+  packageIdentifier: string;
 }
 
 // The actual expected type by the RevenueCat Capacitor plugin
 export interface PurchasePackageOptions {
-  packageType?: string;
-  aPackage: RevenueCatPackage; // This is what the plugin actually expects
+  aPackage: RevenueCatPackage;
   presentedOfferingIdentifier?: string;
 }

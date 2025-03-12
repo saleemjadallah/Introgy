@@ -30,7 +30,7 @@ export async function restorePurchases(platform: 'ios' | 'android' | 'web'): Pro
   }
 }
 
-// Convert RevenueCat customer info to our Purchase type
+// This function is now handled by purchaseService directly
 export function convertCustomerInfoToPurchases(customerInfo: CustomerInfo): Purchase[] {
   try {
     if (!customerInfo.activeSubscriptions || customerInfo.activeSubscriptions.length === 0) {
