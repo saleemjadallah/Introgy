@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { 
@@ -24,6 +25,7 @@ import {
   convertDbStarter,
   convertDbTemplate
 } from '@/utils/relationshipTypeConverters';
+import { usePremium } from '@/contexts/premium/PremiumContext';
 
 // Import mock data for fallback when not authenticated
 import { 
@@ -49,10 +51,11 @@ export function useRelationshipNurturing() {
   // This hook will now use the smaller, focused hooks to provide a unified interface
   const { toast } = useToast();
   const { batteryLevel } = useSocialBattery();
+  const { isPremium } = usePremium();
   
   // Add missing properties from useRelationshipNurturingData
   const {
-    relationships,
+    relationships: allRelationships,
     insights,
     stats,
     scheduler,
@@ -61,6 +64,12 @@ export function useRelationshipNurturing() {
     setInsights,
     saveSchedulerData
   } = useRelationshipNurturingData();
+  
+  // Limit relationships for free users
+  const MAX_FREE_RELATIONSHIPS = 10;
+  const relationships = isPremium 
+    ? allRelationships 
+    : allRelationships.slice(0, MAX_FREE_RELATIONSHIPS);
   
   // Add placeholder data for the missing properties
   const relationshipHealth: RelationshipHealth[] = mockRelationshipHealth;
@@ -98,6 +107,13 @@ export function useRelationshipNurturing() {
   
   // State for active relationship
   const [activeRelationship, setActiveRelationship] = useState<Relationship | null>(null);
+  
+  // State for tracking if the user has more relationships than the free limit
+  const [hasMoreRelationships, setHasMoreRelationships] = useState<boolean>(false);
+  
+  useEffect(() => {
+    setHasMoreRelationships(!isPremium && allRelationships.length > MAX_FREE_RELATIONSHIPS);
+  }, [isPremium, allRelationships.length]);
 
   // Function to load nurturing data
   const loadNurturingData = () => {
@@ -145,11 +161,14 @@ export function useRelationshipNurturing() {
   return {
     scheduler,
     relationships,
+    allRelationships,
+    hasMoreRelationships,
     scheduledInteractions,
     todayInteractions,
     stats,
     isLoading,
     activeRelationship,
+    MAX_FREE_RELATIONSHIPS,
     
     // Add missing properties
     relationshipHealth,

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useCommunicationProfiles } from '@/hooks/useCommunicationProfiles'; // Updated import path
@@ -12,6 +12,9 @@ import AIProfileWizard from './communication-preferences/AIProfileWizard';
 import { CommunicationProfile } from '@/types/communication-preferences';
 import { MessageCircle, ListPlus, Users, Share2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Lock } from "lucide-react";
+import { usePremium } from '@/contexts/premium/PremiumContext';
 
 const CommunicationPreferences = () => {
   const { toast } = useToast();
@@ -23,6 +26,15 @@ const CommunicationPreferences = () => {
     deleteProfile,
     setDefaultProfile,
   } = useCommunicationProfiles();
+  const { isPremium } = usePremium();
+
+  const MAX_FREE_PROFILES = 3;
+  const [canCreateProfile, setCanCreateProfile] = useState(true);
+
+  // Check if the user can create more profiles
+  useEffect(() => {
+    setCanCreateProfile(isPremium || profiles.length < MAX_FREE_PROFILES);
+  }, [isPremium, profiles.length]);
 
   const [activeTab, setActiveTab] = useState<string>('profiles');
   const [currentProfile, setCurrentProfile] = useState<CommunicationProfile | null>(null);
@@ -35,6 +47,15 @@ const CommunicationPreferences = () => {
   };
 
   const handleCreateNew = (mode: 'template' | 'wizard' | 'ai' = 'template') => {
+    if (!canCreateProfile && !isPremium) {
+      toast({
+        title: 'Free plan limit reached',
+        description: `You can only create ${MAX_FREE_PROFILES} profiles with the free plan. Upgrade to premium for unlimited profiles.`,
+        variant: 'destructive'
+      });
+      return;
+    }
+    
     setCurrentProfile(null);
     setIsCreating(true);
     setCreateMode(mode);
@@ -42,6 +63,15 @@ const CommunicationPreferences = () => {
   };
 
   const handleCreateFromTemplate = (newProfile: CommunicationProfile) => {
+    if (!canCreateProfile && !isPremium) {
+      toast({
+        title: 'Free plan limit reached',
+        description: `You can only create ${MAX_FREE_PROFILES} profiles with the free plan. Upgrade to premium for unlimited profiles.`,
+        variant: 'destructive'
+      });
+      return;
+    }
+    
     createProfile(newProfile);
     toast({
       title: 'Profile created',
@@ -81,6 +111,19 @@ const CommunicationPreferences = () => {
         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Communication Preferences</h2>
         <p className="text-sm sm:text-base text-muted-foreground">Define how you prefer to communicate and share with others</p>
       </div>
+
+      {!isPremium && profiles.length >= MAX_FREE_PROFILES && (
+        <Alert className="bg-amber-50 text-amber-800 border-amber-200">
+          <AlertTitle className="flex items-center gap-2">
+            <Lock className="h-4 w-4" />
+            Free Plan Limitations
+          </AlertTitle>
+          <AlertDescription>
+            You've reached the maximum of {MAX_FREE_PROFILES} communication profiles with your free plan. 
+            Upgrade to premium for unlimited profiles and advanced communication tools.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-5 h-auto">
@@ -130,6 +173,9 @@ const CommunicationPreferences = () => {
             onCreateNew={() => handleCreateNew('template')}
             onSetDefault={handleSetDefault}
             onDeleteProfile={handleProfileDelete}
+            canCreateProfile={canCreateProfile}
+            maxFreeProfiles={MAX_FREE_PROFILES}
+            isPremium={isPremium}
           />
           
           <div className="flex justify-center mt-4">
@@ -137,6 +183,7 @@ const CommunicationPreferences = () => {
               variant="outline"
               onClick={() => handleCreateNew('ai')}
               className="flex items-center gap-2"
+              disabled={!canCreateProfile && !isPremium}
             >
               <Sparkles className="h-4 w-4" />
               Create with AI assistant
@@ -178,6 +225,15 @@ const CommunicationPreferences = () => {
                 });
               } else {
                 // Create new profile
+                if (!canCreateProfile && !isPremium) {
+                  toast({
+                    title: 'Free plan limit reached',
+                    description: `You can only create ${MAX_FREE_PROFILES} profiles with the free plan. Upgrade to premium for unlimited profiles.`,
+                    variant: 'destructive'
+                  });
+                  return;
+                }
+                
                 createProfile(profile);
                 toast({
                   title: 'Profile created',

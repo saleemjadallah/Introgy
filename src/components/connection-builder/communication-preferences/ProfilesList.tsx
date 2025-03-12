@@ -1,3 +1,4 @@
+
 import { 
   Card, 
   CardContent,
@@ -13,6 +14,7 @@ import {
   Trash2,
   Share2,
   MoreVertical, 
+  Lock
 } from 'lucide-react';
 import { CommunicationProfile } from '@/types/communication-preferences';
 import { format } from 'date-fns';
@@ -35,6 +37,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface ProfilesListProps {
   profiles: CommunicationProfile[];
@@ -42,6 +45,9 @@ interface ProfilesListProps {
   onCreateNew: () => void;
   onSetDefault: (profileId: string) => void;
   onDeleteProfile: (profileId: string) => void;
+  canCreateProfile: boolean;
+  maxFreeProfiles: number;
+  isPremium: boolean;
 }
 
 const ProfilesList = ({
@@ -50,6 +56,9 @@ const ProfilesList = ({
   onCreateNew,
   onSetDefault,
   onDeleteProfile,
+  canCreateProfile,
+  maxFreeProfiles,
+  isPremium
 }: ProfilesListProps) => {
   if (profiles.length === 0) {
     return (
@@ -79,11 +88,22 @@ const ProfilesList = ({
           onClick={onCreateNew} 
           size="sm" 
           className="w-full sm:w-auto py-5 sm:py-2 text-base sm:text-sm"
+          disabled={!canCreateProfile && !isPremium}
         >
           <ListPlus className="mr-2 h-4 w-4" />
           Create New Profile
+          {!canCreateProfile && !isPremium && <Lock className="ml-2 h-3.5 w-3.5" />}
         </Button>
       </div>
+
+      {!isPremium && profiles.length > 0 && (
+        <div className="text-sm text-muted-foreground">
+          {canCreateProfile 
+            ? `Using ${profiles.length} of ${maxFreeProfiles} available profiles (Free plan)`
+            : `Free plan limit reached (${profiles.length}/${maxFreeProfiles})`
+          }
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {profiles.map((profile) => (

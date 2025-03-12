@@ -4,7 +4,7 @@ import { PricingFeature } from "./PricingFeatureTypes";
 export const pricingFeatures: PricingFeature[] = [
   {
     name: "Social Battery",
-    free: ["Basic tracking", "Standard activities", "Simple metrics"],
+    free: ["Basic tracking", "3 standard activities", "2 custom activities"],
     premium: ["Advanced tracking", "Custom activities", "Predictive analytics", "Calendar integration"]
   },
   {
@@ -14,7 +14,7 @@ export const pricingFeatures: PricingFeature[] = [
   },
   {
     name: "Connection Builder",
-    free: ["Up to 10 relationships", "Basic communication tools"],
+    free: ["Up to 10 relationships", "Basic communication tools", "3 communication profiles"],
     premium: ["Unlimited relationships", "AI interaction tools", "Advanced nurturing", "Boundary management", "Relationship analytics"]
   },
   {

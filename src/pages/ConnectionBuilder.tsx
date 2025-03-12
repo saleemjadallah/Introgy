@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Brain, MessageCircle, Heart, Shield, Sparkle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import MeaningfulInteractionTools from "@/components/connection-builder/Meaningf
 import BoundaryManager from "@/components/connection-builder/boundary-manager/BoundaryManager";
 import { PremiumFeatureGuard } from "@/components/premium/PremiumFeatureGuard";
 import { usePremium } from "@/contexts/premium/PremiumContext";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Lock } from "lucide-react";
 
 const ConnectionBuilder = () => {
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
@@ -17,9 +19,25 @@ const ConnectionBuilder = () => {
   const renderFeatureContent = () => {
     switch (activeFeature) {
       case 'communication-preferences':
-        return <CommunicationPreferences />;
+        return (
+          <PremiumFeatureGuard 
+            feature="basic-communication-tools"
+            title="Communication Preferences"
+            description="Create up to 3 communication profiles with the free plan. Upgrade to premium for unlimited profiles and advanced features."
+          >
+            <CommunicationPreferences />
+          </PremiumFeatureGuard>
+        );
       case 'relationship-nurturing':
-        return <RelationshipNurturing />;
+        return (
+          <PremiumFeatureGuard 
+            feature="up-to-10-relationships"
+            title="Relationship Nurturing"
+            description="Free plan allows managing up to 10 relationships. Upgrade to premium for unlimited relationships and advanced nurturing tools."
+          >
+            <RelationshipNurturing />
+          </PremiumFeatureGuard>
+        );
       case 'meaningful-interactions':
         return (
           <PremiumFeatureGuard 
@@ -126,13 +144,27 @@ const ConnectionBuilder = () => {
             <p className="text-sm text-muted-foreground">
               Intelligently manage your relationships, get personalized suggestions, and maintain meaningful connections with minimal energy.
             </p>
-            <Button 
-              onClick={() => setActiveFeature('relationship-nurturing')}
-              className="w-full py-5 sm:py-2 text-base sm:text-sm mt-2 bg-white/70 hover:bg-white text-mauve"
-              size="lg"
-            >
-              Open Intelligent Assistant
-            </Button>
+            <div className="space-y-4">
+              {!isPremium && (
+                <Alert className="bg-amber-50 text-amber-800 border-amber-200">
+                  <AlertTitle className="flex items-center gap-2">
+                    <Lock className="h-4 w-4" />
+                    Free Plan Limitations
+                  </AlertTitle>
+                  <AlertDescription>
+                    Free plan allows managing up to 10 relationships with basic tools. 
+                    Upgrade to premium for unlimited relationships and advanced features.
+                  </AlertDescription>
+                </Alert>
+              )}
+              <Button 
+                onClick={() => setActiveFeature('relationship-nurturing')}
+                className="w-full py-5 sm:py-2 text-base sm:text-sm mt-2 bg-white/70 hover:bg-white text-mauve"
+                size="lg"
+              >
+                Open Intelligent Assistant
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

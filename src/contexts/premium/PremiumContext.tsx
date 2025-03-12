@@ -23,6 +23,8 @@ export type PremiumFeature =
   | "full-strategies-access"
   | "real-time-social-support"
   // Connection Builder features
+  | "up-to-10-relationships"
+  | "basic-communication-tools"
   | "unlimited-relationships"
   | "ai-interaction-tools"
   | "advanced-nurturing"
@@ -88,6 +90,8 @@ export const PremiumProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const checkFeatureAccess = (feature: PremiumFeature): boolean => {
     // Free plan features (available to everyone)
     const freeFeatures: PremiumFeature[] = [
+      "up-to-10-relationships",
+      "basic-communication-tools"
       // All non-premium features are implicitly available
     ];
     
