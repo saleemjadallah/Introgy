@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
@@ -14,7 +13,7 @@ import { MessageCircle, ListPlus, Users, Share2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
-import { usePremium } from '@/contexts/premium/PremiumContext';
+import { usePremium } from '@/contexts/premium';
 
 const CommunicationPreferences = () => {
   const { toast } = useToast();

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BatteryStatus } from "@/components/social-battery/BatteryStatus";
@@ -11,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { BatteryCharging } from "lucide-react";
 import { SleepQualityDialog } from "@/components/social-battery/SleepQualityDialog";
 import { PremiumFeatureGuard } from "@/components/premium/PremiumFeatureGuard";
-import { usePremium } from "@/contexts/premium/PremiumContext";
+import { usePremium } from "@/contexts/premium";
 
 const SocialBattery = () => {
   const { batteryLevel, batteryHistory, handleSliderChange, handleActivitySelect } = useSocialBattery();
@@ -20,26 +19,22 @@ const SocialBattery = () => {
   const [showOvernightBadge, setShowOvernightBadge] = useState(false);
   const { isPremium } = usePremium();
 
-  // Check if there was a recent overnight recharge
   useEffect(() => {
     const lastRechargeStr = localStorage.getItem("lastNightlyRecharge");
     if (lastRechargeStr) {
       const lastRecharge = new Date(lastRechargeStr);
       const today = new Date();
       
-      // Show badge if the last recharge was today
       if (lastRecharge.getDate() === today.getDate() && 
           lastRecharge.getMonth() === today.getMonth() && 
           lastRecharge.getFullYear() === today.getFullYear()) {
         setShowOvernightBadge(true);
         
-        // Hide badge after 15 seconds
         setTimeout(() => setShowOvernightBadge(false), 15000);
       }
     }
   }, []);
 
-  // Toast notification when battery level reaches critical levels
   useEffect(() => {
     if (batteryLevel <= 20) {
       toast.warning("Critical Battery Level", {

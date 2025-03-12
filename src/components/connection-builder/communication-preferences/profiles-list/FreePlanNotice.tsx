@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth";
-import { usePremium } from "@/contexts/premium/PremiumContext";
+import { usePremium } from "@/contexts/premium";
 import { toast } from "sonner";
 import { Capacitor } from "@capacitor/core";
 import { PRODUCT_IDS } from "@/services/InAppPurchaseService";

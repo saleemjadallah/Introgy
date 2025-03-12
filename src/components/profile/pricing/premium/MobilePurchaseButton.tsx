@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Star, Loader2, RefreshCw } from "lucide-react";
-import { usePremium } from "@/contexts/premium/PremiumContext";
+import { usePremium } from "@/contexts/premium";
 import { PRODUCT_IDS } from "@/services/InAppPurchaseService";
 import { toast } from "sonner";
 

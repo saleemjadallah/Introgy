@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Lock, Star, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { usePremium, PremiumFeature } from "@/contexts/premium/PremiumContext";
+import { usePremium, PremiumFeature } from "@/contexts/premium";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Capacitor } from "@capacitor/core";
 import { PRODUCT_IDS } from "@/services/InAppPurchaseService";

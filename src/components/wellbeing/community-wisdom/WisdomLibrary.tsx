@@ -8,7 +8,7 @@ import EmptyLibraryMessage from "./library/EmptyLibraryMessage";
 import WisdomDetailView from "./library/WisdomDetailView";
 import WisdomGrid from "./library/WisdomGrid";
 import { useWisdomFilters } from "./library/useWisdomFilters";
-import { usePremium } from "@/contexts/premium/PremiumContext";
+import { usePremium } from "@/contexts/premium";
 import { PremiumFeatureGuard } from "@/components/premium/PremiumFeatureGuard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
