@@ -19,10 +19,10 @@ class RevenueCatService {
 
   async initialize(): Promise<boolean> {
     try {
-      // Initialize RevenueCat SDK with platform-specific API key
+      // Replace these API keys with your actual RevenueCat API keys
       const apiKey = this.platform === 'ios' 
-        ? 'ios_api_key_here' 
-        : 'android_api_key_here';
+        ? 'appl_SzJgXcUsXnIyzkyCTSAQXZozMfb' // Your iOS API key from RevenueCat dashboard
+        : 'goog_YkwgHvPZnlbmIfTBBQLPKHulLkX'; // Your Android API key from RevenueCat dashboard
       
       await Purchases.configure({
         apiKey,
