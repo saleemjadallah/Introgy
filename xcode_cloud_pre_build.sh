@@ -10,6 +10,14 @@ if [[ ! -z "$CI_XCODE_CLOUD" ]]; then
   # Print working directory for debugging
   echo "Working directory: $(pwd)"
 
+  # Install npm dependencies if needed
+  echo "Installing npm dependencies..."
+  npm ci
+  
+  # Run Capacitor sync to ensure iOS platform is properly configured
+  echo "Running Capacitor sync..."
+  npx cap sync ios
+  
   # Copy RevenueCat plugin files from node_modules to the appropriate location
   echo "Copying RevenueCat plugin files..."
   mkdir -p ios/App/RevenuecatPurchasesCapacitor/Plugin

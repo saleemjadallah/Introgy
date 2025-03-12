@@ -1,0 +1,15 @@
+{
+  "ios": {
+    "dependencyPaths": [
+      "node_modules/@capacitor/ios",
+      "node_modules/@capacitor/core",
+      "node_modules/@capacitor/app",
+      "node_modules/@capacitor/device",
+      "node_modules/@capacitor/local-notifications",
+      "node_modules/@capacitor/preferences",
+      "node_modules/@capacitor/splash-screen",
+      "node_modules/@capacitor/status-bar",
+      "node_modules/@revenuecat/purchases-capacitor"
+    ]
+  }
+}
