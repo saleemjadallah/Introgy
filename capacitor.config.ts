@@ -2,7 +2,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.4cb77e9924114b1d9e47bac88f43f4af',
+  appId: 'com.introgy.app',
   appName: 'Introgy',
   webDir: 'dist',
   server: {
