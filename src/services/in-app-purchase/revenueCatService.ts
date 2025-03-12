@@ -1,10 +1,12 @@
+
 import { Capacitor } from '@capacitor/core';
 import { Purchases } from '@revenuecat/purchases-capacitor';
 import { 
   CustomerInfo, 
   Purchase,
   PurchasePackageOptions,
-  RevenueCatPackage
+  RevenueCatPackage,
+  PurchasesIntroPrice
 } from './types';
 
 class RevenueCatService {
@@ -54,11 +56,26 @@ class RevenueCatService {
   async purchasePackage(options: PurchasePackageOptions) {
     try {
       // Convert our package type to match RevenueCat's expected format
+      // Create a proper IntroPrice object if the product has one
+      let introPrice: PurchasesIntroPrice | undefined = undefined;
+      
+      if (options.aPackage.product.introPrice) {
+        introPrice = {
+          price: options.aPackage.product.introPrice,
+          priceString: options.aPackage.product.introPriceString || '',
+          period: options.aPackage.product.introPricePeriod || 'P1M',
+          cycles: options.aPackage.product.introPriceCycles || 1,
+          periodUnit: 'MONTH',
+          periodNumberOfUnits: 1
+        };
+      }
+      
       const purchaseOptions = {
         aPackage: {
           ...options.aPackage,
           product: {
             ...options.aPackage.product,
+            introPrice: introPrice,
             discounts: [],
             productCategory: 'subscription',
             productType: 'subscription',

@@ -1,3 +1,4 @@
+
 export const PRODUCT_IDS = {
   PREMIUM_MONTHLY: 'app.introgy.premium.monthly',
   PREMIUM_YEARLY: 'app.introgy.premium.yearly',
@@ -98,6 +99,16 @@ export interface RevenueCatPackage {
   offeringIdentifier?: string;
 }
 
+// Define the PurchasesIntroPrice interface to match RevenueCat's expectations
+export interface PurchasesIntroPrice {
+  price: number;
+  priceString: string;
+  period: string;
+  cycles: number;
+  periodUnit: string; 
+  periodNumberOfUnits: number;
+}
+
 // Updated to match RevenueCat's PurchasesStoreProduct
 export interface RevenueCatProduct {
   identifier: string;
@@ -106,7 +117,7 @@ export interface RevenueCatProduct {
   price: number;
   priceString: string;
   currencyCode: string;
-  introPrice?: number;
+  introPrice?: PurchasesIntroPrice;
   introPriceString?: string;
   introPricePeriod?: string;
   introPriceCycles?: number;

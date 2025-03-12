@@ -6,9 +6,9 @@ import {
   RevenueCatOfferings,
   RevenueCatPackage,
   PurchasePackageOptions,
-  PACKAGE_TYPE
+  PACKAGE_TYPE,
+  ENTITLEMENTS
 } from './types';
-import { ENTITLEMENTS } from './mockProducts';
 import { revenueCatService } from './revenueCatService';
 import { verifyPurchase, processCustomerInfo } from './purchaseVerification';
 import { restorePurchases } from './purchaseRestoration';
