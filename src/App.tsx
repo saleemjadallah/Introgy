@@ -19,6 +19,7 @@ import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 import Onboarding from "./pages/Onboarding";
 import { AuthCallback } from "@/components/auth";
+import PaymentSuccess from "./pages/PaymentSuccess";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ function App() {
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/auth/callback" element={<AuthCallback />} />
                   <Route path="/onboarding" element={<Onboarding />} />
+                  <Route path="/payment-success" element={<PaymentSuccess />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>

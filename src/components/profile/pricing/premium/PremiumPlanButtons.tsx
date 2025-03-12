@@ -1,7 +1,11 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/auth";
+import { toast } from "sonner";
 
 interface PremiumPlanButtonsProps {
   isMobile: boolean;
@@ -16,14 +20,53 @@ const PremiumPlanButtons: React.FC<PremiumPlanButtonsProps> = ({
   isUpgrading, 
   onSubscribe 
 }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleCheckout = async (planType: 'monthly' | 'yearly') => {
+    if (!user) {
+      toast.error("You need to be logged in to upgrade");
+      navigate("/auth?mode=signin");
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+
+      // Call the Stripe checkout edge function
+      const { data, error } = await supabase.functions.invoke('stripe-checkout', {
+        body: { planType, userId: user.id }
+      });
+
+      if (error) {
+        console.error("Checkout error:", error);
+        toast.error("Failed to start checkout process");
+        return;
+      }
+
+      // Redirect to Stripe checkout page
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error during checkout:", err);
+      toast.error("Failed to process checkout");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   if (isMobile) {
     return (
       <Button 
         className="w-full" 
-        onClick={() => onSubscribe('monthly')}
-        disabled={isUpgrading || isPremium}
+        onClick={() => handleCheckout('monthly')}
+        disabled={isProcessing || isPremium}
       >
-        {isUpgrading ? (
+        {isProcessing ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Processing...
@@ -42,10 +85,10 @@ const PremiumPlanButtons: React.FC<PremiumPlanButtonsProps> = ({
     <>
       <Button 
         className="w-1/2" 
-        onClick={() => onSubscribe('monthly')}
-        disabled={isUpgrading || isPremium}
+        onClick={() => handleCheckout('monthly')}
+        disabled={isProcessing || isPremium}
       >
-        {isUpgrading ? (
+        {isProcessing ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Processing...
@@ -59,11 +102,11 @@ const PremiumPlanButtons: React.FC<PremiumPlanButtonsProps> = ({
       </Button>
       <Button 
         className="w-1/2" 
-        onClick={() => onSubscribe('yearly')}
-        disabled={isUpgrading || isPremium}
+        onClick={() => handleCheckout('yearly')}
+        disabled={isProcessing || isPremium}
         variant="outline"
       >
-        {isUpgrading ? (
+        {isProcessing ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Processing...

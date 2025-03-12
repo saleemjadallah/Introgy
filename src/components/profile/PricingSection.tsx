@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/auth";
 import { toast } from "sonner";
@@ -10,12 +10,30 @@ import LoadingPricingSection from "./pricing/LoadingPricingSection";
 import MobilePricingLayout from "./pricing/MobilePricingLayout";
 import DesktopPricingLayout from "./pricing/DesktopPricingLayout";
 import MoneyBackGuarantee from "./pricing/MoneyBackGuarantee";
+import { useSearchParams } from "react-router-dom";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { XCircle } from "lucide-react";
 
 const PricingSection = () => {
   const { user } = useAuth();
   const { isPremium, isLoading, upgradeToPremium } = usePremium();
   const isMobile = useIsMobile();
   const [isUpgrading, setIsUpgrading] = useState<boolean>(false);
+  const [searchParams] = useSearchParams();
+  const [showCanceledMessage, setShowCanceledMessage] = useState(false);
+
+  useEffect(() => {
+    // Check if payment was canceled
+    const canceled = searchParams.get('canceled');
+    if (canceled === 'true') {
+      setShowCanceledMessage(true);
+      // Auto-hide the message after 5 seconds
+      const timer = setTimeout(() => {
+        setShowCanceledMessage(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
 
   // Mock subscription function
   const handleSubscribe = async (planType: 'monthly' | 'yearly') => {
@@ -53,6 +71,15 @@ const PricingSection = () => {
           {isPremium ? "Premium" : "Free Plan"}
         </Badge>
       </div>
+
+      {showCanceledMessage && (
+        <Alert variant="destructive" className="bg-destructive/10 border-destructive/30">
+          <AlertDescription className="flex items-center gap-2">
+            <XCircle className="h-4 w-4" />
+            Payment canceled. Your subscription has not been changed.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {isMobile ? (
         <MobilePricingLayout 
