@@ -16,6 +16,7 @@ import {
   HelpCircle,
   DollarSign
 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 import ProfileSection from "@/components/profile/ProfileSection";
 import SettingsSection from "@/components/profile/SettingsSection";
@@ -86,28 +87,55 @@ const Profile = () => {
           </p>
         </div>
         
-        <TabsList className={`grid ${isMobile ? 'grid-cols-3 mb-4' : 'grid-cols-5 mb-8'} w-full`}>
-          <TabsTrigger value="profile" className="gap-2">
-            <User size={isMobile ? 14 : 16} /> 
-            <span className={isMobile ? "hidden sm:inline" : ""}>Profile</span>
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="gap-2">
-            <Settings size={isMobile ? 14 : 16} /> 
-            <span className={isMobile ? "hidden sm:inline" : ""}>Settings</span>
-          </TabsTrigger>
-          <TabsTrigger value="badges" className="gap-2">
-            <Award size={isMobile ? 14 : 16} /> 
-            <span className={isMobile ? "hidden sm:inline" : ""}>Badges</span>
-          </TabsTrigger>
-          <TabsTrigger value="pricing" className="gap-2">
-            <DollarSign size={isMobile ? 14 : 16} /> 
-            <span className={isMobile ? "hidden sm:inline" : ""}>Pricing</span>
-          </TabsTrigger>
-          <TabsTrigger value="help" className="gap-2">
-            <HelpCircle size={isMobile ? 14 : 16} /> 
-            <span className={isMobile ? "hidden sm:inline" : ""}>Help</span>
-          </TabsTrigger>
-        </TabsList>
+        {isMobile ? (
+          <ScrollArea orientation="horizontal" className="w-full pb-4" type="native">
+            <TabsList className="inline-flex w-max px-1">
+              <TabsTrigger value="profile" className="gap-1 px-3">
+                <User size={14} /> 
+                <span>Profile</span>
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="gap-1 px-3">
+                <Settings size={14} /> 
+                <span>Settings</span>
+              </TabsTrigger>
+              <TabsTrigger value="badges" className="gap-1 px-3">
+                <Award size={14} /> 
+                <span>Badges</span>
+              </TabsTrigger>
+              <TabsTrigger value="pricing" className="gap-1 px-3">
+                <DollarSign size={14} /> 
+                <span>Pricing</span>
+              </TabsTrigger>
+              <TabsTrigger value="help" className="gap-1 px-3">
+                <HelpCircle size={14} /> 
+                <span>Help</span>
+              </TabsTrigger>
+            </TabsList>
+          </ScrollArea>
+        ) : (
+          <TabsList className="grid grid-cols-5 mb-8 w-full">
+            <TabsTrigger value="profile" className="gap-2">
+              <User size={16} /> 
+              <span>Profile</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-2">
+              <Settings size={16} /> 
+              <span>Settings</span>
+            </TabsTrigger>
+            <TabsTrigger value="badges" className="gap-2">
+              <Award size={16} /> 
+              <span>Badges</span>
+            </TabsTrigger>
+            <TabsTrigger value="pricing" className="gap-2">
+              <DollarSign size={16} /> 
+              <span>Pricing</span>
+            </TabsTrigger>
+            <TabsTrigger value="help" className="gap-2">
+              <HelpCircle size={16} /> 
+              <span>Help</span>
+            </TabsTrigger>
+          </TabsList>
+        )}
         
         <TabsContent value="profile">
           <ProfileSection />
