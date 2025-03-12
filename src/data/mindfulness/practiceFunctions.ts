@@ -15,9 +15,25 @@ export const mindfulnessPractices: MindfulnessPractice[] = [
   ...deepFocusPractices
 ];
 
+// Define the 5 free practices for non-premium users
+const freePracticeIds = [
+  'sr-001', // Simple breathing exercise
+  'ec-001', // Basic energy conservation
+  'qs-001', // Simple quiet strength practice
+  'prep-001', // Basic preparation exercise
+  'df-001', // Simple deep focus practice
+];
+
 // API endpoint simulation functions
-export const getPractices = (filters?: PracticeFilterOptions) => {
+export const getPractices = (filters?: PracticeFilterOptions, isPremium: boolean = false) => {
   let filteredPractices = [...mindfulnessPractices];
+  
+  // If not premium, limit to free practices
+  if (!isPremium) {
+    filteredPractices = filteredPractices.filter(practice => 
+      freePracticeIds.includes(practice.id)
+    );
+  }
   
   if (filters) {
     if (filters.category) {
@@ -63,11 +79,18 @@ export const getPractices = (filters?: PracticeFilterOptions) => {
   return filteredPractices;
 };
 
-export const getPracticeById = (id: string) => {
-  return mindfulnessPractices.find(practice => practice.id === id);
+export const getPracticeById = (id: string, isPremium: boolean = false) => {
+  const practice = mindfulnessPractices.find(practice => practice.id === id);
+  
+  // If not premium and trying to access a premium practice, return null
+  if (!isPremium && practice && !freePracticeIds.includes(id)) {
+    return null;
+  }
+  
+  return practice;
 };
 
-export const getRecommendedPractices = (batteryLevel: number, timeOfDay: 'morning' | 'afternoon' | 'evening', previousPractices: string[] = []) => {
+export const getRecommendedPractices = (batteryLevel: number, timeOfDay: 'morning' | 'afternoon' | 'evening', previousPractices: string[] = [], isPremium: boolean = false) => {
   // Simple recommendation algorithm based on energy level and time of day
   let recommendations: MindfulnessPractice[] = [];
   
@@ -102,6 +125,11 @@ export const getRecommendedPractices = (batteryLevel: number, timeOfDay: 'mornin
   // Remove practices that user has recently done
   if (previousPractices.length > 0) {
     recommendations = recommendations.filter(p => !previousPractices.includes(p.id));
+  }
+  
+  // If not premium, limit to free practices
+  if (!isPremium) {
+    recommendations = recommendations.filter(p => freePracticeIds.includes(p.id));
   }
   
   // Return top 3 recommendations, or all if less than 3

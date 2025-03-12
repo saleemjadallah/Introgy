@@ -1,3 +1,4 @@
+
 import { LineChart, BookOpen, Users, Battery, Book, ChevronDown, AlertCircle, User, MessageSquare, MountainSnow } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -12,10 +13,17 @@ import MindfulnessExercises from "@/components/wellbeing/mindfulness/Mindfulness
 import EducationCenter from "@/components/wellbeing/education/EducationCenter";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePremium } from "@/contexts/premium/PremiumContext"; 
+import { Star } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useNavigate } from "react-router-dom";
+import { PremiumFeatureGuard } from "@/components/premium/PremiumFeatureGuard";
 
 const Wellbeing = () => {
   const [activeSection, setActiveSection] = useState<'overview' | 'education' | 'wisdom' | 'mindfulness'>('overview');
   const isMobile = useIsMobile();
+  const { isPremium } = usePremium();
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-4 w-full max-w-full">
@@ -66,6 +74,22 @@ const Wellbeing = () => {
           </div>
         </ScrollArea>
       </div>
+
+      {!isPremium && activeSection !== 'overview' && (
+        <Alert className="bg-muted/50 border border-primary/20">
+          <AlertDescription className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <span>Free plan includes 5 basic mindfulness exercises and limited community access.</span>
+            <Button 
+              size="sm" 
+              onClick={() => navigate("/profile?tab=pricing")}
+              className="whitespace-nowrap"
+            >
+              <Star className="h-4 w-4 mr-2" />
+              Upgrade to Premium
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {activeSection === 'overview' ? (
         <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2'} gap-4 w-full max-w-full`}>

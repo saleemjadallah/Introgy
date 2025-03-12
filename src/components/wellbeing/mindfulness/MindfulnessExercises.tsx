@@ -8,6 +8,7 @@ import MindfulMomentsTab from "./tabs/MindfulMomentsTab";
 import PracticeBuilder from "./PracticeBuilder";
 import { useMindfulnessPractices } from "./hooks/useMindfulnessPractices";
 import { useSocialBattery } from "@/hooks/useSocialBattery";
+import { PremiumFeatureGuard } from "@/components/premium/PremiumFeatureGuard";
 
 const MindfulnessExercises = () => {
   const [activeTab, setActiveTab] = useState("discover");
@@ -50,12 +51,18 @@ const MindfulnessExercises = () => {
         </TabsContent>
         
         <TabsContent value="recommended">
-          <RecommendedTab 
-            timeOfDay={getTimeOfDay()}
-            batteryLevel={batteryLevel}
-            completedPractices={completedPractices}
-            onSelectPractice={handleSelectPractice}
-          />
+          <PremiumFeatureGuard 
+            feature="personalized-recommendations"
+            title="Premium Recommendations"
+            description="Personalized practice recommendations require a premium subscription"
+          >
+            <RecommendedTab 
+              timeOfDay={getTimeOfDay()}
+              batteryLevel={batteryLevel}
+              completedPractices={completedPractices}
+              onSelectPractice={handleSelectPractice}
+            />
+          </PremiumFeatureGuard>
         </TabsContent>
         
         <TabsContent value="history">
@@ -71,7 +78,13 @@ const MindfulnessExercises = () => {
         </TabsContent>
         
         <TabsContent value="builder">
-          <PracticeBuilder />
+          <PremiumFeatureGuard 
+            feature="custom-ritual-creation"
+            title="Premium Practice Builder"
+            description="Creating custom mindfulness practices requires a premium subscription"
+          >
+            <PracticeBuilder />
+          </PremiumFeatureGuard>
         </TabsContent>
       </Tabs>
     </div>

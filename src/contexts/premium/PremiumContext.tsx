@@ -91,7 +91,7 @@ export const PremiumProvider: React.FC<{ children: React.ReactNode }> = ({ child
     // Free plan features (available to everyone)
     const freeFeatures: PremiumFeature[] = [
       "up-to-10-relationships",
-      "basic-communication-tools"
+      "basic-communication-tools",
       // All non-premium features are implicitly available
     ];
     

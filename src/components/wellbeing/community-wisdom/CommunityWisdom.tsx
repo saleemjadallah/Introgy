@@ -6,6 +6,12 @@ import WisdomLibrary from "./WisdomLibrary";
 import { WisdomItem } from "@/types/community-wisdom";
 import { useToast } from "@/hooks/use-toast";
 import { generateSeedWisdom } from "./wisdomSeedData";
+import { usePremium } from "@/contexts/premium/PremiumContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { PremiumFeatureGuard } from "@/components/premium/PremiumFeatureGuard";
 
 const CommunityWisdom = () => {
   const [wisdomItems, setWisdomItems] = useState<WisdomItem[]>(() => {
@@ -20,6 +26,8 @@ const CommunityWisdom = () => {
   });
   
   const { toast } = useToast();
+  const { isPremium } = usePremium();
+  const navigate = useNavigate();
 
   const handleSubmitWisdom = (newWisdom: WisdomItem) => {
     const updatedWisdom = [newWisdom, ...wisdomItems];
@@ -33,6 +41,15 @@ const CommunityWisdom = () => {
   };
 
   const handleToggleSaveWisdom = (id: string) => {
+    // Free users can only save 5 items
+    if (!isPremium && !savedItems.includes(id) && savedItems.length >= 5) {
+      toast({
+        title: "Free plan limit reached",
+        description: "Upgrade to premium to save unlimited wisdom items.",
+      });
+      return;
+    }
+    
     let updatedSavedItems;
     
     if (savedItems.includes(id)) {
@@ -67,8 +84,27 @@ const CommunityWisdom = () => {
     });
   };
 
+  // Free users can only save up to 5 items
+  const showSavedLimitWarning = !isPremium && savedItems.length >= 5;
+
   return (
     <div className="space-y-6">
+      {!isPremium && (
+        <Alert className="bg-muted/50 border border-primary/20">
+          <AlertDescription className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <span>Free plan limits community wisdom access to 10 items and 5 saved items.</span>
+            <Button 
+              size="sm" 
+              onClick={() => navigate("/profile?tab=pricing")}
+              className="whitespace-nowrap"
+            >
+              <Star className="h-4 w-4 mr-2" />
+              Upgrade to Premium
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <Tabs defaultValue="contribute" className="w-full">
         <TabsList className="w-full grid grid-cols-4">
           <TabsTrigger value="contribute">Contribute</TabsTrigger>
@@ -89,6 +125,13 @@ const CommunityWisdom = () => {
           />
         </TabsContent>
         <TabsContent value="saved" className="space-y-4 mt-6">
+          {showSavedLimitWarning && (
+            <Alert className="mb-4">
+              <AlertDescription>
+                You've reached the maximum of 5 saved items in the free plan.
+              </AlertDescription>
+            </Alert>
+          )}
           <WisdomLibrary 
             wisdomItems={wisdomItems}
             savedItems={savedItems}
