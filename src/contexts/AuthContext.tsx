@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,7 +12,7 @@ interface AuthContextProps {
   signIn: (credentials: { email?: string; phone?: string; password?: string; }) => Promise<void>;
   signUp: (credentials: { email?: string; phone?: string; password?: string; displayName?: string; }) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  signInWithOTP: (phone: string) => Promise<void>;
+  signInWithOTP: (phone: string) => Promise<boolean>; // Changed from Promise<void> to Promise<boolean>
   verifyOTP: (phone: string, token: string) => Promise<void>;
   signOut: () => Promise<void>;
   isAuthenticated: boolean;
