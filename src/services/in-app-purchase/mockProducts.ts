@@ -23,3 +23,13 @@ export function getMockProducts(): Product[] {
     }
   ];
 }
+
+// RevenueCat entitlement identifiers
+export const ENTITLEMENTS = {
+  PREMIUM: 'premium'
+};
+
+// RevenueCat offering identifiers
+export const OFFERINGS = {
+  DEFAULT: 'default'
+};

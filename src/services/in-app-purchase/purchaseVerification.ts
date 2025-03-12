@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Purchase, VerificationResult } from './types';
+import { Purchase, VerificationResult, RevenueCatCustomerInfo } from './types';
 
 export async function verifyPurchase(
   purchase: Purchase, 
@@ -8,7 +8,7 @@ export async function verifyPurchase(
   platform: 'ios' | 'android' | 'web'
 ): Promise<VerificationResult> {
   try {
-    console.log('Simulating purchase verification for', purchase.productId);
+    console.log('Verifying purchase for', purchase.productId);
     
     const planType = purchase.productId.includes('yearly') ? 'yearly' : 'monthly';
     const expiresAt = new Date();
@@ -40,6 +40,45 @@ export async function verifyPurchase(
     };
   } catch (err) {
     console.error('Error during purchase verification:', err);
+    return {
+      success: false,
+      planType: 'monthly',
+      expiresAt: new Date().toISOString(),
+      error: err.message
+    };
+  }
+}
+
+export function processCustomerInfo(customerInfo: RevenueCatCustomerInfo): VerificationResult {
+  try {
+    // Check if the premium entitlement is active
+    const premiumEntitlement = customerInfo.entitlements.active['premium'];
+    
+    if (!premiumEntitlement) {
+      return {
+        success: false,
+        planType: 'monthly',
+        expiresAt: new Date().toISOString(),
+        error: 'No active premium entitlement'
+      };
+    }
+    
+    // Determine plan type based on subscription period
+    const planType: 'monthly' | 'yearly' = 
+      premiumEntitlement.periodType.includes('annual') ? 'yearly' : 'monthly';
+    
+    // Get expiration date
+    const expiresAt = premiumEntitlement.expirationDate || 
+      new Date(Date.now() + 31536000000).toISOString(); // Default to 1 year if no expiration
+    
+    return {
+      success: true,
+      planType,
+      expiresAt,
+      error: undefined
+    };
+  } catch (err) {
+    console.error('Error processing customer info:', err);
     return {
       success: false,
       planType: 'monthly',

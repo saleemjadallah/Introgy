@@ -1,9 +1,18 @@
 
 import { Capacitor } from '@capacitor/core';
-import { Product, Purchase, VerificationResult, PurchaseListener } from './in-app-purchase/types';
-import { getMockProducts } from './in-app-purchase/mockProducts';
-import { verifyPurchase } from './in-app-purchase/purchaseVerification';
-import { restorePurchases } from './in-app-purchase/purchaseRestoration';
+import { 
+  Product, 
+  Purchase, 
+  VerificationResult, 
+  PurchaseListener,
+  RevenueCatOfferings,
+  RevenueCatPurchaseResult,
+  RevenueCatCustomerInfo
+} from './in-app-purchase/types';
+import { getMockProducts, ENTITLEMENTS, OFFERINGS } from './in-app-purchase/mockProducts';
+import { verifyPurchase, processCustomerInfo } from './in-app-purchase/purchaseVerification';
+import { restorePurchases, convertCustomerInfoToPurchases } from './in-app-purchase/purchaseRestoration';
+import { Purchases } from '@revenuecat/purchases-capacitor';
 
 export { PRODUCT_IDS } from './in-app-purchase/types';
 export type { Product, Purchase, VerificationResult, ProductType } from './in-app-purchase/types';
@@ -13,6 +22,7 @@ class InAppPurchaseService {
   private productCache: Product[] = [];
   private listeners: PurchaseListener[] = [];
   private platform: 'ios' | 'android' | 'web' = 'web';
+  private isRevenueCatInitialized = false;
 
   constructor() {
     console.log('InAppPurchaseService initialized, native:', this.isNative);
@@ -24,8 +34,52 @@ class InAppPurchaseService {
         this.platform = 'android';
       }
       
-      this.productCache = getMockProducts();
+      this.initializeRevenueCat();
     }
+  }
+
+  private async initializeRevenueCat() {
+    if (!this.isNative) return;
+    
+    try {
+      // Initialize RevenueCat SDK 
+      // Replace with your actual RevenueCat API key
+      const apiKey = this.platform === 'ios' 
+        ? 'ios_api_key_here' 
+        : 'android_api_key_here';
+      
+      await Purchases.configure({
+        apiKey,
+        appUserID: null // Will use anonymous ID initially
+      });
+      
+      // Set up a listener for purchase events
+      Purchases.addCustomerInfoUpdateListener((info: RevenueCatCustomerInfo) => {
+        console.log('RevenueCat customer info updated:', info);
+        const purchases = convertCustomerInfoToPurchases(info);
+        purchases.forEach(purchase => this.notifyListeners(purchase));
+      });
+      
+      this.isRevenueCatInitialized = true;
+      console.log('RevenueCat SDK initialized successfully');
+    } catch (error) {
+      console.error('Error initializing RevenueCat:', error);
+    }
+  }
+
+  async setUserId(userId: string) {
+    if (!this.isNative || !this.isRevenueCatInitialized) return;
+    
+    try {
+      await Purchases.logIn({ appUserID: userId });
+      console.log('RevenueCat user ID set:', userId);
+    } catch (error) {
+      console.error('Error setting RevenueCat user ID:', error);
+    }
+  }
+
+  private notifyListeners(purchase: Purchase) {
+    this.listeners.forEach(listener => listener(purchase));
   }
 
   async getProducts(): Promise<Product[]> {
@@ -33,12 +87,46 @@ class InAppPurchaseService {
       return getMockProducts();
     }
     
-    if (this.productCache.length === 0) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      this.productCache = getMockProducts();
+    if (this.productCache.length > 0) {
+      return this.productCache;
     }
     
-    return this.productCache;
+    try {
+      if (!this.isRevenueCatInitialized) {
+        await this.initializeRevenueCat();
+      }
+      
+      // Fetch offerings from RevenueCat
+      const { offerings } = await Purchases.getOfferings() as { offerings: RevenueCatOfferings };
+      
+      if (!offerings || !offerings.current) {
+        console.log('No RevenueCat offerings available, using mock products');
+        this.productCache = getMockProducts();
+        return this.productCache;
+      }
+      
+      // Convert RevenueCat products to our Product type
+      const products: Product[] = offerings.current.availablePackages.map(pkg => {
+        const product = pkg.product;
+        return {
+          id: product.identifier,
+          title: product.title,
+          description: product.description,
+          price: product.priceString,
+          priceAsNumber: product.price,
+          currency: product.currencyCode,
+          type: product.identifier.includes('yearly') ? 'yearly' : 'monthly'
+        };
+      });
+      
+      this.productCache = products;
+      return products;
+    } catch (error) {
+      console.error('Error getting products from RevenueCat:', error);
+      // Fall back to mock products
+      this.productCache = getMockProducts();
+      return this.productCache;
+    }
   }
 
   async purchaseProduct(productId: string): Promise<Purchase | null> {
@@ -57,23 +145,89 @@ class InAppPurchaseService {
       return mockPurchase;
     }
 
-    console.log('Simulating purchase for product:', productId);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const purchase = {
-      productId,
-      transactionId: `transaction-${Date.now()}`,
-      timestamp: Date.now(),
-      receipt: `receipt-${Date.now()}`,
-      platform: this.platform as 'ios' | 'android'
-    };
-    
-    this.listeners.forEach(listener => listener(purchase));
-    return purchase;
+    try {
+      if (!this.isRevenueCatInitialized) {
+        await this.initializeRevenueCat();
+      }
+      
+      console.log('Purchasing product with RevenueCat:', productId);
+      
+      // Get the offerings first
+      const { offerings } = await Purchases.getOfferings() as { offerings: RevenueCatOfferings };
+      
+      if (!offerings || !offerings.current) {
+        throw new Error('No RevenueCat offerings available');
+      }
+      
+      // Find the package containing the product
+      const packageToPurchase = offerings.current.availablePackages.find(
+        pkg => pkg.product.identifier === productId
+      );
+      
+      if (!packageToPurchase) {
+        throw new Error(`Package not found for product ID: ${productId}`);
+      }
+      
+      // Purchase the package
+      const { customerInfo, productIdentifier } = await Purchases.purchasePackage({ 
+        packageIdentifier: packageToPurchase.identifier 
+      }) as { 
+        customerInfo: RevenueCatCustomerInfo,
+        productIdentifier: string
+      };
+      
+      console.log('RevenueCat purchase successful:', productIdentifier);
+      
+      // Create our Purchase object
+      const purchase: Purchase = {
+        productId: productIdentifier,
+        transactionId: `revenuecat-${Date.now()}`,
+        timestamp: Date.now(),
+        platform: this.platform
+      };
+      
+      // Notify listeners
+      this.notifyListeners(purchase);
+      
+      return purchase;
+    } catch (error) {
+      console.error('Error purchasing with RevenueCat:', error);
+      return null;
+    }
   }
 
   async verifyPurchase(purchase: Purchase, userId: string): Promise<VerificationResult> {
-    return verifyPurchase(purchase, userId, this.platform);
+    if (!this.isNative) {
+      return verifyPurchase(purchase, userId, this.platform);
+    }
+    
+    try {
+      if (!this.isRevenueCatInitialized) {
+        await this.initializeRevenueCat();
+      }
+      
+      // Get the customer info from RevenueCat
+      const customerInfo = await Purchases.getCustomerInfo() as RevenueCatCustomerInfo;
+      
+      // Process the customer info
+      const verificationResult = processCustomerInfo(customerInfo);
+      
+      // If verification successful, store in database
+      if (verificationResult.success) {
+        // Store in Supabase
+        await verifyPurchase(purchase, userId, this.platform);
+      }
+      
+      return verificationResult;
+    } catch (error) {
+      console.error('Error verifying purchase with RevenueCat:', error);
+      return {
+        success: false,
+        planType: 'monthly',
+        expiresAt: new Date().toISOString(),
+        error: error.message
+      };
+    }
   }
 
   async restorePurchases(): Promise<Purchase[]> {
@@ -82,10 +236,50 @@ class InAppPurchaseService {
       return [];
     }
     
-    console.log('Simulating restore purchases');
-    const purchases = await restorePurchases(this.platform);
-    purchases.forEach(purchase => this.listeners.forEach(listener => listener(purchase)));
-    return purchases;
+    try {
+      if (!this.isRevenueCatInitialized) {
+        await this.initializeRevenueCat();
+      }
+      
+      console.log('Restoring purchases with RevenueCat');
+      
+      // Restore purchases with RevenueCat
+      const customerInfo = await Purchases.restorePurchases() as RevenueCatCustomerInfo;
+      
+      // Convert to our Purchase type
+      const purchases = convertCustomerInfoToPurchases(customerInfo);
+      
+      // Notify listeners
+      purchases.forEach(purchase => this.notifyListeners(purchase));
+      
+      return purchases;
+    } catch (error) {
+      console.error('Error restoring purchases with RevenueCat:', error);
+      return [];
+    }
+  }
+
+  async checkEntitlementStatus(): Promise<boolean> {
+    if (!this.isNative) {
+      // For web, check with our backend
+      const restoredPurchases = await restorePurchases('web');
+      return restoredPurchases.length > 0;
+    }
+    
+    try {
+      if (!this.isRevenueCatInitialized) {
+        await this.initializeRevenueCat();
+      }
+      
+      // Get customer info from RevenueCat
+      const customerInfo = await Purchases.getCustomerInfo() as RevenueCatCustomerInfo;
+      
+      // Check if the premium entitlement is active
+      return !!customerInfo.entitlements.active[ENTITLEMENTS.PREMIUM];
+    } catch (error) {
+      console.error('Error checking entitlement status:', error);
+      return false;
+    }
   }
 
   addPurchaseListener(listener: PurchaseListener): void {

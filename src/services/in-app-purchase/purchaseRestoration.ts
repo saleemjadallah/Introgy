@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Purchase, PRODUCT_IDS } from './types';
+import { Purchase, PRODUCT_IDS, RevenueCatCustomerInfo } from './types';
 
 export async function restorePurchases(platform: 'ios' | 'android' | 'web'): Promise<Purchase[]> {
   try {
@@ -26,6 +26,27 @@ export async function restorePurchases(platform: 'ios' | 'android' | 'web'): Pro
     return [restoredPurchase];
   } catch (err) {
     console.error('Error restoring purchases:', err);
+    return [];
+  }
+}
+
+// Convert RevenueCat customer info to our Purchase type
+export function convertCustomerInfoToPurchases(customerInfo: RevenueCatCustomerInfo): Purchase[] {
+  try {
+    if (!customerInfo.activeSubscriptions || customerInfo.activeSubscriptions.length === 0) {
+      return [];
+    }
+    
+    return customerInfo.activeSubscriptions.map(productId => {
+      return {
+        productId,
+        transactionId: `revenuecat-${Date.now()}`,
+        timestamp: Date.now(),
+        platform: 'ios' // This would be determined in a real implementation
+      };
+    });
+  } catch (err) {
+    console.error('Error converting customer info to purchases:', err);
     return [];
   }
 }
