@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, CreditCard, DollarSign } from "lucide-react";
+import { Check, CreditCard, DollarSign, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -24,14 +24,27 @@ interface PricingFeature {
 
 const PricingSection = () => {
   const { user } = useAuth();
-  const { isPremium, upgradeToPremium } = usePremium();
+  const { isPremium, isLoading, upgradeToPremium } = usePremium();
   const isMobile = useIsMobile();
+  const [isUpgrading, setIsUpgrading] = useState<boolean>(false);
 
   // Mock subscription function
-  const handleSubscribe = () => {
-    // In production, this would connect to Stripe
-    upgradeToPremium();
-    toast.success("You've been upgraded to Premium! This would connect to a payment processor in production.");
+  const handleSubscribe = async (planType: 'monthly' | 'yearly') => {
+    if (!user) {
+      toast.error("You need to be logged in to upgrade to premium");
+      return;
+    }
+    
+    try {
+      setIsUpgrading(true);
+      // In production, this would connect to Stripe first
+      await upgradeToPremium(planType);
+    } catch (error) {
+      console.error("Error during subscription:", error);
+      toast.error("Failed to process your subscription. Please try again.");
+    } finally {
+      setIsUpgrading(false);
+    }
   };
 
   const features: PricingFeature[] = [
@@ -62,6 +75,53 @@ const PricingSection = () => {
     }
   ];
 
+  // Show loading state while checking subscription status
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center flex-wrap gap-2">
+          <div>
+            <h2 className="text-2xl font-semibold mb-1">Pricing Plans</h2>
+            <p className="text-muted-foreground">Choose the plan that's right for your introvert journey</p>
+          </div>
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        </div>
+        
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Skeleton cards */}
+          {Array(2).fill(0).map((_, i) => (
+            <Card key={i} className="border-2 animate-pulse">
+              <CardHeader>
+                <div className="w-36 h-8 bg-muted rounded" />
+                <div className="w-full h-5 bg-muted rounded mt-2" />
+                <div className="w-24 h-8 bg-muted rounded mt-3" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {Array(5).fill(0).map((_, j) => (
+                  <div key={j} className="space-y-2">
+                    <div className="w-24 h-5 bg-muted rounded" />
+                    <div className="space-y-1">
+                      {Array(3).fill(0).map((_, k) => (
+                        <div key={k} className="flex items-start gap-2">
+                          <div className="w-4 h-4 rounded-full bg-muted mt-1" />
+                          <div className="w-full h-4 bg-muted rounded" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+              <CardFooter>
+                <div className="w-full h-10 bg-muted rounded" />
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Main content
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center flex-wrap gap-2">
@@ -140,11 +200,20 @@ const PricingSection = () => {
             <CardFooter>
               <Button 
                 className="w-full" 
-                onClick={handleSubscribe}
-                disabled={isPremium}
+                onClick={() => handleSubscribe('monthly')}
+                disabled={isUpgrading || isPremium}
               >
-                <CreditCard className="mr-2 h-4 w-4" />
-                {isPremium ? "Current Plan" : "Upgrade Now"}
+                {isUpgrading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    {isPremium ? "Current Plan" : "Upgrade Now"}
+                  </>
+                )}
               </Button>
             </CardFooter>
           </Card>
@@ -157,7 +226,7 @@ const PricingSection = () => {
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
                 <span>Free Plan</span>
-                <Badge variant="outline" className="font-normal">Current</Badge>
+                {!isPremium && <Badge variant="outline" className="font-normal">Current</Badge>}
               </CardTitle>
               <CardDescription>Essential tools for introverts</CardDescription>
               <div className="mt-2 text-3xl font-bold">$0</div>
@@ -214,14 +283,38 @@ const PricingSection = () => {
                 </div>
               ))}
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex gap-4">
               <Button 
-                className="w-full" 
-                onClick={handleSubscribe}
-                disabled={isPremium}
+                className="w-1/2" 
+                onClick={() => handleSubscribe('monthly')}
+                disabled={isUpgrading || isPremium}
               >
-                <CreditCard className="mr-2 h-4 w-4" />
-                {isPremium ? "Current Plan" : "Upgrade Now"}
+                {isUpgrading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Monthly
+                  </>
+                )}
+              </Button>
+              <Button 
+                className="w-1/2" 
+                onClick={() => handleSubscribe('yearly')}
+                disabled={isUpgrading || isPremium}
+                variant="outline"
+              >
+                {isUpgrading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  "Yearly (Save 37%)"
+                )}
               </Button>
             </CardFooter>
           </Card>

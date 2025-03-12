@@ -1,10 +1,14 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface PremiumContextType {
   isPremium: boolean;
+  isLoading: boolean;
   checkFeatureAccess: (feature: PremiumFeature) => boolean;
-  upgradeToPremium: () => void;
+  upgradeToPremium: (planType?: 'monthly' | 'yearly') => Promise<void>;
 }
 
 export type PremiumFeature = 
@@ -40,14 +44,45 @@ const PremiumContext = createContext<PremiumContextType | undefined>(undefined);
 export const PremiumProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [isPremium, setIsPremium] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   
-  // In a real implementation, this would check with your backend
-  // to validate the user's subscription status
+  // Check premium status whenever the user changes
   useEffect(() => {
-    // For now, we're using localStorage as a temporary solution
-    // In production, you'd want to validate this server-side
-    const storedPremiumStatus = localStorage.getItem("isPremium") === "true";
-    setIsPremium(storedPremiumStatus);
+    const checkPremiumStatus = async () => {
+      if (!user) {
+        setIsPremium(false);
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        setIsLoading(true);
+        
+        // Fetch premium subscription from Supabase
+        const { data, error } = await supabase
+          .from('premium_subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .gt('expires_at', new Date().toISOString())
+          .maybeSingle();
+        
+        if (error) {
+          console.error("Error checking premium status:", error);
+          setIsPremium(false);
+        } else {
+          // User is premium if we found an active subscription
+          setIsPremium(!!data);
+        }
+      } catch (err) {
+        console.error("Unexpected error checking premium status:", err);
+        setIsPremium(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkPremiumStatus();
   }, [user]);
   
   const checkFeatureAccess = (feature: PremiumFeature): boolean => {
@@ -63,15 +98,35 @@ export const PremiumProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return freeFeatures.includes(feature);
   };
   
-  const upgradeToPremium = () => {
-    // This would connect to Stripe in production
-    // For now, we'll just set the premium flag in localStorage
-    localStorage.setItem("isPremium", "true");
-    setIsPremium(true);
+  const upgradeToPremium = async (planType: 'monthly' | 'yearly' = 'monthly') => {
+    if (!user) {
+      toast.error("You need to be logged in to upgrade to premium");
+      return;
+    }
+    
+    try {
+      // In a real implementation, this would connect to Stripe
+      // For now, we'll just call our database function to create/update the subscription
+      const { data, error } = await supabase.rpc('upgrade_to_premium', { plan_type: planType });
+      
+      if (error) {
+        console.error("Error upgrading to premium:", error);
+        toast.error("Failed to upgrade to premium. Please try again.");
+        return;
+      }
+      
+      // Refresh premium status
+      setIsPremium(true);
+      toast.success(`You've been upgraded to the ${planType} Premium plan!`);
+      
+    } catch (err) {
+      console.error("Unexpected error upgrading to premium:", err);
+      toast.error("An unexpected error occurred. Please try again.");
+    }
   };
   
   return (
-    <PremiumContext.Provider value={{ isPremium, checkFeatureAccess, upgradeToPremium }}>
+    <PremiumContext.Provider value={{ isPremium, isLoading, checkFeatureAccess, upgradeToPremium }}>
       {children}
     </PremiumContext.Provider>
   );
