@@ -20,12 +20,18 @@ vi.mock("sonner", () => ({
 
 describe("PricingSection Component", () => {
   beforeEach(() => {
-    // Reset mock implementations
+    // Reset mock implementations with all required properties
     vi.mocked(usePremium).mockReturnValue({
       isPremium: false,
       isLoading: false,
       upgradeToPremium: vi.fn().mockResolvedValue(undefined),
-      checkFeatureAccess: vi.fn()
+      checkFeatureAccess: vi.fn(),
+      // Add the new properties needed for in-app purchases
+      products: [],
+      loadingProducts: false,
+      purchaseInProgress: false,
+      handlePurchase: vi.fn().mockResolvedValue(undefined),
+      restorePurchases: vi.fn().mockResolvedValue(undefined)
     });
     
     vi.mocked(useAuth).mockReturnValue({
@@ -55,7 +61,13 @@ describe("PricingSection Component", () => {
       isPremium: false,
       isLoading: true,
       upgradeToPremium: vi.fn(),
-      checkFeatureAccess: vi.fn()
+      checkFeatureAccess: vi.fn(),
+      // Add the new properties needed for in-app purchases
+      products: [],
+      loadingProducts: false,
+      purchaseInProgress: false,
+      handlePurchase: vi.fn(),
+      restorePurchases: vi.fn()
     });
     
     render(<PricingSection />);
@@ -94,7 +106,13 @@ describe("PricingSection Component", () => {
       isPremium: true,
       isLoading: false,
       upgradeToPremium: vi.fn(),
-      checkFeatureAccess: vi.fn()
+      checkFeatureAccess: vi.fn(),
+      // Add the new properties needed for in-app purchases
+      products: [],
+      loadingProducts: false,
+      purchaseInProgress: false,
+      handlePurchase: vi.fn(),
+      restorePurchases: vi.fn()
     });
     
     rerender(<PricingSection />);
@@ -110,7 +128,13 @@ describe("PricingSection Component", () => {
       isPremium: false,
       isLoading: false,
       upgradeToPremium: mockUpgradeToPremium,
-      checkFeatureAccess: vi.fn()
+      checkFeatureAccess: vi.fn(),
+      // Add the new properties needed for in-app purchases
+      products: [],
+      loadingProducts: false,
+      purchaseInProgress: false,
+      handlePurchase: vi.fn(),
+      restorePurchases: vi.fn()
     });
     
     render(<PricingSection />);
