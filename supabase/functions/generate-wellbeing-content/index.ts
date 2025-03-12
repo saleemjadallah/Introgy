@@ -15,8 +15,19 @@ serve(async (req) => {
   }
 
   try {
-    const { contentType, query } = await req.json();
+    const { contentType, query, isPremium } = await req.json();
     console.log(`Generating ${contentType} content with query: ${query}`);
+
+    // Check for premium access for restricted content types
+    if (!isPremium && (contentType === 'mythbuster' || contentType === 'famous')) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Premium required",
+          message: "This content type requires a premium subscription" 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
+      );
+    }
 
     // Select the appropriate prompt based on content type
     let prompt = "";

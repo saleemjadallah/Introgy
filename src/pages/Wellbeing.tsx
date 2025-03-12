@@ -78,7 +78,13 @@ const Wellbeing = () => {
       {!isPremium && activeSection !== 'overview' && (
         <Alert className="bg-muted/50 border border-primary/20">
           <AlertDescription className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <span>Free plan includes 5 basic mindfulness exercises and limited community access.</span>
+            {activeSection === 'education' ? (
+              <span>Free plan includes basic glossary and introvert fundamentals.</span>
+            ) : activeSection === 'mindfulness' ? (
+              <span>Free plan includes 5 basic mindfulness exercises.</span>
+            ) : (
+              <span>Free plan includes limited community access.</span>
+            )}
             <Button 
               size="sm" 
               onClick={() => navigate("/profile?tab=pricing")}

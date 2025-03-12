@@ -11,6 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useWellbeingContent } from "@/hooks/useWellbeingContent";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { usePremium } from "@/contexts/premium/PremiumContext";
+import { PremiumFeatureGuard } from "@/components/premium/PremiumFeatureGuard";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const EducationCenter = () => {
   const isMobile = useIsMobile();
@@ -20,6 +25,8 @@ const EducationCenter = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   const { generateContent, isLoading } = useWellbeingContent();
+  const { isPremium } = usePremium();
+  const navigate = useNavigate();
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,6 +132,22 @@ const EducationCenter = () => {
           </Dialog>
         </div>
         
+        {!isPremium && (
+          <Alert className="mb-4 bg-muted/50 border border-primary/20">
+            <AlertDescription className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <span>Free plan includes basic glossary and introvert fundamentals.</span>
+              <Button 
+                size="sm" 
+                onClick={() => navigate("/profile?tab=pricing")}
+                className="whitespace-nowrap"
+              >
+                <Star className="h-4 w-4 mr-2" />
+                Upgrade to Premium
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <TabsContent value="glossary">
           <div className="mt-6">
             <h3 className="text-xl font-semibold mb-4">Introvert Psychology Glossary</h3>
@@ -135,14 +158,34 @@ const EducationCenter = () => {
         <TabsContent value="mythbusters">
           <div className="mt-6">
             <h3 className="text-xl font-semibold mb-4">Introvert Mythbusters</h3>
-            <IntrovertMythbusters />
+            {isPremium ? (
+              <IntrovertMythbusters />
+            ) : (
+              <PremiumFeatureGuard
+                feature="advanced-content"
+                title="Premium Feature"
+                description="Access to the complete Introvert Mythbusters gallery requires a premium subscription"
+              >
+                <IntrovertMythbusters />
+              </PremiumFeatureGuard>
+            )}
           </div>
         </TabsContent>
         
         <TabsContent value="famous">
           <div className="mt-6">
             <h3 className="text-xl font-semibold mb-4">Famous Introverts Gallery</h3>
-            <FamousIntrovertsGallery />
+            {isPremium ? (
+              <FamousIntrovertsGallery />
+            ) : (
+              <PremiumFeatureGuard
+                feature="complete-galleries"
+                title="Premium Feature" 
+                description="Access to the Famous Introverts gallery requires a premium subscription"
+              >
+                <FamousIntrovertsGallery />
+              </PremiumFeatureGuard>
+            )}
           </div>
         </TabsContent>
       </Tabs>

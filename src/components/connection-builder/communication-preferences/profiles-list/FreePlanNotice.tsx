@@ -15,7 +15,7 @@ const FreePlanNotice = ({
   profilesCount, 
   maxFreeProfiles, 
   canCreateProfile,
-  showUpgradeButton = false 
+  showUpgradeButton = true 
 }: FreePlanNoticeProps) => {
   const navigate = useNavigate();
   
