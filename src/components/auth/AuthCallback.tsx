@@ -16,6 +16,9 @@ export const AuthCallback = () => {
         const urlError = hashParams.get('error');
         const urlErrorDescription = hashParams.get('error_description');
         
+        console.log("Auth callback URL:", window.location.href);
+        console.log("Hash params:", Object.fromEntries(hashParams.entries()));
+        
         if (urlError) {
           console.error("URL Error:", urlError, urlErrorDescription);
           setError(urlErrorDescription || "Authentication failed");

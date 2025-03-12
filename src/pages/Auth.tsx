@@ -39,6 +39,7 @@ const Auth = () => {
   
   const handleGoogleSignIn = async () => {
     try {
+      console.log("Initiating Google sign in from Auth page");
       await signInWithGoogle();
     } catch (error) {
       console.error("Google sign in error:", error);
