@@ -1,7 +1,5 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import { Purchase, VerificationResult, CustomerInfo } from './types';
-import { ENTITLEMENTS } from './mockProducts';
+import { Purchase, VerificationResult, CustomerInfo, ENTITLEMENTS } from './types';
 
 export async function verifyPurchase(
   purchase: Purchase, 
