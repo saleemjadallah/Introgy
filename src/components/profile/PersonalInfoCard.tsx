@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import ProfileCardHeader from "./ProfileCardHeader";
 import AvatarSection from "./AvatarSection";
 import ProfileFormFields from "./ProfileFormFields";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth"; // Updated import path
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 

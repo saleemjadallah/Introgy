@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth"; // Updated import path
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { getRecentlyEarnedBadges } from "@/data/badgesData";

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -21,7 +20,7 @@ import SettingsSection from "@/components/profile/SettingsSection";
 import BadgesSection from "@/components/profile/BadgesSection";
 import HelpFaqSection from "@/components/profile/HelpFaqSection";
 import { earnBadge } from "@/services/badgeService";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("profile");

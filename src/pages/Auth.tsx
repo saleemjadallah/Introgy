@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PhoneAuthForm } from "@/components/auth/PhoneAuthForm";
-import { useAuth } from "@/contexts/auth";
+import { PhoneAuthForm } from "@/components/auth"; // Updated import
+import { useAuth } from "@/contexts/auth"; // Updated import
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
