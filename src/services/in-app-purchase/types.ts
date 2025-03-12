@@ -4,6 +4,10 @@ export const PRODUCT_IDS = {
   PREMIUM_YEARLY: 'app.introgy.premium.yearly',
 };
 
+export const ENTITLEMENTS = {
+  PREMIUM: 'premium'
+};
+
 export type ProductType = 'monthly' | 'yearly';
 
 export interface Purchase {
@@ -31,9 +35,7 @@ export interface Product {
   type: ProductType;
 }
 
-export interface PurchaseListener {
-  (purchase: Purchase): void;
-}
+export type PurchaseListener = (purchase: Purchase) => void;
 
 // Types aligned with the actual RevenueCat Capacitor plugin
 export interface CustomerInfo {
@@ -77,9 +79,22 @@ export interface RevenueCatOffering {
   availablePackages: RevenueCatPackage[];
 }
 
+// Enum to match RevenueCat's expected package types
+export enum PACKAGE_TYPE {
+  UNKNOWN = "UNKNOWN",
+  CUSTOM = "CUSTOM",
+  LIFETIME = "LIFETIME",
+  ANNUAL = "ANNUAL",
+  SIX_MONTH = "SIX_MONTH",
+  THREE_MONTH = "THREE_MONTH",
+  TWO_MONTH = "TWO_MONTH",
+  MONTHLY = "MONTHLY",
+  WEEKLY = "WEEKLY"
+}
+
 export interface RevenueCatPackage {
   identifier: string;
-  packageType: string;
+  packageType: PACKAGE_TYPE; // Updated to use enum
   product: RevenueCatProduct;
   offeringIdentifier?: string;
 }
@@ -97,12 +112,7 @@ export interface RevenueCatProduct {
   introPriceCycles?: number;
 }
 
-// For purchasing packages - aligned with the actual Capacitor plugin expectations
-export interface RevenueCatPurchaseOptions {
-  packageIdentifier: string;
-}
-
-// The actual expected type by the RevenueCat Capacitor plugin
+// Make this match the RevenueCat plugin's expected format
 export interface PurchasePackageOptions {
   aPackage: RevenueCatPackage;
   presentedOfferingIdentifier?: string;

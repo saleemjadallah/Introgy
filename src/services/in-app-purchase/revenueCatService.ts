@@ -53,8 +53,11 @@ class RevenueCatService {
 
   async purchasePackage(options: PurchasePackageOptions) {
     try {
-      // Use correct package type for RevenueCat
-      const purchaseResult = await Purchases.purchasePackage(options);
+      // We need to ensure the options object matches what the plugin expects
+      const purchaseResult = await Purchases.purchasePackage({
+        aPackage: options.aPackage,
+        presentedOfferingIdentifier: options.presentedOfferingIdentifier
+      });
       return purchaseResult;
     } catch (error) {
       console.error('Error purchasing package from RevenueCat:', error);

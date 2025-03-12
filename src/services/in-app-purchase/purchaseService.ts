@@ -5,7 +5,8 @@ import {
   CustomerInfo, 
   RevenueCatOfferings,
   RevenueCatPackage,
-  PurchasePackageOptions
+  PurchasePackageOptions,
+  PACKAGE_TYPE
 } from './types';
 import { ENTITLEMENTS } from './mockProducts';
 import { revenueCatService } from './revenueCatService';
