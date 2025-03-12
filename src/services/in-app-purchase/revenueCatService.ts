@@ -1,3 +1,4 @@
+
 import { Capacitor } from '@capacitor/core';
 import { Purchases } from '@revenuecat/purchases-capacitor';
 import { 
@@ -55,15 +56,13 @@ class RevenueCatService {
 
   async purchasePackage(options: PurchasePackageOptions) {
     try {
-      // Convert our package type to match RevenueCat's expected format
-      
-      // Create a proper IntroPrice object if the product has one
+      // Ensure the product has all required properties for RevenueCat
       const purchaseOptions = {
         aPackage: {
           ...options.aPackage,
           product: {
             ...options.aPackage.product,
-            // If product already has the right introPrice type, use it, otherwise keep it undefined
+            // Ensure all required properties are present
             discounts: options.aPackage.product.discounts || [],
             productCategory: PRODUCT_CATEGORY.SUBSCRIPTION,
             productType: 'subscription',

@@ -1,4 +1,3 @@
-
 export const PRODUCT_IDS = {
   PREMIUM_MONTHLY: 'app.introgy.premium.monthly',
   PREMIUM_YEARLY: 'app.introgy.premium.yearly',
