@@ -10,12 +10,15 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { BatteryCharging } from "lucide-react";
 import { SleepQualityDialog } from "@/components/social-battery/SleepQualityDialog";
+import { PremiumFeatureGuard } from "@/components/premium/PremiumFeatureGuard";
+import { usePremium } from "@/contexts/premium/PremiumContext";
 
 const SocialBattery = () => {
   const { batteryLevel, batteryHistory, handleSliderChange, handleActivitySelect } = useSocialBattery();
   const [selectedTab, setSelectedTab] = useState("current");
   const showWarning = batteryLevel < 20;
   const [showOvernightBadge, setShowOvernightBadge] = useState(false);
+  const { isPremium } = usePremium();
 
   // Check if there was a recent overnight recharge
   useEffect(() => {
@@ -80,11 +83,31 @@ const SocialBattery = () => {
         </TabsContent>
 
         <TabsContent value="recharge" className="space-y-4 mt-4">
-          <RechargeActivitiesList onActivitySelect={handleActivitySelect} />
+          {isPremium ? (
+            <RechargeActivitiesList onActivitySelect={handleActivitySelect} />
+          ) : (
+            <PremiumFeatureGuard 
+              feature="advanced-tracking"
+              title="Advanced Recharge Tracking"
+              description="Unlock custom recharge activities and advanced tracking by upgrading to premium"
+            >
+              <RechargeActivitiesList onActivitySelect={handleActivitySelect} />
+            </PremiumFeatureGuard>
+          )}
         </TabsContent>
 
         <TabsContent value="activities" className="space-y-4 mt-4">
-          <DepletingActivitiesList onActivitySelect={handleActivitySelect} />
+          {isPremium ? (
+            <DepletingActivitiesList onActivitySelect={handleActivitySelect} />
+          ) : (
+            <PremiumFeatureGuard 
+              feature="custom-activities"
+              title="Custom Activities"
+              description="Create unlimited custom activities with premium"
+            >
+              <DepletingActivitiesList onActivitySelect={handleActivitySelect} />
+            </PremiumFeatureGuard>
+          )}
         </TabsContent>
       </Tabs>
     </div>
