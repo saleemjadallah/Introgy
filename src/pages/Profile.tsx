@@ -88,7 +88,7 @@ const Profile = () => {
         </div>
         
         {isMobile ? (
-          <ScrollArea orientation="horizontal" className="w-full pb-4" type="native">
+          <ScrollArea orientation="horizontal" className="w-full pb-4" type={"native" as any}>
             <TabsList className="inline-flex w-max px-1">
               <TabsTrigger value="profile" className="gap-1 px-3">
                 <User size={14} /> 
