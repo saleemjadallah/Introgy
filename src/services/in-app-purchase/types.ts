@@ -107,6 +107,14 @@ export enum PRODUCT_TYPE {
   PREPAID_SUBSCRIPTION = "PREPAID_SUBSCRIPTION"
 }
 
+// Define SubscriptionOption interface to match RevenueCat's expectations
+export interface SubscriptionOption {
+  id: string;
+  storeProductId: string;
+  productId: string;
+  pricingPhases: any[];
+}
+
 export interface RevenueCatPackage {
   identifier: string;
   packageType: PACKAGE_TYPE;
@@ -142,17 +150,17 @@ export interface RevenueCatProduct {
   price: number;
   priceString: string;
   currencyCode: string;
-  introPrice: PurchasesIntroPrice;  // Made required as per the error
+  introPrice: PurchasesIntroPrice;
   introPriceString?: string;
   introPricePeriod?: string;
   introPriceCycles?: number;
   discounts: any[];
   productCategory: PRODUCT_CATEGORY;
-  productType: PRODUCT_TYPE;  // Updated from string to enum type
+  productType: PRODUCT_TYPE;
   subscriptionPeriod: string;
-  defaultOption: boolean;
+  defaultOption?: SubscriptionOption; // Changed from boolean to SubscriptionOption
   presentedOfferingIdentifier?: string;
-  subscriptionOptions?: any[];
+  subscriptionOptions?: SubscriptionOption[];
 }
 
 // Make this match the RevenueCat plugin's expected format

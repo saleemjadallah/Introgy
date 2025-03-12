@@ -9,6 +9,7 @@ import {
   ENTITLEMENTS,
   PRODUCT_CATEGORY,
   PRODUCT_TYPE,
+  SubscriptionOption,
   VerificationResult,
   DEFAULT_INTRO_PRICE
 } from './types';
@@ -54,16 +55,24 @@ export async function purchaseNative(
       throw new Error(`Package not found for product ID: ${productId}`);
     }
     
+    // Create a default subscription option
+    const defaultSubscriptionOption: SubscriptionOption = {
+      id: productId,
+      storeProductId: productId,
+      productId: productId,
+      pricingPhases: []
+    };
+    
     // Ensure product has the correct type properties before purchase
     const enhancedPackage: RevenueCatPackage = {
       ...packageToPurchase,
       product: {
         ...packageToPurchase.product,
         productCategory: PRODUCT_CATEGORY.SUBSCRIPTION,
-        productType: PRODUCT_TYPE.AUTO_RENEWABLE_SUBSCRIPTION, // Using proper enum type
+        productType: PRODUCT_TYPE.AUTO_RENEWABLE_SUBSCRIPTION,
         discounts: packageToPurchase.product.discounts || [],
         subscriptionPeriod: productId.includes('yearly') ? 'P1Y' : 'P1M',
-        defaultOption: true,
+        defaultOption: defaultSubscriptionOption,
         subscriptionOptions: [],
         // Always provide a valid introPrice
         introPrice: packageToPurchase.product.introPrice || DEFAULT_INTRO_PRICE

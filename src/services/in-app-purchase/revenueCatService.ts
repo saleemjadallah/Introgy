@@ -9,6 +9,7 @@ import {
   PurchasesIntroPrice,
   PRODUCT_CATEGORY,
   PRODUCT_TYPE,
+  SubscriptionOption,
   DEFAULT_INTRO_PRICE
 } from './types';
 
@@ -58,6 +59,14 @@ class RevenueCatService {
 
   async purchasePackage(options: PurchasePackageOptions) {
     try {
+      // Create a default subscription option if one is not provided
+      const defaultSubscriptionOption: SubscriptionOption = {
+        id: options.aPackage.product.identifier,
+        storeProductId: options.aPackage.product.identifier,
+        productId: options.aPackage.product.identifier,
+        pricingPhases: []
+      };
+      
       // Create a valid options object with all required properties for RevenueCat
       const purchaseOptions: PurchasePackageOptions = {
         aPackage: {
@@ -67,9 +76,10 @@ class RevenueCatService {
             // Ensure all required properties are present
             discounts: options.aPackage.product.discounts || [],
             productCategory: PRODUCT_CATEGORY.SUBSCRIPTION,
-            productType: PRODUCT_TYPE.AUTO_RENEWABLE_SUBSCRIPTION, // Using proper enum type
+            productType: PRODUCT_TYPE.AUTO_RENEWABLE_SUBSCRIPTION,
             subscriptionPeriod: options.aPackage.packageType === 'ANNUAL' ? 'P1Y' : 'P1M',
-            defaultOption: options.aPackage.product.defaultOption || true,
+            // Use proper SubscriptionOption type instead of boolean
+            defaultOption: options.aPackage.product.defaultOption || defaultSubscriptionOption,
             subscriptionOptions: options.aPackage.product.subscriptionOptions || [],
             // Ensure introPrice is always defined
             introPrice: options.aPackage.product.introPrice || DEFAULT_INTRO_PRICE
@@ -79,6 +89,7 @@ class RevenueCatService {
       };
       
       console.log('Purchasing package with options:', JSON.stringify(purchaseOptions));
+      // Pass the options to RevenueCat for purchase
       const purchaseResult = await Purchases.purchasePackage(purchaseOptions);
       return purchaseResult;
     } catch (error) {
