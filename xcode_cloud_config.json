@@ -1,0 +1,17 @@
+{
+  "scheme": "App",
+  "workspace": "ios/App/App.xcworkspace",
+  "target": "App",
+  "xcode_project": "ios/App/App.xcodeproj",
+  "build_settings": {
+    "PRODUCT_NAME": "Introgy",
+    "MARKETING_VERSION": "1.0",
+    "CURRENT_PROJECT_VERSION": "1"
+  },
+  "export_options": {
+    "method": "app-store",
+    "provisioningProfiles": {
+      "com.introgy.app": "match AppStore com.introgy.app"
+    }
+  }
+}

@@ -1,13 +1,13 @@
 name: Xcode Cloud Build
 
 # This workflow configuration helps Xcode Cloud find the correct project
-# Define the correct paths for your Xcode project/workspace
+# Updated to use the correct scheme name: App
 
 settings:
   xcode:
     project: ios/App/App.xcodeproj
     workspace: ios/App/App.xcworkspace
-    scheme: App
+    scheme: App  # Previously was looking for "Introgy"
 
 # Define the build steps
 steps:
@@ -15,7 +15,7 @@ steps:
     build:
       project: ios/App/App.xcodeproj
       workspace: ios/App/App.xcworkspace
-      scheme: App
+      scheme: App  # This must match an existing scheme
       destination: 'platform=iOS Simulator,name=iPhone 15'
       
 # Pre-build script to ensure permissions are correct
