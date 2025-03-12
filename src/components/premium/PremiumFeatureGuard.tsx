@@ -1,11 +1,13 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Lock, Star, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePremium, PremiumFeature } from "@/contexts/premium/PremiumContext";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Capacitor } from "@capacitor/core";
+import { PRODUCT_IDS } from "@/services/InAppPurchaseService";
 
 interface PremiumFeatureGuardProps {
   feature: PremiumFeature;
@@ -20,8 +22,9 @@ export const PremiumFeatureGuard: React.FC<PremiumFeatureGuardProps> = ({
   title = "Premium Feature", 
   description = "This feature requires a premium subscription" 
 }) => {
-  const { checkFeatureAccess, isLoading } = usePremium();
+  const { checkFeatureAccess, isLoading, handlePurchase, purchaseInProgress } = usePremium();
   const navigate = useNavigate();
+  const isNative = Capacitor.isNativePlatform();
   
   // Show loading skeleton while checking premium status
   if (isLoading) {
@@ -52,6 +55,16 @@ export const PremiumFeatureGuard: React.FC<PremiumFeatureGuardProps> = ({
   if (hasAccess) {
     return <>{children}</>;
   }
+
+  const handleUpgrade = async () => {
+    if (isNative) {
+      // For native platforms, use in-app purchase
+      await handlePurchase(PRODUCT_IDS.PREMIUM_MONTHLY);
+    } else {
+      // For web, navigate to pricing page
+      navigate("/profile?tab=pricing");
+    }
+  };
   
   return (
     <Card className="border-dashed border-2 border-muted-foreground/30">
@@ -70,11 +83,18 @@ export const PremiumFeatureGuard: React.FC<PremiumFeatureGuardProps> = ({
       <CardFooter>
         <Button 
           className="w-full"
-          onClick={() => navigate("/profile?tab=pricing")}
+          onClick={handleUpgrade}
           variant="default"
+          disabled={purchaseInProgress}
         >
-          <Star className="w-4 h-4 mr-2" />
-          Upgrade to Premium
+          {purchaseInProgress ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <>
+              <Star className="w-4 h-4 mr-2" />
+              Upgrade to Premium
+            </>
+          )}
         </Button>
       </CardFooter>
     </Card>

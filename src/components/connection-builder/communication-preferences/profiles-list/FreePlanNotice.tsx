@@ -1,12 +1,15 @@
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Star } from "lucide-react";
+import { Star, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth";
+import { usePremium } from "@/contexts/premium/PremiumContext";
 import { toast } from "sonner";
+import { Capacitor } from "@capacitor/core";
+import { PRODUCT_IDS } from "@/services/InAppPurchaseService";
 
 interface FreePlanNoticeProps {
   profilesCount: number;
@@ -23,7 +26,9 @@ const FreePlanNotice = ({
 }: FreePlanNoticeProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { handlePurchase, purchaseInProgress } = usePremium();
   const [isProcessing, setIsProcessing] = useState(false);
+  const isNative = Capacitor.isNativePlatform();
   
   if (profilesCount === 0) return null;
   
@@ -34,6 +39,13 @@ const FreePlanNotice = ({
       return;
     }
 
+    // For native platforms, use in-app purchase
+    if (isNative) {
+      await handlePurchase(PRODUCT_IDS.PREMIUM_MONTHLY);
+      return;
+    }
+
+    // For web, use Stripe checkout
     try {
       setIsProcessing(true);
 
@@ -76,10 +88,16 @@ const FreePlanNotice = ({
           size="sm" 
           onClick={handleUpgrade}
           className="whitespace-nowrap ml-2"
-          disabled={isProcessing}
+          disabled={isProcessing || purchaseInProgress}
         >
-          <Star className="h-4 w-4 mr-2" />
-          Upgrade Now
+          {isProcessing || purchaseInProgress ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              <Star className="h-4 w-4 mr-2" />
+              Upgrade Now
+            </>
+          )}
         </Button>
       )}
     </div>

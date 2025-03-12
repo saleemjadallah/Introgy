@@ -3,12 +3,24 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Capacitor } from "@capacitor/core";
+import { 
+  inAppPurchaseService, 
+  PRODUCT_IDS, 
+  Purchase, 
+  Product 
+} from "@/services/InAppPurchaseService";
 
 interface PremiumContextType {
   isPremium: boolean;
   isLoading: boolean;
   checkFeatureAccess: (feature: PremiumFeature) => boolean;
   upgradeToPremium: (planType?: 'monthly' | 'yearly') => Promise<void>;
+  products: Product[];
+  loadingProducts: boolean;
+  purchaseInProgress: boolean;
+  handlePurchase: (productId: string) => Promise<void>;
+  restorePurchases: () => Promise<void>;
 }
 
 export type PremiumFeature = 
@@ -47,6 +59,54 @@ export const PremiumProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const { user } = useAuth();
   const [isPremium, setIsPremium] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState<boolean>(false);
+  const [purchaseInProgress, setPurchaseInProgress] = useState<boolean>(false);
+  const isNative = Capacitor.isNativePlatform();
+  
+  // Load available products
+  useEffect(() => {
+    const loadProducts = async () => {
+      if (!isNative) return;
+      
+      try {
+        setLoadingProducts(true);
+        const availableProducts = await inAppPurchaseService.getProducts();
+        setProducts(availableProducts);
+      } catch (error) {
+        console.error("Error loading products:", error);
+        toast.error("Failed to load purchase options");
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+    
+    loadProducts();
+  }, [isNative]);
+  
+  // Set up purchase listener
+  useEffect(() => {
+    if (!user || !isNative) return;
+    
+    const handlePurchaseEvent = async (purchase: Purchase) => {
+      try {
+        // Verify purchase with backend
+        await validateAndRecordPurchase(purchase);
+        // Update premium status
+        setIsPremium(true);
+        toast.success("Premium subscription activated!");
+      } catch (err) {
+        console.error("Error processing purchase:", err);
+        toast.error("Failed to activate subscription");
+      }
+    };
+    
+    inAppPurchaseService.addPurchaseListener(handlePurchaseEvent);
+    
+    return () => {
+      inAppPurchaseService.removePurchaseListener(handlePurchaseEvent);
+    };
+  }, [user, isNative]);
   
   // Check premium status whenever the user changes
   useEffect(() => {
@@ -129,8 +189,105 @@ export const PremiumProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
   
+  const handlePurchase = async (productId: string) => {
+    if (!user) {
+      toast.error("You need to be logged in to make a purchase");
+      return;
+    }
+    
+    try {
+      setPurchaseInProgress(true);
+      
+      // Initiate purchase through our service
+      const purchase = await inAppPurchaseService.purchaseProduct(productId);
+      
+      // If purchase was successful, validate and record it
+      if (purchase) {
+        await validateAndRecordPurchase(purchase);
+        setIsPremium(true);
+        toast.success("Premium subscription activated!");
+      }
+    } catch (error) {
+      console.error("Error during purchase:", error);
+      toast.error("Purchase failed. Please try again.");
+    } finally {
+      setPurchaseInProgress(false);
+    }
+  };
+  
+  const restorePurchases = async () => {
+    if (!user) {
+      toast.error("You need to be logged in to restore purchases");
+      return;
+    }
+    
+    try {
+      setPurchaseInProgress(true);
+      
+      // Restore purchases using our service
+      const restoredPurchases = await inAppPurchaseService.restorePurchases();
+      
+      if (restoredPurchases && restoredPurchases.length > 0) {
+        // Process each restored purchase
+        for (const purchase of restoredPurchases) {
+          await validateAndRecordPurchase(purchase);
+        }
+        
+        setIsPremium(true);
+        toast.success("Your subscription has been restored!");
+      } else {
+        toast.info("No previous purchases found");
+      }
+    } catch (error) {
+      console.error("Error restoring purchases:", error);
+      toast.error("Failed to restore purchases. Please try again.");
+    } finally {
+      setPurchaseInProgress(false);
+    }
+  };
+  
+  // Helper to validate and record purchases in our database
+  const validateAndRecordPurchase = async (purchase: Purchase): Promise<void> => {
+    // Determine plan type based on product ID
+    const planType = purchase.productId === PRODUCT_IDS.PREMIUM_YEARLY ? 'yearly' : 'monthly';
+    
+    // Calculate expiration date
+    const expiresAt = new Date();
+    if (planType === 'yearly') {
+      expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+    } else {
+      expiresAt.setMonth(expiresAt.getMonth() + 1);
+    }
+    
+    // Record the purchase in our database
+    const { error } = await supabase
+      .from('premium_subscriptions')
+      .upsert({
+        user_id: user?.id,
+        plan_type: planType,
+        is_active: true,
+        expires_at: expiresAt.toISOString(),
+        payment_id: purchase.transactionId
+      });
+    
+    if (error) {
+      console.error("Error recording purchase:", error);
+      throw new Error("Failed to record purchase");
+    }
+  };
+  
   return (
-    <PremiumContext.Provider value={{ isPremium, isLoading, checkFeatureAccess, upgradeToPremium }}>
+    <PremiumContext.Provider value={{ 
+      isPremium, 
+      isLoading, 
+      checkFeatureAccess, 
+      upgradeToPremium,
+      products,
+      loadingProducts,
+      purchaseInProgress,
+      handlePurchase,
+      restorePurchases
+    }}>
       {children}
     </PremiumContext.Provider>
   );

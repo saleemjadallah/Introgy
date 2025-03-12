@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth";
 import { toast } from "sonner";
+import { Capacitor } from "@capacitor/core";
+import MobilePurchaseButton from "./MobilePurchaseButton";
 
 interface PremiumPlanButtonsProps {
   isMobile: boolean;
@@ -23,7 +25,23 @@ const PremiumPlanButtons: React.FC<PremiumPlanButtonsProps> = ({
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
+  const isNative = Capacitor.isNativePlatform();
 
+  // If we're on a native platform, use the native in-app purchase flow
+  if (isNative) {
+    if (isMobile) {
+      return <MobilePurchaseButton planType="monthly" isPremium={isPremium} />;
+    }
+    
+    return (
+      <>
+        <MobilePurchaseButton planType="monthly" isPremium={isPremium} />
+        <MobilePurchaseButton planType="yearly" isPremium={isPremium} />
+      </>
+    );
+  }
+
+  // Web platform flow using Stripe
   const handleCheckout = async (planType: 'monthly' | 'yearly') => {
     if (!user) {
       toast.error("You need to be logged in to upgrade");
