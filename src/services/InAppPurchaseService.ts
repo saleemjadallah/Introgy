@@ -1,5 +1,6 @@
 
 import { Capacitor } from '@capacitor/core';
+import { supabase } from "@/integrations/supabase/client";
 
 // Product IDs should match what you configure in App Store/Play Store
 export const PRODUCT_IDS = {
@@ -13,6 +14,15 @@ export interface Purchase {
   productId: string;
   transactionId: string;
   timestamp: number;
+  receipt?: string;
+  platform?: 'ios' | 'android';
+}
+
+export interface VerificationResult {
+  success: boolean;
+  planType: ProductType;
+  expiresAt: string;
+  error?: string;
 }
 
 export interface Product {
@@ -29,6 +39,7 @@ class InAppPurchaseService {
   private isNative = Capacitor.isNativePlatform();
   private productCache: Product[] = [];
   private listeners: Array<(purchase: Purchase) => void> = [];
+  private platform: 'ios' | 'android' | 'web' = 'web';
 
   constructor() {
     // In a real implementation, this would connect to native plugins
@@ -36,6 +47,13 @@ class InAppPurchaseService {
     console.log('InAppPurchaseService initialized, native:', this.isNative);
     
     if (this.isNative) {
+      // Determine platform
+      if (Capacitor.getPlatform() === 'ios') {
+        this.platform = 'ios';
+      } else if (Capacitor.getPlatform() === 'android') {
+        this.platform = 'android';
+      }
+      
       // In a real implementation, here we would:
       // 1. Initialize the native plugin
       // 2. Set up listeners for purchase events
@@ -71,7 +89,9 @@ class InAppPurchaseService {
       const mockPurchase = {
         productId,
         transactionId: `mock-${Date.now()}`,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        receipt: `mock-receipt-${Date.now()}`,
+        platform: 'ios' as const
       };
       
       // Notify listeners
@@ -93,13 +113,51 @@ class InAppPurchaseService {
     const purchase = {
       productId,
       transactionId: `transaction-${Date.now()}`,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      receipt: `receipt-${Date.now()}`,
+      platform: this.platform as 'ios' | 'android'
     };
     
     // Notify listeners
     this.listeners.forEach(listener => listener(purchase));
     
     return purchase;
+  }
+
+  // Verify purchase with backend
+  async verifyPurchase(purchase: Purchase, userId: string): Promise<VerificationResult> {
+    try {
+      // Call our edge function to verify the purchase
+      const { data, error } = await supabase.functions.invoke('verify-purchase', {
+        body: {
+          userId,
+          receipt: purchase.receipt || purchase.transactionId,
+          productId: purchase.productId,
+          platform: purchase.platform || this.platform
+        }
+      });
+      
+      if (error) {
+        console.error('Purchase verification error:', error);
+        return {
+          success: false,
+          planType: 'monthly',
+          expiresAt: new Date().toISOString(),
+          error: error.message
+        };
+      }
+      
+      console.log('Purchase verification result:', data);
+      return data as VerificationResult;
+    } catch (err) {
+      console.error('Error during purchase verification:', err);
+      return {
+        success: false,
+        planType: 'monthly',
+        expiresAt: new Date().toISOString(),
+        error: err.message
+      };
+    }
   }
 
   // Restore previous purchases

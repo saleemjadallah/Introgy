@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +7,8 @@ import {
   inAppPurchaseService, 
   PRODUCT_IDS, 
   Purchase, 
-  Product 
+  Product,
+  VerificationResult
 } from "@/services/InAppPurchaseService";
 
 interface PremiumContextType {
@@ -91,7 +91,7 @@ export const PremiumProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const handlePurchaseEvent = async (purchase: Purchase) => {
       try {
         // Verify purchase with backend
-        await validateAndRecordPurchase(purchase);
+        await verifyAndProcessPurchase(purchase);
         // Update premium status
         setIsPremium(true);
         toast.success("Premium subscription activated!");
@@ -201,9 +201,9 @@ export const PremiumProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Initiate purchase through our service
       const purchase = await inAppPurchaseService.purchaseProduct(productId);
       
-      // If purchase was successful, validate and record it
+      // If purchase was successful, verify and record it
       if (purchase) {
-        await validateAndRecordPurchase(purchase);
+        await verifyAndProcessPurchase(purchase);
         setIsPremium(true);
         toast.success("Premium subscription activated!");
       }
@@ -230,7 +230,7 @@ export const PremiumProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (restoredPurchases && restoredPurchases.length > 0) {
         // Process each restored purchase
         for (const purchase of restoredPurchases) {
-          await validateAndRecordPurchase(purchase);
+          await verifyAndProcessPurchase(purchase);
         }
         
         setIsPremium(true);
@@ -246,34 +246,31 @@ export const PremiumProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
   
-  // Helper to validate and record purchases in our database
+  // New method to verify and process purchases with receipt validation
+  const verifyAndProcessPurchase = async (purchase: Purchase): Promise<void> => {
+    if (!user) throw new Error("User is not authenticated");
+    
+    console.log("Verifying purchase:", purchase);
+    
+    // Verify purchase receipt with backend
+    const verificationResult = await inAppPurchaseService.verifyPurchase(purchase, user.id);
+    
+    // If verification fails, throw error
+    if (!verificationResult.success) {
+      console.error("Purchase verification failed:", verificationResult.error);
+      throw new Error(`Purchase verification failed: ${verificationResult.error}`);
+    }
+    
+    console.log("Purchase verified successfully:", verificationResult);
+    
+    // Purchase is already recorded in the database by the verification function
+    // No need to store it again
+  };
+  
+  // Helper to validate and record purchases in our database (old method, kept for backwards compatibility)
   const validateAndRecordPurchase = async (purchase: Purchase): Promise<void> => {
-    // Determine plan type based on product ID
-    const planType = purchase.productId === PRODUCT_IDS.PREMIUM_YEARLY ? 'yearly' : 'monthly';
-    
-    // Calculate expiration date
-    const expiresAt = new Date();
-    if (planType === 'yearly') {
-      expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-    } else {
-      expiresAt.setMonth(expiresAt.getMonth() + 1);
-    }
-    
-    // Record the purchase in our database
-    const { error } = await supabase
-      .from('premium_subscriptions')
-      .upsert({
-        user_id: user?.id,
-        plan_type: planType,
-        is_active: true,
-        expires_at: expiresAt.toISOString(),
-        payment_id: purchase.transactionId
-      });
-    
-    if (error) {
-      console.error("Error recording purchase:", error);
-      throw new Error("Failed to record purchase");
-    }
+    // This method now uses the new verification flow
+    return verifyAndProcessPurchase(purchase);
   };
   
   return (

@@ -41,7 +41,12 @@ const FreePlanNotice = ({
 
     // For native platforms, use in-app purchase
     if (isNative) {
-      await handlePurchase(PRODUCT_IDS.PREMIUM_MONTHLY);
+      try {
+        await handlePurchase(PRODUCT_IDS.PREMIUM_MONTHLY);
+      } catch (error) {
+        console.error("Purchase error:", error);
+        toast.error("Purchase failed. Please try again later.");
+      }
       return;
     }
 

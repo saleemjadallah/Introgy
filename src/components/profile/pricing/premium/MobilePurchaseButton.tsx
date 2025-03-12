@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Star, Loader2, RefreshCw } from "lucide-react";
 import { usePremium } from "@/contexts/premium/PremiumContext";
 import { PRODUCT_IDS } from "@/services/InAppPurchaseService";
+import { toast } from "sonner";
 
 interface MobilePurchaseButtonProps {
   planType: 'monthly' | 'yearly';
@@ -24,6 +25,24 @@ const MobilePurchaseButton: React.FC<MobilePurchaseButtonProps> = ({
     ? PRODUCT_IDS.PREMIUM_YEARLY 
     : PRODUCT_IDS.PREMIUM_MONTHLY;
   
+  const handlePurchaseWithErrorHandling = async () => {
+    try {
+      await handlePurchase(productId);
+    } catch (error) {
+      console.error("Purchase error:", error);
+      toast.error("Purchase failed. Please try again later.");
+    }
+  };
+  
+  const handleRestorePurchases = async () => {
+    try {
+      await restorePurchases();
+    } catch (error) {
+      console.error("Restore error:", error);
+      toast.error("Failed to restore purchases. Please try again later.");
+    }
+  };
+  
   if (isPremium) {
     return (
       <Button 
@@ -39,7 +58,7 @@ const MobilePurchaseButton: React.FC<MobilePurchaseButtonProps> = ({
     <div className="space-y-2 w-full">
       <Button 
         className="w-full" 
-        onClick={() => handlePurchase(productId)}
+        onClick={handlePurchaseWithErrorHandling}
         disabled={purchaseInProgress}
       >
         {purchaseInProgress ? (
@@ -58,7 +77,7 @@ const MobilePurchaseButton: React.FC<MobilePurchaseButtonProps> = ({
       <Button 
         variant="outline" 
         className="w-full text-sm" 
-        onClick={restorePurchases}
+        onClick={handleRestorePurchases}
         disabled={purchaseInProgress}
       >
         <RefreshCw className="mr-2 h-3 w-3" />
