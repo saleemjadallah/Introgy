@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth";
 import { PhoneInputForm } from "./PhoneInputForm";
 import { OtpVerificationForm } from "./OtpVerificationForm";
 import { formatPhoneNumber } from "./utils/phoneUtils";
