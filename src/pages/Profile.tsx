@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { 
   Tabs, 
   TabsContent, 
@@ -24,11 +24,14 @@ import HelpFaqSection from "@/components/profile/HelpFaqSection";
 import PricingSection from "@/components/profile/PricingSection";
 import { earnBadge } from "@/services/badgeService";
 import { useAuth } from "@/contexts/auth";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuth();
+  const isMobile = useIsMobile();
 
   const handleEarnDemo = () => {
     earnBadge("reflection-master");
@@ -37,12 +40,11 @@ const Profile = () => {
 
   useEffect(() => {
     // Check for tab in URL params
-    const urlParams = new URLSearchParams(window.location.search);
-    const tabParam = urlParams.get('tab');
+    const tabParam = searchParams.get('tab');
     if (tabParam) {
       setActiveTab(tabParam);
     }
-  }, []);
+  }, [searchParams]);
 
   if (!isAuthenticated) {
     return (
@@ -75,30 +77,35 @@ const Profile = () => {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto py-6">
+    <div className="container max-w-4xl mx-auto py-6 px-4 md:px-6">
       <Tabs defaultValue="profile" value={activeTab} onValueChange={setActiveTab}>
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold mb-2">My Profile</h1>
-          <p className="text-muted-foreground">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-semibold mb-2">My Profile</h1>
+          <p className="text-muted-foreground text-sm md:text-base">
             Manage your account, preferences, and privacy settings
           </p>
         </div>
         
-        <TabsList className="grid grid-cols-2 md:grid-cols-5 mb-8">
+        <TabsList className={`grid ${isMobile ? 'grid-cols-3 mb-4' : 'grid-cols-5 mb-8'} w-full`}>
           <TabsTrigger value="profile" className="gap-2">
-            <User size={16} /> Profile
+            <User size={isMobile ? 14 : 16} /> 
+            <span className={isMobile ? "hidden sm:inline" : ""}>Profile</span>
           </TabsTrigger>
           <TabsTrigger value="settings" className="gap-2">
-            <Settings size={16} /> Settings
+            <Settings size={isMobile ? 14 : 16} /> 
+            <span className={isMobile ? "hidden sm:inline" : ""}>Settings</span>
           </TabsTrigger>
           <TabsTrigger value="badges" className="gap-2">
-            <Award size={16} /> Badges
+            <Award size={isMobile ? 14 : 16} /> 
+            <span className={isMobile ? "hidden sm:inline" : ""}>Badges</span>
           </TabsTrigger>
           <TabsTrigger value="pricing" className="gap-2">
-            <DollarSign size={16} /> Pricing
+            <DollarSign size={isMobile ? 14 : 16} /> 
+            <span className={isMobile ? "hidden sm:inline" : ""}>Pricing</span>
           </TabsTrigger>
           <TabsTrigger value="help" className="gap-2">
-            <HelpCircle size={16} /> Help & FAQ
+            <HelpCircle size={isMobile ? 14 : 16} /> 
+            <span className={isMobile ? "hidden sm:inline" : ""}>Help</span>
           </TabsTrigger>
         </TabsList>
         

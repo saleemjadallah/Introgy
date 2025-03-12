@@ -10,9 +10,10 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, X, CreditCard, DollarSign, ArrowUp } from "lucide-react";
+import { Check, CreditCard, DollarSign } from "lucide-react";
 import { useAuth } from "@/contexts/auth";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PricingFeature {
   name: string;
@@ -23,6 +24,7 @@ interface PricingFeature {
 const PricingSection = () => {
   const { user } = useAuth();
   const [isPremium, setIsPremium] = React.useState(false);
+  const isMobile = useIsMobile();
 
   // Mock subscription function
   const handleSubscribe = () => {
@@ -60,7 +62,7 @@ const PricingSection = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-wrap gap-2">
         <div>
           <h2 className="text-2xl font-semibold mb-1">Pricing Plans</h2>
           <p className="text-muted-foreground">Choose the plan that's right for your introvert journey</p>
@@ -70,89 +72,167 @@ const PricingSection = () => {
         </Badge>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Free Plan Card */}
-        <Card className={`border-2 ${!isPremium ? "border-primary" : "border-border"}`}>
-          <CardHeader>
-            <CardTitle className="flex justify-between items-center">
-              <span>Free Plan</span>
-              <Badge variant="outline" className="font-normal">Current</Badge>
-            </CardTitle>
-            <CardDescription>Essential tools for introverts</CardDescription>
-            <div className="mt-2 text-3xl font-bold">$0</div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {features.map((feature, index) => (
-              <div key={`free-${index}`} className="space-y-2">
-                <h4 className="font-medium">{feature.name}</h4>
-                <ul className="space-y-1">
-                  {feature.free.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <Check size={16} className="text-green-500 shrink-0 mt-1" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+      {isMobile ? (
+        // Mobile layout - vertical stack
+        <div className="space-y-6">
+          {/* Free Plan Card */}
+          <Card className={`border-2 ${!isPremium ? "border-primary" : "border-border"}`}>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-xl">Free Plan</CardTitle>
+                {!isPremium && <Badge variant="outline" className="font-normal">Current</Badge>}
               </div>
-            ))}
-          </CardContent>
-          <CardFooter>
-            <Button variant="outline" className="w-full" disabled>
-              Current Plan
-            </Button>
-          </CardFooter>
-        </Card>
+              <CardDescription>Essential tools for introverts</CardDescription>
+              <div className="mt-2 text-2xl font-bold">$0</div>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-0">
+              {features.map((feature, index) => (
+                <div key={`free-${index}`} className="space-y-1">
+                  <h4 className="font-medium text-sm">{feature.name}</h4>
+                  <ul className="space-y-0.5">
+                    {feature.free.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-xs">
+                        <Check size={14} className="text-green-500 shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full" disabled>
+                Current Plan
+              </Button>
+            </CardFooter>
+          </Card>
 
-        {/* Premium Plan Card */}
-        <Card className={`border-2 ${isPremium ? "border-primary" : "border-border"}`}>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle>Premium Plan</CardTitle>
-              <Badge className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700">
-                Best Value
-              </Badge>
-            </div>
-            <CardDescription>Complete introvert toolkit</CardDescription>
-            <div className="mt-2">
-              <div className="text-3xl font-bold">$7.99 <span className="text-base font-normal text-muted-foreground">/month</span></div>
-              <div className="text-sm text-muted-foreground mt-1">or $59.99/year (save 37%)</div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {features.map((feature, index) => (
-              <div key={`premium-${index}`} className="space-y-2">
-                <h4 className="font-medium">{feature.name}</h4>
-                <ul className="space-y-1">
-                  {feature.premium.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <Check size={16} className="text-green-500 shrink-0 mt-1" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+          {/* Premium Plan Card */}
+          <Card className={`border-2 ${isPremium ? "border-primary" : "border-border"}`}>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-xl">Premium Plan</CardTitle>
+                <Badge className="bg-gradient-to-r from-purple-500 to-indigo-600">Best</Badge>
               </div>
-            ))}
-          </CardContent>
-          <CardFooter>
-            <Button 
-              className="w-full" 
-              onClick={handleSubscribe}
-              disabled={isPremium}
-            >
-              <CreditCard className="mr-2 h-4 w-4" />
-              {isPremium ? "Current Plan" : "Upgrade Now"}
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+              <CardDescription>Complete introvert toolkit</CardDescription>
+              <div className="mt-2">
+                <div className="text-2xl font-bold">$7.99 <span className="text-sm font-normal text-muted-foreground">/mo</span></div>
+                <div className="text-xs text-muted-foreground mt-0.5">or $59.99/year (save 37%)</div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-0">
+              {features.map((feature, index) => (
+                <div key={`premium-${index}`} className="space-y-1">
+                  <h4 className="font-medium text-sm">{feature.name}</h4>
+                  <ul className="space-y-0.5">
+                    {feature.premium.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-xs">
+                        <Check size={14} className="text-green-500 shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </CardContent>
+            <CardFooter>
+              <Button 
+                className="w-full" 
+                onClick={handleSubscribe}
+                disabled={isPremium}
+              >
+                <CreditCard className="mr-2 h-4 w-4" />
+                {isPremium ? "Current Plan" : "Upgrade Now"}
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      ) : (
+        // Desktop layout - side by side
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Free Plan Card */}
+          <Card className={`border-2 ${!isPremium ? "border-primary" : "border-border"}`}>
+            <CardHeader>
+              <CardTitle className="flex justify-between items-center">
+                <span>Free Plan</span>
+                <Badge variant="outline" className="font-normal">Current</Badge>
+              </CardTitle>
+              <CardDescription>Essential tools for introverts</CardDescription>
+              <div className="mt-2 text-3xl font-bold">$0</div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {features.map((feature, index) => (
+                <div key={`free-${index}`} className="space-y-2">
+                  <h4 className="font-medium">{feature.name}</h4>
+                  <ul className="space-y-1">
+                    {feature.free.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm">
+                        <Check size={16} className="text-green-500 shrink-0 mt-1" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full" disabled>
+                Current Plan
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Premium Plan Card */}
+          <Card className={`border-2 ${isPremium ? "border-primary" : "border-border"}`}>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle>Premium Plan</CardTitle>
+                <Badge className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700">
+                  Best Value
+                </Badge>
+              </div>
+              <CardDescription>Complete introvert toolkit</CardDescription>
+              <div className="mt-2">
+                <div className="text-3xl font-bold">$7.99 <span className="text-base font-normal text-muted-foreground">/month</span></div>
+                <div className="text-sm text-muted-foreground mt-1">or $59.99/year (save 37%)</div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {features.map((feature, index) => (
+                <div key={`premium-${index}`} className="space-y-2">
+                  <h4 className="font-medium">{feature.name}</h4>
+                  <ul className="space-y-1">
+                    {feature.premium.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm">
+                        <Check size={16} className="text-green-500 shrink-0 mt-1" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </CardContent>
+            <CardFooter>
+              <Button 
+                className="w-full" 
+                onClick={handleSubscribe}
+                disabled={isPremium}
+              >
+                <CreditCard className="mr-2 h-4 w-4" />
+                {isPremium ? "Current Plan" : "Upgrade Now"}
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      )}
 
       <Card className="bg-muted/50">
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-4">
-            <DollarSign className="h-8 w-8 text-primary" />
+        <CardContent className={`${isMobile ? 'p-4' : 'pt-6'}`}>
+          <div className="flex items-center gap-3">
+            <DollarSign className={`${isMobile ? 'h-6 w-6' : 'h-8 w-8'} text-primary`} />
             <div>
-              <h3 className="font-medium">30-Day Money-Back Guarantee</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className={`font-medium ${isMobile ? 'text-sm' : ''}`}>30-Day Money-Back Guarantee</h3>
+              <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
                 Try Premium risk-free. If you're not satisfied, get a full refund within 30 days.
               </p>
             </div>
