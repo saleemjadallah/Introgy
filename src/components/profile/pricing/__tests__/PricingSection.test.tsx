@@ -29,7 +29,13 @@ describe("PricingSection Component", () => {
     });
     
     vi.mocked(useAuth).mockReturnValue({
-      user: { id: "user-123" },
+      user: { 
+        id: "user-123",
+        app_metadata: {},
+        user_metadata: {},
+        aud: "authenticated",
+        created_at: "2023-01-01"
+      },
       session: null,
       isLoading: false,
       isAuthenticated: true,
