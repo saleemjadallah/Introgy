@@ -14,6 +14,7 @@ import { Check, CreditCard, DollarSign } from "lucide-react";
 import { useAuth } from "@/contexts/auth";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePremium } from "@/contexts/premium/PremiumContext";
 
 interface PricingFeature {
   name: string;
@@ -23,13 +24,14 @@ interface PricingFeature {
 
 const PricingSection = () => {
   const { user } = useAuth();
-  const [isPremium, setIsPremium] = React.useState(false);
+  const { isPremium, upgradeToPremium } = usePremium();
   const isMobile = useIsMobile();
 
   // Mock subscription function
   const handleSubscribe = () => {
-    toast.success("Upgrade requested! This would connect to a payment processor in production.");
-    setIsPremium(true);
+    // In production, this would connect to Stripe
+    upgradeToPremium();
+    toast.success("You've been upgraded to Premium! This would connect to a payment processor in production.");
   };
 
   const features: PricingFeature[] = [

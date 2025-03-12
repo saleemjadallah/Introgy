@@ -7,9 +7,12 @@ import CommunicationPreferences from "@/components/connection-builder/Communicat
 import RelationshipNurturing from "@/components/connection-builder/RelationshipNurturing";
 import MeaningfulInteractionTools from "@/components/connection-builder/MeaningfulInteractionTools";
 import BoundaryManager from "@/components/connection-builder/boundary-manager/BoundaryManager";
+import { PremiumFeatureGuard } from "@/components/premium/PremiumFeatureGuard";
+import { usePremium } from "@/contexts/premium/PremiumContext";
 
 const ConnectionBuilder = () => {
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
+  const { isPremium } = usePremium();
   
   const renderFeatureContent = () => {
     switch (activeFeature) {
@@ -18,9 +21,25 @@ const ConnectionBuilder = () => {
       case 'relationship-nurturing':
         return <RelationshipNurturing />;
       case 'meaningful-interactions':
-        return <MeaningfulInteractionTools />;
+        return (
+          <PremiumFeatureGuard 
+            feature="ai-interaction-tools"
+            title="Premium Interaction Tools"
+            description="Unlock AI-powered tools to create deeper connections with less effort"
+          >
+            <MeaningfulInteractionTools />
+          </PremiumFeatureGuard>
+        );
       case 'boundary-manager':
-        return <BoundaryManager />;
+        return (
+          <PremiumFeatureGuard 
+            feature="boundary-management"
+            title="Premium Boundary Management"
+            description="Advanced tools for setting and maintaining healthy social boundaries"
+          >
+            <BoundaryManager />
+          </PremiumFeatureGuard>
+        );
       default:
         return renderFeatureCards();
     }
