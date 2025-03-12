@@ -1,10 +1,10 @@
-
 import { Capacitor } from '@capacitor/core';
 import { Purchases } from '@revenuecat/purchases-capacitor';
 import { 
   CustomerInfo, 
   Purchase,
-  PurchasePackageOptions
+  PurchasePackageOptions,
+  RevenueCatPackage
 } from './types';
 
 class RevenueCatService {
@@ -53,11 +53,24 @@ class RevenueCatService {
 
   async purchasePackage(options: PurchasePackageOptions) {
     try {
-      // We need to ensure the options object matches what the plugin expects
-      const purchaseResult = await Purchases.purchasePackage({
-        aPackage: options.aPackage,
+      // Convert our package type to match RevenueCat's expected format
+      const purchaseOptions = {
+        aPackage: {
+          ...options.aPackage,
+          product: {
+            ...options.aPackage.product,
+            discounts: [],
+            productCategory: 'subscription',
+            productType: 'subscription',
+            subscriptionPeriod: options.aPackage.packageType === 'ANNUAL' ? 'P1Y' : 'P1M',
+            defaultOption: true,
+            subscriptionOptions: []
+          }
+        },
         presentedOfferingIdentifier: options.presentedOfferingIdentifier
-      });
+      };
+      
+      const purchaseResult = await Purchases.purchasePackage(purchaseOptions);
       return purchaseResult;
     } catch (error) {
       console.error('Error purchasing package from RevenueCat:', error);

@@ -1,4 +1,3 @@
-
 export const PRODUCT_IDS = {
   PREMIUM_MONTHLY: 'app.introgy.premium.monthly',
   PREMIUM_YEARLY: 'app.introgy.premium.yearly',
@@ -94,11 +93,12 @@ export enum PACKAGE_TYPE {
 
 export interface RevenueCatPackage {
   identifier: string;
-  packageType: PACKAGE_TYPE; // Updated to use enum
+  packageType: PACKAGE_TYPE;
   product: RevenueCatProduct;
   offeringIdentifier?: string;
 }
 
+// Updated to match RevenueCat's PurchasesStoreProduct
 export interface RevenueCatProduct {
   identifier: string;
   description: string;
@@ -110,6 +110,13 @@ export interface RevenueCatProduct {
   introPriceString?: string;
   introPricePeriod?: string;
   introPriceCycles?: number;
+  discounts: any[];
+  productCategory: string;
+  productType: string;
+  subscriptionPeriod: string;
+  defaultOption: boolean;
+  presentedOfferingIdentifier?: string;
+  subscriptionOptions?: any[];
 }
 
 // Make this match the RevenueCat plugin's expected format
