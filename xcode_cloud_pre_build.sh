@@ -9,6 +9,12 @@ if [[ ! -z "$CI_XCODE_CLOUD" ]]; then
   
   # Print working directory for debugging
   echo "Working directory: $(pwd)"
+
+  # Copy RevenueCat plugin files from node_modules to the appropriate location
+  echo "Copying RevenueCat plugin files..."
+  mkdir -p ios/App/RevenuecatPurchasesCapacitor/Plugin
+  cp -R node_modules/@revenuecat/purchases-capacitor/ios/Plugin/* ios/App/RevenuecatPurchasesCapacitor/Plugin/
+  echo "RevenueCat plugin files copied"
   
   # Navigate to iOS directory
   cd ios || exit 1
