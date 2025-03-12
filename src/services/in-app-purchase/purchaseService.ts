@@ -16,7 +16,7 @@ import {
   verifyNativePurchase, 
   checkNativeEntitlementStatus,
   restoreNativePurchases
-} from './nativePurchaseHandler';
+} from './native';
 
 class PurchaseService {
   private isNative = Capacitor.isNativePlatform();
