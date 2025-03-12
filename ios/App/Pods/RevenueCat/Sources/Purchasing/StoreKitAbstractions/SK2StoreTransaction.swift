@@ -16,13 +16,19 @@ import StoreKit
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
 internal struct SK2StoreTransaction: StoreTransactionType {
 
-    init(sk2Transaction: SK2Transaction) {
+    /// - Parameter environmentOverride: Overrides the environment from the StoreKit 2 transaction.
+    /// Used to override the default `Xcode` environment when running tests.
+    init(sk2Transaction: SK2Transaction,
+         jwsRepresentation: String,
+         environmentOverride: StoreEnvironment? = nil) {
         self.underlyingSK2Transaction = sk2Transaction
 
         self.productIdentifier = sk2Transaction.productID
         self.purchaseDate = sk2Transaction.purchaseDate
         self.transactionIdentifier = String(sk2Transaction.id)
         self.quantity = sk2Transaction.purchasedQuantity
+        self.jwsRepresentation = jwsRepresentation
+        self.environment = environmentOverride ?? .init(sk2Transaction: sk2Transaction)
 
         #if swift(>=5.9)
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
@@ -42,6 +48,8 @@ internal struct SK2StoreTransaction: StoreTransactionType {
     let transactionIdentifier: String
     let quantity: Int
     let storefront: Storefront?
+    let jwsRepresentation: String?
+    var environment: StoreEnvironment?
 
     var hasKnownPurchaseDate: Bool { return true }
     var hasKnownTransactionIdentifier: Bool { return true }

@@ -36,6 +36,16 @@ internal struct SK1StoreTransaction: StoreTransactionType {
         return nil
     }
 
+    internal var jwsRepresentation: String? {
+        // This is only available on StoreKit 2 transactions.
+        return nil
+    }
+
+    internal var environment: StoreEnvironment? {
+        // This is only available on StoreKit 2 transactions.
+        return nil
+    }
+
     var hasKnownPurchaseDate: Bool {
         return self.underlyingSK1Transaction.transactionDate != nil
     }

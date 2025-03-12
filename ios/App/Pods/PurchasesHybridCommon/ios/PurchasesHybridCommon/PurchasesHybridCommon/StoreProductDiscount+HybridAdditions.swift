@@ -10,6 +10,16 @@ import Foundation
 import StoreKit
 import RevenueCat
 
+@objc public extension StoreProductDiscount {
+    
+    // Re-exports price property with a different name to avoid recursion.
+
+    @objc var priceAmount: NSDecimalNumber {
+        return self.priceDecimalNumber
+    }
+
+}
+
 internal extension StoreProductDiscount {
 
     var rc_currencyCode: String? {
@@ -27,10 +37,8 @@ internal extension StoreProductDiscount {
             "cycles": numberOfPeriods
         ]
         
-        if #available(iOS 12.2, tvOS 12.2, macOS 10.14.4, *) {
-            if offerIdentifier != nil {
-                dictionary["identifier"] = offerIdentifier
-            }
+        if offerIdentifier != nil {
+            dictionary["identifier"] = offerIdentifier
         }
         return dictionary
     }

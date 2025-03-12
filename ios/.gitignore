@@ -1,12 +1,12 @@
 App/build
-# App/Pods  # Commented out so Pods can be committed for Xcode Cloud
+App/Pods
 App/output
 App/App/public
 DerivedData
 xcuserdata
 
 # Cordova plugins for Capacitor
-# capacitor-cordova-ios-plugins  # Commented out for Xcode Cloud
+capacitor-cordova-ios-plugins
 
 # Generated Config files
 App/App/capacitor.config.json

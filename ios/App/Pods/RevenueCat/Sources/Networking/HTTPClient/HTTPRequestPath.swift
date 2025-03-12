@@ -33,6 +33,9 @@ protocol HTTPRequestPath {
     /// The path component for this endpoint.
     var pathComponent: String { get }
 
+    /// The name of the endpoint.
+    var name: String { get }
+
 }
 
 extension HTTPRequestPath {
@@ -67,6 +70,20 @@ extension HTTPRequest {
         case postAdServicesToken(appUserID: String)
         case health
         case getProductEntitlementMapping
+        case getCustomerCenterConfig(appUserID: String)
+        case postRedeemWebPurchase
+
+    }
+
+    enum PaywallPath: Hashable {
+
+        case postEvents
+
+    }
+
+    enum DiagnosticsPath: Hashable {
+
+        case postDiagnostics
 
     }
 
@@ -87,7 +104,9 @@ extension HTTPRequest.Path: HTTPRequestPath {
                 .postReceiptData,
                 .postSubscriberAttributes,
                 .postAdServicesToken,
-                .getProductEntitlementMapping:
+                .postRedeemWebPurchase,
+                .getProductEntitlementMapping,
+                .getCustomerCenterConfig:
             return true
 
         case .health:
@@ -106,7 +125,9 @@ extension HTTPRequest.Path: HTTPRequestPath {
                 .postReceiptData,
                 .postSubscriberAttributes,
                 .postAdServicesToken,
-                .getProductEntitlementMapping:
+                .postRedeemWebPurchase,
+                .getProductEntitlementMapping,
+                .getCustomerCenterConfig:
             return true
         case .health:
             return false
@@ -126,7 +147,9 @@ extension HTTPRequest.Path: HTTPRequestPath {
                 .postSubscriberAttributes,
                 .postAttributionData,
                 .postAdServicesToken,
-                .postOfferForSigning:
+                .postOfferForSigning,
+                .postRedeemWebPurchase,
+                .getCustomerCenterConfig:
             return false
         }
     }
@@ -144,7 +167,9 @@ extension HTTPRequest.Path: HTTPRequestPath {
                 .postAttributionData,
                 .postAdServicesToken,
                 .postOfferForSigning,
-                .getProductEntitlementMapping:
+                .postRedeemWebPurchase,
+                .getProductEntitlementMapping,
+                .getCustomerCenterConfig:
             return false
         }
     }
@@ -183,6 +208,57 @@ extension HTTPRequest.Path: HTTPRequestPath {
 
         case .getProductEntitlementMapping:
             return "product_entitlement_mapping"
+
+        case let .getCustomerCenterConfig(appUserID):
+            return "customercenter/\(Self.escape(appUserID))"
+
+        case .postRedeemWebPurchase:
+            return "subscribers/redeem_purchase"
+
+        }
+    }
+
+    var name: String {
+        switch self {
+        case .getCustomerInfo:
+            return "get_customer"
+
+        case .getOfferings:
+            return "get_offerings"
+
+        case .getIntroEligibility:
+            return "get_intro_eligibility"
+
+        case .logIn:
+            return "log_in"
+
+        case .postAttributionData:
+            return "post_attribution"
+
+        case .postAdServicesToken:
+            return "post_adservices_token"
+
+        case .postOfferForSigning:
+            return "post_offer_for_signing"
+
+        case .postReceiptData:
+            return "post_receipt"
+
+        case .postSubscriberAttributes:
+            return "post_attributes"
+
+        case .health:
+            return "post_health"
+
+        case .getProductEntitlementMapping:
+            return "get_product_entitlement_mapping"
+
+        case .getCustomerCenterConfig:
+            return "customer_center"
+
+        case .postRedeemWebPurchase:
+            return "post_redeem_web_purchase"
+
         }
     }
 

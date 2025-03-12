@@ -25,12 +25,14 @@ internal extension EntitlementInfo {
             "expirationDateMillis": expirationDate?.rc_millisecondsSince1970AsDouble() ?? NSNull(),
             "store": storeString,
             "productIdentifier": productIdentifier,
+            "productPlanIdentifier": productPlanIdentifier ?? NSNull(),
             "isSandbox": isSandbox,
             "unsubscribeDetectedAt": unsubscribeDetectedAt?.rc_formattedAsISO8601() ?? NSNull(),
             "unsubscribeDetectedAtMillis": unsubscribeDetectedAt?.rc_millisecondsSince1970AsDouble() ?? NSNull(),
             "billingIssueDetectedAt": billingIssueDetectedAt?.rc_formattedAsISO8601() ?? NSNull(),
             "billingIssueDetectedAtMillis": billingIssueDetectedAt?.rc_millisecondsSince1970AsDouble() ?? NSNull(),
-            "ownershipType": ownershipTypeString
+            "ownershipType": ownershipTypeString,
+            "verification": verification.name
         ]
     }
 
@@ -46,6 +48,8 @@ private extension EntitlementInfo {
             return "NORMAL"
         case .trial:
             return "TRIAL"
+        case .prepaid:
+            return "PREPAID"
         @unknown default:
             return "UNKNOWN"
         }
@@ -80,6 +84,10 @@ private extension EntitlementInfo {
             return "AMAZON"
         case .stripe:
             return "STRIPE"
+        case .rcBilling:
+            return "RC_BILLING"
+        case .external:
+            return "EXTERNAL"
         @unknown default:
             return "UNKNOWN_STORE"
         }

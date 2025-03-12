@@ -26,15 +26,20 @@ import AppKit
 class SystemInfo {
 
     static let appleSubscriptionsURL = URL(string: "https://apps.apple.com/account/subscriptions")!
-    static var forceUniversalAppStore: Bool = false
 
-    let storeKit2Setting: StoreKit2Setting
+    static var forceUniversalAppStore: Bool {
+        get { self._forceUniversalAppStore.value }
+        set { self._forceUniversalAppStore.value = newValue }
+    }
+
+    let storeKitVersion: StoreKitVersion
     let operationDispatcher: OperationDispatcher
     let platformFlavor: String
     let platformFlavorVersion: String?
     let responseVerificationMode: Signing.ResponseVerificationMode
     let dangerousSettings: DangerousSettings
     let clock: ClockType
+    let preferredLocalesProvider: PreferredLocalesProviderType
 
     var finishTransactions: Bool {
         get { return self._finishTransactions.value }
@@ -46,15 +51,39 @@ class SystemInfo {
     var observerMode: Bool { return !self.finishTransactions }
 
     private let sandboxEnvironmentDetector: SandboxEnvironmentDetector
+    private let storefrontProvider: StorefrontProviderType
     private let _finishTransactions: Atomic<Bool>
     private let _bundle: Atomic<Bundle>
 
-    var isSandbox: Bool {
+    private static let _forceUniversalAppStore: Atomic<Bool> = false
+    private static let _proxyURL: Atomic<URL?> = nil
+
+    private lazy var _isSandbox: Bool = {
         return self.sandboxEnvironmentDetector.isSandbox
+    }()
+
+    var isSandbox: Bool {
+        return self._isSandbox
+    }
+
+    var isDebugBuild: Bool {
+#if DEBUG
+        return true
+#else
+        return false
+#endif
+    }
+
+    var storefront: StorefrontType? {
+        return self.storefrontProvider.currentStorefront
+    }
+
+    var preferredLanguages: [String] {
+        return self.preferredLocalesProvider.preferredLanguages
     }
 
     static var frameworkVersion: String {
-        return "4.25.10"
+        return "5.18.0"
     }
 
     static var systemVersion: String {
@@ -77,12 +106,27 @@ class SystemInfo {
         return Self.forceUniversalAppStore ? "iOS" : self.platformHeaderConstant
     }
 
+    static var deviceVersion: String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+
+        let machineMirror = Mirror(reflecting: systemInfo.machine)
+        let identifier = machineMirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8, value != 0 else { return identifier }
+            return identifier + String(UnicodeScalar(UInt8(value)))
+        }
+
+        return identifier
+    }
+
     var identifierForVendor: String? {
         // Should match available platforms in
         // https://developer.apple.com/documentation/uikit/uidevice?language=swift
         // https://developer.apple.com/documentation/watchkit/wkinterfacedevice?language=swift
 
         #if os(iOS) || os(tvOS) || VISION_OS
+            // Fix-me: `UIDevice.current` is `@MainActor` so this method
+            // will need to be marked as such too.
             return UIDevice.current.identifierForVendor?.uuidString
         #elseif os(watchOS)
             return WKInterfaceDevice.current().identifierForVendor?.uuidString
@@ -94,8 +138,11 @@ class SystemInfo {
     }
 
     static var proxyURL: URL? {
-        didSet {
-            if let privateProxyURLString = proxyURL?.absoluteString {
+        get { return self._proxyURL.value }
+        set {
+            self._proxyURL.value = newValue
+
+            if let privateProxyURLString = newValue?.absoluteString {
                 Logger.info(Strings.configure.configuring_purchases_proxy_url_set(url: privateProxyURLString))
             }
         }
@@ -106,26 +153,34 @@ class SystemInfo {
          operationDispatcher: OperationDispatcher = .default,
          bundle: Bundle = .main,
          sandboxEnvironmentDetector: SandboxEnvironmentDetector = BundleSandboxEnvironmentDetector.default,
-         storeKit2Setting: StoreKit2Setting = .default,
+         storefrontProvider: StorefrontProviderType = DefaultStorefrontProvider(),
+         storeKitVersion: StoreKitVersion = .default,
          responseVerificationMode: Signing.ResponseVerificationMode = .default,
          dangerousSettings: DangerousSettings? = nil,
-         clock: ClockType = Clock.default) {
+         clock: ClockType = Clock.default,
+         preferredLocalesProvider: PreferredLocalesProviderType = PreferredLocalesProvider.default) {
         self.platformFlavor = platformInfo?.flavor ?? "native"
         self.platformFlavorVersion = platformInfo?.version
         self._bundle = .init(bundle)
 
         self._finishTransactions = .init(finishTransactions)
         self.operationDispatcher = operationDispatcher
-        self.storeKit2Setting = storeKit2Setting
+        self.storeKitVersion = storeKitVersion
         self.sandboxEnvironmentDetector = sandboxEnvironmentDetector
+        self.storefrontProvider = storefrontProvider
         self.responseVerificationMode = responseVerificationMode
         self.dangerousSettings = dangerousSettings ?? DangerousSettings()
         self.clock = clock
+        self.preferredLocalesProvider = preferredLocalesProvider
+    }
+
+    var supportsOfflineEntitlements: Bool {
+        !self.observerMode && !self.dangerousSettings.customEntitlementComputation
     }
 
     /// Asynchronous API if caller can't ensure that it's invoked in the `@MainActor`
     /// - Seealso: `isApplicationBackgrounded`
-    func isApplicationBackgrounded(completion: @escaping (Bool) -> Void) {
+    func isApplicationBackgrounded(completion: @escaping @Sendable (Bool) -> Void) {
         self.operationDispatcher.dispatchOnMainActor {
             completion(self.isApplicationBackgrounded)
         }
@@ -235,6 +290,27 @@ extension SystemInfo {
             NSApplication.didResignActiveNotification
         #elseif os(watchOS)
             Notification.Name.NSExtensionHostDidEnterBackground
+        #endif
+    }
+
+    /// Returns the appropriate `Notification.Name` for the OS's didBecomeActive notification,
+    /// indicating that the application did become active. This value is only nil for watchOS
+    /// versions below 7.0.
+    static var applicationDidBecomeActiveNotification: Notification.Name? {
+        #if os(iOS) || os(tvOS) || VISION_OS || targetEnvironment(macCatalyst)
+            return UIApplication.didBecomeActiveNotification
+        #elseif os(macOS)
+            return NSApplication.didBecomeActiveNotification
+        #elseif os(watchOS)
+        if #available(watchOS 9, *) {
+            return WKApplication.didBecomeActiveNotification
+        } else if #available(watchOS 7, *) {
+            // Work around for "Symbol not found" dyld crashes on watchOS 7.0..<9.0
+            return Notification.Name("WKApplicationDidBecomeActiveNotification")
+        } else {
+            // There's no equivalent notification available on watchOS <7.
+            return nil
+        }
         #endif
     }
 

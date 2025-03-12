@@ -37,6 +37,10 @@ enum StoreKitStrings {
 
     case sk2_purchasing_added_promotional_offer_option(String)
 
+    case sk2_purchasing_added_winback_offer_option(String)
+
+    case sk2_purchasing_added_uuid_option(UUID)
+
     case sk2_unknown_product_type(String)
 
     case sk1_no_known_product_type
@@ -59,11 +63,33 @@ enum StoreKitStrings {
 
     case sk2_observing_transaction_updates
 
+    case sk2_observing_purchase_intents
+
+    case sk2_unknown_environment(String)
+
+    case sk2_error_encoding_receipt(Error)
+
+    case sk2_error_fetching_app_transaction(Error)
+
+    case sk2_error_fetching_subscription_status(subscriptionGroupId: String, Error)
+
+    case sk2_app_transaction_unavailable
+
+    case sk2_unverified_transaction(identifier: String, Error)
+
+    case sk2_unverified_renewal_info(productIdentifier: String)
+
+    case sk2_receipt_missing_purchase(transactionId: String)
+
     #if DEBUG
 
     case sk1_wrapper_notifying_delegate_of_existing_transactions(count: Int)
 
     #endif
+
+    case could_not_defer_store_messages(Error)
+
+    case error_displaying_store_message(Error)
 
 }
 
@@ -103,6 +129,12 @@ extension StoreKitStrings: LogMessage {
 
         case let .sk2_purchasing_added_promotional_offer_option(discountIdentifier):
             return "Adding Product.PurchaseOption for discount '\(discountIdentifier)'"
+
+        case let .sk2_purchasing_added_winback_offer_option(winBackOfferID):
+            return "Adding Product.PurchaseOption for win-back offer with ID '\(winBackOfferID)'"
+
+        case let .sk2_purchasing_added_uuid_option(uuid):
+            return "Adding Product.PurchaseOption for .appAccountToken '\(uuid)'"
 
         case let .sk2_unknown_product_type(type):
             return "Product.ProductType '\(type)' unknown, the product type will be undefined."
@@ -145,12 +177,44 @@ extension StoreKitStrings: LogMessage {
         case .sk2_observing_transaction_updates:
             return "Observing StoreKit.Transaction.updates"
 
+        case .sk2_observing_purchase_intents:
+            return "Observing StoreKit.PurchaseIntent.intents"
+
+        case let .sk2_unknown_environment(environment):
+            return "Unrecognized StoreKit Environment: \(environment)"
+
+        case let .sk2_error_encoding_receipt(error):
+            return "Error encoding SK2 receipt: '\(error)'"
+
+        case let .sk2_error_fetching_app_transaction(error):
+            return "Error fetching AppTransaction: '\(error)'"
+
+        case let .sk2_error_fetching_subscription_status(subscriptionGroupId, error):
+            return "Error fetching status for subscription group with id '\(subscriptionGroupId)': '\(error)'"
+
+        case .sk2_app_transaction_unavailable:
+            return "Not fetching AppTransaction because it is not available"
+
+        case let .sk2_unverified_transaction(id, error):
+            return "Found unverified transaction with ID: '\(id)' Error: '\(error)'"
+
+        case let .sk2_unverified_renewal_info(productIdentifier):
+            return "Found unverified renewal info for product with identifier: '\(productIdentifier)'"
+
+        case let .sk2_receipt_missing_purchase(transactionId):
+            return "SK2 receipt is still missing transaction with id '\(transactionId)'"
+
         #if DEBUG
         case let .sk1_wrapper_notifying_delegate_of_existing_transactions(count):
             return "StoreKit1Wrapper: sending delegate \(count) existing transactions " +
             "for Integration Tests."
         #endif
 
+        case let .could_not_defer_store_messages(error):
+            return "Tried to defer store messages but an error occured: '\(error)'."
+
+        case let .error_displaying_store_message(error):
+            return "Error displaying StoreKit message: '\(error)'"
         }
     }
 

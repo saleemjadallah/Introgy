@@ -51,6 +51,10 @@ public struct TestStoreProduct {
     public var localizedTitle: String
     public var price: Decimal
     public var localizedPriceString: String
+    public var localizedPricePerDay: String?
+    public var localizedPricePerWeek: String?
+    public var localizedPricePerMonth: String?
+    public var localizedPricePerYear: String?
     public var productIdentifier: String
     public var productType: StoreProduct.ProductType
     public var localizedDescription: String
@@ -59,6 +63,7 @@ public struct TestStoreProduct {
     public var isFamilyShareable: Bool
     public var introductoryDiscount: StoreProductDiscount?
     public var discounts: [StoreProductDiscount]
+    public var locale: Locale
 
     public init(
         localizedTitle: String,
@@ -71,7 +76,8 @@ public struct TestStoreProduct {
         subscriptionPeriod: SubscriptionPeriod? = nil,
         isFamilyShareable: Bool = false,
         introductoryDiscount: TestStoreProductDiscount? = nil,
-        discounts: [TestStoreProductDiscount] = []
+        discounts: [TestStoreProductDiscount] = [],
+        locale: Locale = .current
     ) {
         self.localizedTitle = localizedTitle
         self.price = price
@@ -84,6 +90,7 @@ public struct TestStoreProduct {
         self.isFamilyShareable = isFamilyShareable
         self.introductoryDiscount = introductoryDiscount?.toStoreProductDiscount()
         self.discounts = discounts.map { $0.toStoreProductDiscount() }
+        self.locale = locale
     }
 
     // swiftlint:enable missing_docs
@@ -98,13 +105,12 @@ extension TestStoreProduct: StoreProductType {
     internal var productCategory: StoreProduct.ProductCategory { return self.productType.productCategory }
 
     internal var currencyCode: String? {
-        // Test currency defaults to current locale
-        return Locale.current.rc_currencyCode
+        return self.locale.rc_currencyCode
     }
 
     internal var priceFormatter: NumberFormatter? {
         return self.currencyCode.map {
-            self.priceFormatterProvider.priceFormatterForSK2(withCurrencyCode: $0)
+            self.priceFormatterProvider.priceFormatterForSK2(withCurrencyCode: $0, locale: self.locale)
         }
     }
 

@@ -25,8 +25,10 @@ struct PurchaseSource: Equatable {
 struct PurchasedTransactionData {
 
     var appUserID: String
-    var presentedOfferingID: String?
+    var presentedOfferingContext: PresentedOfferingContext?
+    var presentedPaywall: PaywallEvent?
     var unsyncedAttributes: SubscriberAttribute.Dictionary?
+    var metadata: [String: String]?
     var aadAttributionToken: String?
     var storefront: StorefrontType?
     var source: PurchaseSource
@@ -57,6 +59,7 @@ final class TransactionPoster: TransactionPosterType {
 
     private let productsManager: ProductsManagerType
     private let receiptFetcher: ReceiptFetcher
+    private let transactionFetcher: StoreKit2TransactionFetcherType
     private let backend: Backend
     private let paymentQueueWrapper: EitherPaymentQueueWrapper
     private let systemInfo: SystemInfo
@@ -65,6 +68,7 @@ final class TransactionPoster: TransactionPosterType {
     init(
         productsManager: ProductsManagerType,
         receiptFetcher: ReceiptFetcher,
+        transactionFetcher: StoreKit2TransactionFetcherType,
         backend: Backend,
         paymentQueueWrapper: EitherPaymentQueueWrapper,
         systemInfo: SystemInfo,
@@ -72,6 +76,7 @@ final class TransactionPoster: TransactionPosterType {
     ) {
         self.productsManager = productsManager
         self.receiptFetcher = receiptFetcher
+        self.transactionFetcher = transactionFetcher
         self.backend = backend
         self.paymentQueueWrapper = paymentQueueWrapper
         self.systemInfo = systemInfo
@@ -85,22 +90,35 @@ final class TransactionPoster: TransactionPosterType {
             transactionID: transaction.transactionIdentifier,
             productID: transaction.productIdentifier,
             transactionDate: transaction.purchaseDate,
-            offeringID: data.presentedOfferingID
+            offeringID: data.presentedOfferingContext?.offeringIdentifier,
+            placementID: data.presentedOfferingContext?.placementIdentifier,
+            paywallSessionID: data.presentedPaywall?.data.sessionIdentifier
         ))
 
-        self.receiptFetcher.receiptData(
-            refreshPolicy: self.refreshRequestPolicy(forProductIdentifier: transaction.productIdentifier)
-        ) { receiptData, receiptURL in
-            if let receiptData = receiptData, !receiptData.isEmpty {
-                self.fetchProductsAndPostReceipt(
-                    transaction: transaction,
-                    data: data,
-                    receiptData: receiptData,
-                    completion: completion
-                )
-            } else {
+        guard let productIdentifier = transaction.productIdentifier.notEmpty else {
+            self.handleReceiptPost(withTransaction: transaction,
+                                   result: .failure(.missingTransactionProductIdentifier()),
+                                   subscriberAttributes: nil,
+                                   completion: completion)
+            return
+        }
+
+        self.fetchEncodedReceipt(transaction: transaction) { result in
+            switch result {
+            case .success(let encodedReceipt):
+                self.product(with: productIdentifier) { product in
+                    self.transactionFetcher.appTransactionJWS { appTransaction in
+                        self.postReceipt(transaction: transaction,
+                                         purchasedTransactionData: data,
+                                         receipt: encodedReceipt,
+                                         product: product,
+                                         appTransaction: appTransaction,
+                                         completion: completion)
+                    }
+                }
+            case .failure(let error):
                 self.handleReceiptPost(withTransaction: transaction,
-                                       result: .failure(.missingReceiptFile(receiptURL)),
+                                       result: .failure(error),
                                        subscriberAttributes: nil,
                                        completion: completion)
             }
@@ -165,7 +183,6 @@ final class TransactionPoster: TransactionPosterType {
 }
 
 /// Async extension
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
 extension TransactionPosterType {
 
     /// Starts a `PostReceiptDataOperation` for the transaction.
@@ -183,28 +200,6 @@ extension TransactionPosterType {
 // MARK: - Implementation
 
 private extension TransactionPoster {
-
-    func fetchProductsAndPostReceipt(
-        transaction: StoreTransactionType,
-        data: PurchasedTransactionData,
-        receiptData: Data,
-        completion: @escaping CustomerAPI.CustomerInfoResponseHandler
-    ) {
-        if let productIdentifier = transaction.productIdentifier.notEmpty {
-            self.product(with: productIdentifier) { product in
-                self.postReceipt(transaction: transaction,
-                                 purchasedTransactionData: data,
-                                 receiptData: receiptData,
-                                 product: product,
-                                 completion: completion)
-            }
-        } else {
-            self.handleReceiptPost(withTransaction: transaction,
-                                   result: .failure(.missingTransactionProductIdentifier()),
-                                   subscriberAttributes: nil,
-                                   completion: completion)
-        }
-    }
 
     func handleReceiptPost(withTransaction transaction: StoreTransactionType,
                            result: Result<(info: CustomerInfo, product: StoreProduct?), BackendError>,
@@ -240,21 +235,50 @@ private extension TransactionPoster {
         }
     }
 
+    // swiftlint:disable function_parameter_count
     func postReceipt(transaction: StoreTransactionType,
                      purchasedTransactionData: PurchasedTransactionData,
-                     receiptData: Data,
+                     receipt: EncodedAppleReceipt,
                      product: StoreProduct?,
+                     appTransaction: String?,
                      completion: @escaping CustomerAPI.CustomerInfoResponseHandler) {
         let productData = product.map { ProductRequestData(with: $0, storefront: purchasedTransactionData.storefront) }
 
-        self.backend.post(receiptData: receiptData,
+        self.backend.post(receipt: receipt,
                           productData: productData,
                           transactionData: purchasedTransactionData,
-                          observerMode: self.observerMode) { result in
+                          observerMode: self.observerMode,
+                          appTransaction: appTransaction) { result in
             self.handleReceiptPost(withTransaction: transaction,
                                    result: result.map { ($0, product) },
                                    subscriberAttributes: purchasedTransactionData.unsyncedAttributes,
                                    completion: completion)
+        }
+    }
+
+    func fetchEncodedReceipt(transaction: StoreTransactionType,
+                             completion: @escaping (Result<EncodedAppleReceipt, BackendError>) -> Void) {
+        if systemInfo.storeKitVersion.isStoreKit2EnabledAndAvailable,
+           let jwsRepresentation = transaction.jwsRepresentation {
+            if transaction.environment == .xcode, #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *) {
+                _ = Task<Void, Never> {
+                    completion(.success(
+                        .sk2receipt(await self.transactionFetcher.fetchReceipt(containing: transaction))
+                    ))
+                }
+            } else {
+                completion(.success(.jws(jwsRepresentation)))
+            }
+        } else {
+            self.receiptFetcher.receiptData(
+                refreshPolicy: self.refreshRequestPolicy(forProductIdentifier: transaction.productIdentifier)
+            ) { receiptData, receiptURL in
+                if let receiptData = receiptData, !receiptData.isEmpty {
+                    completion(.success(.receipt(receiptData)))
+                } else {
+                    completion(.failure(BackendError.missingReceiptFile(receiptURL)))
+                }
+            }
         }
     }
 

@@ -20,23 +20,29 @@ import Foundation
         #if DEBUG
         let forceServerErrors: Bool
         let forceSignatureFailures: Bool
+        let disableHeaderSignatureVerification: Bool
         let testReceiptIdentifier: String?
 
         init(
             enableReceiptFetchRetry: Bool = false,
             forceServerErrors: Bool = false,
             forceSignatureFailures: Bool = false,
+            disableHeaderSignatureVerification: Bool = false,
             testReceiptIdentifier: String? = nil
         ) {
             self.enableReceiptFetchRetry = enableReceiptFetchRetry
             self.forceServerErrors = forceServerErrors
             self.forceSignatureFailures = forceSignatureFailures
+            self.disableHeaderSignatureVerification = disableHeaderSignatureVerification
             self.testReceiptIdentifier = testReceiptIdentifier
         }
         #else
-        init(enableReceiptFetchRetry: Bool = false) {
+        init(
+            enableReceiptFetchRetry: Bool = false
+        ) {
             self.enableReceiptFetchRetry = enableReceiptFetchRetry
         }
+
         #endif
 
         static let `default`: Self = .init()
@@ -51,6 +57,12 @@ import Foundation
      * Auto syncing of purchases is enabled by default.
      */
     @objc public let autoSyncPurchases: Bool
+
+    /**
+     * if `true`, the SDK will return a set of mock products instead of the
+     * products obtained from StoreKit. This is useful for testing or preview purposes. 
+     */
+    @_spi(Internal) public let uiPreviewMode: Bool
 
     /**
      * A property meant for apps that do their own entitlements computation, separated from RevenueCat.
@@ -87,20 +99,33 @@ import Foundation
 
     /// - Note: this is `internal` only so the only `public` way to enable `customEntitlementComputation`
     /// is through ``Purchases/configureInCustomEntitlementsComputationMode(apiKey:appUserID:)``.
-    @objc internal convenience init(autoSyncPurchases: Bool = true, customEntitlementComputation: Bool) {
+    @objc internal convenience init(autoSyncPurchases: Bool = true,
+                                    customEntitlementComputation: Bool) {
         self.init(autoSyncPurchases: autoSyncPurchases,
                   customEntitlementComputation: customEntitlementComputation,
                   internalSettings: Internal.default)
 
     }
 
+    /**
+     * Used to initialize the SDK in UI preview mode.
+     *
+     * - Parameter uiPreviewMode: if `true`, the SDK will return a set of mock products instead of the
+     * products obtained from StoreKit. This is useful for testing or preview purposes. 
+     */
+    @_spi(Internal) public convenience init(uiPreviewMode: Bool) {
+        self.init(autoSyncPurchases: false, internalSettings: Internal.default, uiPreviewMode: uiPreviewMode)
+    }
+
     /// Designated initializer
     internal init(autoSyncPurchases: Bool,
                   customEntitlementComputation: Bool = false,
-                  internalSettings: InternalDangerousSettingsType) {
+                  internalSettings: InternalDangerousSettingsType,
+                  uiPreviewMode: Bool = false) {
         self.autoSyncPurchases = autoSyncPurchases
         self.internalSettings = internalSettings
         self.customEntitlementComputation = customEntitlementComputation
+        self.uiPreviewMode = uiPreviewMode
     }
 
 }
@@ -120,9 +145,13 @@ internal protocol InternalDangerousSettingsType: Sendable {
     /// Whether `HTTPClient` will fake invalid signatures.
     var forceSignatureFailures: Bool { get }
 
+    /// Used to verify that the backend signs correctly without this part of the signature.
+    var disableHeaderSignatureVerification: Bool { get }
+
     /// Allows defining the receipt identifier for `PostReceiptDataOperation`.
     /// This allows the backend to disambiguate between receipts created across separate test invocations.
     var testReceiptIdentifier: String? { get }
+
     #endif
 
 }

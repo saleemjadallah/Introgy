@@ -28,6 +28,27 @@ import Foundation
  */
 @objc(RCOffering) public final class Offering: NSObject {
 
+    /// Initialize a ``PaywallComponents``
+    public struct PaywallComponents {
+
+        /**
+         Paywall components configuration defined in RevenueCat dashboard.
+         */
+        public let uiConfig: UIConfig
+
+        /**
+         Paywall components configuration defined in RevenueCat dashboard.
+         */
+        public let data: PaywallComponentsData
+
+        /// Initialize a ``PaywallComponents``.
+        public init(uiConfig: UIConfig, data: PaywallComponentsData) {
+            self.uiConfig = uiConfig
+            self.data = data
+        }
+
+    }
+
     /**
      Unique identifier defined in RevenueCat dashboard.
      */
@@ -44,6 +65,21 @@ import Foundation
      Offering metadata defined in RevenueCat dashboard.
      */
     @objc public var metadata: [String: Any] { self._metadata.data }
+
+    /**
+     Paywall configuration defined in RevenueCat dashboard.
+     */
+    public let paywall: PaywallData?
+
+    /**
+     Paywall components configuration defined in RevenueCat dashboard.
+     */
+    public let paywallComponents: PaywallComponents?
+
+    /**
+     Draft paywall components configuration defined in RevenueCat dashboard.
+     */
+    @_spi(Internal) public let draftPaywallComponents: PaywallComponents?
 
     /**
      Array of ``Package`` objects available for purchase.
@@ -87,11 +123,19 @@ import Foundation
 
     public override var description: String {
         return """
-        <Offering {\n\tidentifier=\(identifier)\n\tserverDescription=\(serverDescription)\n"
-        \tavailablePackages=\(valueOrEmpty(availablePackages))\n\tlifetime=\(valueOrEmpty(lifetime))\n
-        \tannual=\(valueOrEmpty(annual))\n\tsixMonth=\(valueOrEmpty(sixMonth))\n
-        \tthreeMonth=\(valueOrEmpty(threeMonth))\n\ttwoMonth=\(valueOrEmpty(twoMonth))\n
-        \tmonthly=\(valueOrEmpty(monthly))\n\tweekly=\(valueOrEmpty(weekly))\n}>
+        <Offering {
+            identifier=\(self.identifier)
+            serverDescription=\(self.serverDescription)"
+            availablePackages=\(valueOrEmpty(self.availablePackages))
+            lifetime=\(valueOrEmpty(self.lifetime))
+            annual=\(valueOrEmpty(self.annual))
+            sixMonth=\(valueOrEmpty(self.sixMonth))
+            threeMonth=\(valueOrEmpty(self.threeMonth))
+            twoMonth=\(valueOrEmpty(self.twoMonth))
+            monthly=\(valueOrEmpty(self.monthly))
+            weekly=\(valueOrEmpty(self.weekly))
+            paywall=\(self.paywall.map { "\($0)" } ?? "nil")
+        }>
         """
     }
 
@@ -119,16 +163,59 @@ import Foundation
     // swiftlint:disable cyclomatic_complexity
 
     /// Initialize an ``Offering`` given a list of ``Package``s.
-    public init(
+    @objc
+    public convenience init(
         identifier: String,
         serverDescription: String,
-        metadata: [String: Any],
+        metadata: [String: Any] = [:],
+        availablePackages: [Package]
+    ) {
+        self.init(
+            identifier: identifier,
+            serverDescription: serverDescription,
+            metadata: metadata,
+            paywall: nil,
+            paywallComponents: nil,
+            availablePackages: availablePackages
+        )
+    }
+
+    /// Initialize an ``Offering`` given a list of ``Package``s.
+    public convenience init(
+        identifier: String,
+        serverDescription: String,
+        metadata: [String: Any] = [:],
+        paywall: PaywallData? = nil,
+        paywallComponents: PaywallComponents? = nil,
+        availablePackages: [Package]
+    ) {
+        self.init(
+            identifier: identifier,
+            serverDescription: serverDescription,
+            metadata: metadata,
+            paywall: paywall,
+            paywallComponents: paywallComponents,
+            draftPaywallComponents: nil,
+            availablePackages: availablePackages
+        )
+    }
+
+    init(
+        identifier: String,
+        serverDescription: String,
+        metadata: [String: Any] = [:],
+        paywall: PaywallData? = nil,
+        paywallComponents: PaywallComponents? = nil,
+        draftPaywallComponents: PaywallComponents?,
         availablePackages: [Package]
     ) {
         self.identifier = identifier
         self.serverDescription = serverDescription
         self.availablePackages = availablePackages
         self._metadata = Metadata(data: metadata)
+        self.paywall = paywall
+        self.paywallComponents = paywallComponents
+        self.draftPaywallComponents = draftPaywallComponents
 
         var foundPackages: [PackageType: Package] = [:]
 
@@ -184,15 +271,33 @@ import Foundation
 
 extension Offering {
 
-    /**
-     - Returns: the `metadata` value associated to `key` for the expected type,
-     or `default` if not found, or it's not the expected type.
-     */
+    /// - Returns: The `metadata` value associated to `key` for the expected type,
+    /// or `default` if not found or it's not the expected type.
     public func getMetadataValue<T>(for key: String, default: T) -> T {
         guard let rawValue = self.metadata[key], let value = rawValue as? T else {
             return `default`
         }
         return value
+    }
+
+    /// - Returns: The `metadata` value associated to `key` for the expected `Decodable` type,
+    /// or `nil` if not found or if the content couldn't be deserialized to the expected type.
+    /// - Note: This decodes JSON using `JSONDecoder.KeyDecodingStrategy.convertFromSnakeCase`.
+    public func getMetadataValue<T: Decodable>(for key: String) -> T? {
+        guard let value = self.metadata[key] else { return nil }
+
+        if JSONSerialization.isValidJSONObject(value),
+            let data = try? JSONSerialization.data(withJSONObject: value) {
+            return try? JSONDecoder.default.decode(
+                            T.self,
+                            jsonData: data,
+                            logErrors: true
+                        )
+        } else if let value = value as? T {
+            return value
+        } else {
+            return nil
+        }
     }
 
 }
@@ -203,6 +308,8 @@ extension Offering: Identifiable {
     public var id: String { return self.identifier }
 
 }
+
+extension Offering.PaywallComponents: Sendable {}
 
 extension Offering: Sendable {}
 

@@ -25,13 +25,15 @@ import Foundation
  */
 @objc(RCAttribution) public final class Attribution: NSObject {
 
+    // internal for testing purposes
+    var automaticAdServicesAttributionTokenCollection: Bool = false
+
     private let subscriberAttributesManager: SubscriberAttributesManager
     private let currentUserProvider: CurrentUserProvider
     private let attributionPoster: AttributionPoster
     private let systemInfo: SystemInfo
 
     private var appUserID: String { self.currentUserProvider.currentAppUserID }
-    private var automaticAdServicesAttributionTokenCollection: Bool = false
 
     weak var delegate: AttributionDelegate?
 
@@ -228,7 +230,7 @@ public extension Attribution {
 
     /**
      * Subscriber attribute associated with the OneSignal Player ID for the user.
-     * Required for the RevenueCat OneSignal integration.
+     * Required for the RevenueCat OneSignal integration. Deprecated for OneSignal versions above v9.0.
      *
      * #### Related Articles
      * - [OneSignal RevenueCat Integration](https://docs.revenuecat.com/docs/onesignal)
@@ -237,6 +239,19 @@ public extension Attribution {
      */
     @objc func setOnesignalID(_ onesignalID: String?) {
         self.subscriberAttributesManager.setOnesignalID(onesignalID, appUserID: appUserID)
+    }
+
+    /**
+     * Subscriber attribute associated with the OneSignal User ID for the user.
+     * Required for the RevenueCat OneSignal integration with versions v11.0 and above.
+     *
+     * #### Related Articles
+     * - [OneSignal RevenueCat Integration](https://docs.revenuecat.com/docs/onesignal)
+     *
+     *- Parameter onesignalUserID: Empty String or `nil` will delete the subscriber attribute.
+     */
+    @objc func setOnesignalUserID(_ onesignalUserID: String?) {
+        self.subscriberAttributesManager.setOnesignalUserID(onesignalUserID, appUserID: appUserID)
     }
 
     /**
@@ -266,6 +281,19 @@ public extension Attribution {
     }
 
     /**
+     * Subscriber attribute associated with the Kochava Device ID for the user.
+     * Recommended for the RevenueCat Kochava integration.
+     *
+     * #### Related Articles
+     * - [Kochava RevenueCat Integration](https://docs.revenuecat.com/docs/kochava)
+     *
+     * - Parameter kochavaDeviceID: Empty String or `nil` will delete the subscriber attribute.
+     */
+    @objc func setKochavaDeviceID(_ kochavaDeviceID: String?) {
+        self.subscriberAttributesManager.setKochavaDeviceID(kochavaDeviceID, appUserID: appUserID)
+    }
+
+    /**
      * Subscriber attribute associated with the Mixpanel Distinct ID for the user.
      * Optional for the RevenueCat Mixpanel integration.
      *
@@ -289,6 +317,27 @@ public extension Attribution {
      */
     @objc func setFirebaseAppInstanceID(_ firebaseAppInstanceID: String?) {
         self.subscriberAttributesManager.setFirebaseAppInstanceID(firebaseAppInstanceID, appUserID: appUserID)
+    }
+
+    /**
+     * Subscriber attribute associated with the Tenjin analytics installation ID for the user.
+     * Required for the RevenueCat Tenjin integration.
+     *
+     *- Parameter firebaseAppInstanceID: Empty String or `nil` will delete the subscriber attribute.
+     */
+    @objc func setTenjinAnalyticsInstallationID(_ tenjinAnalyticsInstallationID: String?) {
+        self.subscriberAttributesManager.setTenjinAnalyticsInstallationID(tenjinAnalyticsInstallationID,
+                                                                          appUserID: appUserID)
+    }
+
+    /**
+     * Subscriber attribute associated with the PostHog User ID for the user.
+     * Optional for the RevenueCat PostHog integration.
+     *
+     *- Parameter postHogUserID: Empty String or `nil` will delete the subscriber attribute.
+     */
+    @objc func setPostHogUserID(_ postHogUserID: String?) {
+        self.subscriberAttributesManager.setPostHogUserID(postHogUserID, appUserID: appUserID)
     }
 
     /**
@@ -403,11 +452,22 @@ extension Attribution {
     }
 
     var unsyncedAdServicesToken: String? {
+        get async {
+            return self.automaticAdServicesAttributionTokenCollection
+            ? await self.attributionPoster.adServicesTokenToPostIfNeeded
+            : nil
+        }
+    }
+
+    func unsyncedAdServicesToken(_ completion: @escaping (String?) -> Void) {
         guard self.automaticAdServicesAttributionTokenCollection else {
-            return nil
+            completion(nil)
+            return
         }
 
-        return self.attributionPoster.adServicesTokenToPostIfNeeded
+        Async.call(with: completion) {
+            await self.attributionPoster.adServicesTokenToPostIfNeeded
+        }
     }
 
     @discardableResult

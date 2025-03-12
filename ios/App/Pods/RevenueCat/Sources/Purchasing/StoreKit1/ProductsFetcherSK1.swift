@@ -40,35 +40,6 @@ final class ProductsFetcherSK1: NSObject {
         self.requestTimeout = requestTimeout
     }
 
-    func sk1Products(withIdentifiers identifiers: Set<String>,
-                     completion: @escaping Callback) {
-        guard identifiers.count > 0 else {
-            completion(.success([]))
-            return
-        }
-
-        self.queue.async { [self] in
-            let productsAlreadyCached = self.cachedProductsByIdentifier.filter { key, _ in identifiers.contains(key) }
-            if productsAlreadyCached.count == identifiers.count {
-                let productsAlreadyCachedSet = Set(productsAlreadyCached.values)
-                Logger.debug(Strings.offering.products_already_cached(identifiers: identifiers))
-                completion(.success(productsAlreadyCachedSet))
-                return
-            }
-
-            if let existingHandlers = self.completionHandlers[identifiers] {
-                Logger.debug(Strings.offering.found_existing_product_request(identifiers: identifiers))
-                self.completionHandlers[identifiers] = existingHandlers + [completion]
-                return
-            }
-
-            self.completionHandlers[identifiers] = [completion]
-
-            let request = self.startRequest(forIdentifiers: identifiers, retriesLeft: Self.numberOfRetries)
-            self.scheduleCancellationInCaseOfTimeout(for: request)
-        }
-    }
-
     // Note: this isn't thread-safe and must therefore be used inside of `queue` only.
     @discardableResult
     private func startRequest(forIdentifiers identifiers: Set<String>, retriesLeft: Int) -> SKProductsRequest {
@@ -94,10 +65,38 @@ final class ProductsFetcherSK1: NSObject {
         )
     }
 
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func products(withIdentifiers identifiers: Set<String>) async throws -> Set<SK1StoreProduct> {
         return try await Async.call { completion in
             self.products(withIdentifiers: identifiers, completion: completion)
+        }
+    }
+
+    private func sk1Products(withIdentifiers identifiers: Set<String>,
+                             completion: @escaping Callback) {
+        guard identifiers.count > 0 else {
+            completion(.success([]))
+            return
+        }
+
+        self.queue.async { [self] in
+            let productsAlreadyCached = self.cachedProductsByIdentifier.filter { key, _ in identifiers.contains(key) }
+            if productsAlreadyCached.count == identifiers.count {
+                let productsAlreadyCachedSet = Set(productsAlreadyCached.values)
+                Logger.debug(Strings.offering.products_already_cached(identifiers: identifiers))
+                completion(.success(productsAlreadyCachedSet))
+                return
+            }
+
+            if let existingHandlers = self.completionHandlers[identifiers] {
+                Logger.debug(Strings.offering.found_existing_product_request(identifiers: identifiers))
+                self.completionHandlers[identifiers] = existingHandlers + [completion]
+                return
+            }
+
+            self.completionHandlers[identifiers] = [completion]
+
+            let request = self.startRequest(forIdentifiers: identifiers, retriesLeft: Self.numberOfRetries)
+            self.scheduleCancellationInCaseOfTimeout(for: request)
         }
     }
 
@@ -256,3 +255,11 @@ private extension ProductsFetcherSK1 {
 // @unchecked because:
 // - It has mutable state, but it's made thread-safe through `queue`.
 extension ProductsFetcherSK1: @unchecked Sendable {}
+
+#if swift(>=5.8)
+#if hasFeature(RetroactiveAttribute)
+// Conformance should be safe since it is only used as dictionary key
+extension SKRequest: @unchecked @retroactive Sendable {}
+extension SKProductsRequest: @unchecked @retroactive Sendable {}
+#endif
+#endif

@@ -87,10 +87,12 @@ final class CustomerAPI {
         self.backendConfig.operationQueue.addOperation(postAttributionDataOperation)
     }
 
-    func post(receiptData: Data,
+    // swiftlint:disable function_parameter_count
+    func post(receipt: EncodedAppleReceipt,
               productData: ProductRequestData?,
               transactionData: PurchasedTransactionData,
               observerMode: Bool,
+              appTransaction: String?,
               completion: @escaping CustomerAPI.CustomerInfoResponseHandler) {
         var subscriberAttributesToPost: SubscriberAttribute.Dictionary?
 
@@ -109,9 +111,10 @@ final class CustomerAPI {
         let postData = PostReceiptDataOperation.PostData(
             transactionData: transactionData.withAttributesToPost(subscriberAttributesToPost),
             productData: productData,
-            receiptData: receiptData,
+            receipt: receipt,
             observerMode: observerMode,
-            testReceiptIdentifier: self.backendConfig.systemInfo.testReceiptIdentifier
+            testReceiptIdentifier: self.backendConfig.systemInfo.testReceiptIdentifier,
+            appTransaction: appTransaction
         )
         let factory = PostReceiptDataOperation.createFactory(
             configuration: config,

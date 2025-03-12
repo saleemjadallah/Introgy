@@ -35,12 +35,27 @@ import RevenueCat
     @objc public static var simulatesAskToBuyInSandbox: Bool = false
     @objc public static var appUserID: String { Self.sharedInstance.appUserID }
     @objc public static var isAnonymous: Bool { Self.sharedInstance.isAnonymous }
+    @objc public static var hybridCommonVersion: String { Constants.hybridCommonVersion }
 
     @objc public static var proxyURLString: String? {
         get { Purchases.proxyURL?.absoluteString }
         set {
             if let value = newValue {
-                guard let proxyURL = URL(string: value) else {
+                let url: URL?
+                // Starting with iOS 17, URL(string:) returns a non-nil value from invalid URLs. 
+                // So we use a new method to get the old behavior.
+                // Since the new method isn't recognized by older Xcodes, we use Swift 5.9 as a proxy for Xcode 15+.
+                // https://developer.apple.com/documentation/xcode-release-notes/xcode-15_0-release-notes
+                #if swift(>=5.9)
+                if #available(iOS 17.0, macCatalyst 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
+                    url = URL(string: value, encodingInvalidCharacters: false)
+                } else {
+                    url = URL(string: value)
+                }
+                #else
+                url = URL(string: value)
+                #endif
+                guard let proxyURL = url else {
                     fatalError("could not set the proxyURL, provided value is not a valid URL: \(value)")
                 }
                 Purchases.proxyURL = proxyURL
@@ -70,6 +85,7 @@ import RevenueCat
     }
 
     private static var promoOffersByTimestamp: [String: PromotionalOffer] = [:]
+    private static var winBackOffersByID: [String: WinBackOffer] = [:]
 
     @available(*, deprecated, message: "Use the set<NetworkId> functions instead")
     @objc public static func setAllowSharingStoreAccount(_ allowSharingStoreAccount: Bool) {
@@ -105,11 +121,6 @@ import RevenueCat
         }
     }
 
-    @available(*, deprecated, message: "Use enableAdServicesAttributionTokenCollection() instead")
-    @objc public static func setAutomaticAppleSearchAdsAttributionCollection(_ enabled: Bool) {
-        Purchases.automaticAppleSearchAdsAttributionCollection = enabled
-    }
-
     @available(iOS 14.3, macOS 11.1, macCatalyst 14.3, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
@@ -117,8 +128,10 @@ import RevenueCat
         Self.sharedInstance.attribution.enableAdServicesAttributionTokenCollection()
     }
 
-    @objc public static func setFinishTransactions(_ finishTransactions: Bool) {
-        Self.sharedInstance.finishTransactions = finishTransactions
+    @objc public static func setPurchasesAreCompletedBy(_ purchasesAreCompletedBy: String) {
+        if let actualPurchasesAreCompletedBy = PurchasesAreCompletedBy(name: purchasesAreCompletedBy) {
+            Self.sharedInstance.purchasesAreCompletedBy = actualPurchasesAreCompletedBy
+        }
     }
 
     @objc public static func invalidateCustomerInfoCache() {
@@ -185,6 +198,41 @@ import RevenueCat
 
 }
 
+// MARK: In app messages
+@objc public extension CommonFunctionality {
+
+#if os(iOS) || targetEnvironment(macCatalyst) || VISION_OS
+    @available(iOS 16.0, *)
+    @available(tvOS, unavailable)
+    @available(macOS, unavailable)
+    @available(watchOS, unavailable)
+    @objc(showStoreMessagesCompletion:)
+    static func showStoreMessages(completion: @escaping () -> Void) {
+        _ = Task<Void, Never> {
+            await Self.sharedInstance.showStoreMessages(for: Set(StoreMessageType.allCases))
+            completion()
+        }
+    }
+
+    @available(iOS 16.0, *)
+    @available(tvOS, unavailable)
+    @available(macOS, unavailable)
+    @available(watchOS, unavailable)
+    @objc(showStoreMessagesForTypes:completion:)
+    static func showStoreMessages(forRawValues rawValues: Set<NSNumber>,
+                                  completion: @escaping () -> Void) {
+        let storeMessageTypes = rawValues.compactMap { number in
+            StoreMessageType(rawValue: number.intValue)
+        }
+        _ = Task<Void, Never> {
+            await Self.sharedInstance.showStoreMessages(for: Set(storeMessageTypes))
+            completion()
+        }
+    }
+#endif
+
+}
+
 // MARK: purchasing and restoring
 @objc public extension CommonFunctionality {
 
@@ -208,22 +256,7 @@ import RevenueCat
     static func purchase(product productIdentifier: String,
                          signedDiscountTimestamp: String?,
                          completion: @escaping ([String: Any]?, ErrorContainer?) -> Void) {
-        let hybridCompletion: @Sendable (StoreTransaction?,
-                                         CustomerInfo?,
-                                         Error?,
-                                         Bool) -> Void = { transaction, customerInfo, error, userCancelled in
-            if let error = error {
-                completion(nil, Self.createErrorContainer(error: error, userCancelled: userCancelled))
-            } else if let customerInfo = customerInfo,
-                      let transaction = transaction {
-                completion([
-                    "customerInfo": customerInfo.dictionary,
-                    "productIdentifier": transaction.productIdentifier
-                ], nil)
-            } else {
-                completion(nil, ErrorContainer(error: ErrorCode.unknownError as NSError, extraPayload: [:]))
-            }
-        }
+        let hybridCompletion = Self.createPurchaseCompletionBlock(completion: completion)
 
         self.product(with: productIdentifier) { storeProduct in
             guard let storeProduct = storeProduct else {
@@ -249,30 +282,17 @@ import RevenueCat
         }
     }
 
-    @objc(purchasePackage:offering:signedDiscountTimestamp:completionBlock:)
+    @objc(purchasePackage:presentedOfferingContext:signedDiscountTimestamp:completionBlock:)
     static func purchase(package packageIdentifier: String,
-                         offeringIdentifier: String,
+                         presentedOfferingContext: [String: Any],
                          signedDiscountTimestamp: String?,
                          completion: @escaping ([String: Any]?, ErrorContainer?) -> Void) {
-        let hybridCompletion: @Sendable (StoreTransaction?,
-                                         CustomerInfo?,
-                                         Error?,
-                                         Bool) -> Void = { transaction, customerInfo, error, userCancelled in
-            if let error = error {
-                completion(nil, Self.createErrorContainer(error: error, userCancelled: userCancelled))
-            } else if let customerInfo = customerInfo,
-                      let transaction = transaction {
-                completion([
-                    "customerInfo": customerInfo.dictionary,
-                    "productIdentifier": transaction.productIdentifier
-                ], nil)
-            } else {
-                let error = ErrorCode.unknownError as NSError
-                completion(nil, ErrorContainer(error: error, extraPayload: [:]))
-            }
-        }
+        let hybridCompletion = Self.createPurchaseCompletionBlock(completion: completion)
 
-        package(withIdentifier: packageIdentifier, offeringIdentifier: offeringIdentifier) { package in
+        Self.package(
+            withIdentifier: packageIdentifier,
+            presentedOfferingContext: Self.toPresentedOfferingContext(presentedOfferingContext: presentedOfferingContext)
+        ) { package in
             guard let package = package else {
                 let error = productNotFoundError(description: "Couldn't find package", userCancelled: false)
                 completion(nil, error)
@@ -286,11 +306,10 @@ import RevenueCat
                         return
                     }
                     Self.sharedInstance.purchase(package: package,
-                                              promotionalOffer: promotionalOffer,
-                                              completion: hybridCompletion)
+                                                 promotionalOffer: promotionalOffer,
+                                                 completion: hybridCompletion)
                     return
                 }
-
             }
 
             Self.sharedInstance.purchase(package: package, completion: hybridCompletion)
@@ -301,18 +320,30 @@ import RevenueCat
     @objc(makeDeferredPurchase:completionBlock:)
     static func makeDeferredPurchase(_ startPurchase: StartPurchaseBlock,
                                      completion: @escaping ([String: Any]?, ErrorContainer?) -> Void) {
-        startPurchase { transaction, customerInfo, error, userCancelled in
+        startPurchase(Self.createPurchaseCompletionBlock(completion: completion))
+    }
+
+    private static func createPurchaseCompletionBlock(
+        completion: @escaping ([String: Any]?, ErrorContainer?) -> Void
+    ) -> @Sendable (StoreTransaction?,
+                    CustomerInfo?,
+                    Error?,
+                    Bool) -> Void {
+        return { transaction, customerInfo, error, userCancelled in
             if let error = error {
                 completion(nil, Self.createErrorContainer(error: error, userCancelled: userCancelled))
             } else if let customerInfo = customerInfo,
                       let transaction = transaction {
                 completion([
                     "customerInfo": customerInfo.dictionary,
-                    "productIdentifier": transaction.productIdentifier
+                    "productIdentifier": transaction.productIdentifier,
+                    "transaction": transaction.dictionary
                 ], nil)
             } else {
-                let error = ErrorCode.unknownError as NSError
-                completion(nil, ErrorContainer(error: error, extraPayload: [:]))
+                completion(
+                    nil,
+                    ErrorContainer(error: ErrorCode.unknownError as NSError, extraPayload: [:])
+                )
             }
         }
     }
@@ -374,6 +405,34 @@ import RevenueCat
         }
     }
 
+    @objc(getCurrentOfferingForPlacement:completionBlock:)
+    static func getCurrentOffering(
+        forPlacement placementIdentifier: String,
+        completion: @escaping ([String: Any]?, ErrorContainer?) -> Void
+    ) {
+        Self.sharedInstance.getOfferings { offerings, error in
+            if let error = error {
+                let errorContainer = ErrorContainer(error: error, extraPayload: [:])
+                completion(nil, errorContainer)
+            } else {
+                let offering = offerings?.currentOffering(forPlacement: placementIdentifier)
+                let dict = offering?.dictionary
+                completion(dict, nil)
+            }
+        }
+    }
+
+    @objc(syncAttributesAndOfferingsIfNeededWithCompletionBlock:)
+    static func syncAttributesAndOfferingsIfNeeded(completion: @escaping ([String: Any]?, ErrorContainer?) -> Void) {
+        Self.sharedInstance.syncAttributesAndOfferingsIfNeeded { offerings, error in
+            if let error = error {
+                let errorContainer = ErrorContainer(error: error, extraPayload: [:])
+                completion(nil, errorContainer)
+            } else {
+                completion(offerings?.dictionary, nil)
+            }
+        }
+    }
 
     @objc(checkTrialOrIntroductoryPriceEligibility:completionBlock:)
     static func checkTrialOrIntroductoryPriceEligibility(
@@ -387,7 +446,6 @@ import RevenueCat
                 })
             }
         }
-
 
     @objc static func getProductInfo(_ productIds: [String], completionBlock: @escaping([[String: Any]]) -> Void) {
         Self.sharedInstance.getProducts(productIds) { products in
@@ -436,6 +494,32 @@ import RevenueCat
             Self.sharedInstance.getPromotionalOffer(forProductDiscount: discountToUse,
                                                  product: storeProduct,
                                                  completion: promotionalOfferCompletion)
+        }
+    }
+
+}
+
+// MARK: StoreKit 2 Observer Mode
+@objc public extension CommonFunctionality {
+
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
+    @objc(recordPurchaseForProductID:completion:)
+    static func recordPurchase(productID: String, completion: (([String: Any]?, ErrorContainer?) -> Void)?) {
+        _ = Task<Void, Never> {
+            let result = await StoreKit.Transaction.latest(for: productID)
+            if let result = result {
+                do {
+                    let transaction = try await Self.sharedInstance.recordPurchase(.success(result))
+                    completion?(transaction?.dictionary, nil)
+                } catch {
+                    completion?(nil, ErrorContainer(error: error, extraPayload: [:]))
+                }
+            } else {
+                completion?(nil, transactionNotFoundError(
+                    description: "Couldn't find transaction for product ID '\(productID)'.",
+                    userCancelled: false
+                ))
+            }
         }
     }
 
@@ -493,8 +577,17 @@ import RevenueCat
     @objc static func setFirebaseAppInstanceID(_ firebaseAppInstanceID: String?) {
         Self.sharedInstance.attribution.setFirebaseAppInstanceID(firebaseAppInstanceID)
     }
+    @objc static func setTenjinAnalyticsInstallationID(_ tenjinAnalyticsInstallationID: String?) {
+        Self.sharedInstance.attribution.setTenjinAnalyticsInstallationID(tenjinAnalyticsInstallationID)
+    }
+    @objc static func setKochavaDeviceID(_ kochavaDeviceID: String?) {
+        Self.sharedInstance.attribution.setKochavaDeviceID(kochavaDeviceID)
+    }
     @objc static func setOnesignalID(_ onesignalID: String?) {
         Self.sharedInstance.attribution.setOnesignalID(onesignalID)
+    }
+    @objc static func setOnesignalUserID(_ onesignalUserID: String?) {
+        Self.sharedInstance.attribution.setOnesignalUserID(onesignalUserID)
     }
     @objc static func setAirshipChannelID(_ airshipChannelID: String?) {
         Self.sharedInstance.attribution.setAirshipChannelID(airshipChannelID)
@@ -524,6 +617,198 @@ import RevenueCat
         Self.sharedInstance.attribution.setCreative(creative)
     }
 
+}
+
+// MARK: - Win-Back Offers
+@objc public extension CommonFunctionality {
+
+    /// Fetches and caches the eligible win-back offers for a given product identifier.
+    ///
+    /// - Parameters:
+    ///   - productIdentifier: The identifier of the product to fetch win-back offers for.
+    ///   - completion: A closure that receives an array of win-back offer dictionaries or an error container if something went wrong.
+    @objc(eligibleWinBackOffersForProductIdentifier:completionBlock:)
+    static func eligibleWinBackOffers(
+        for productIdentifier: String,
+        completion: @escaping ([[String: Any]]?, ErrorContainer?) -> Void
+    ) {
+        guard #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else {
+            completion(
+                nil,
+                Self.createErrorContainer(error: ErrorCode.unsupportedError)
+            )
+            return
+        }
+
+        // Fetch the product
+        product(with: productIdentifier) { storeProduct in
+            guard let storeProduct = storeProduct else {
+                completion(nil, productNotFoundError(description: "Couldn't find product", userCancelled: false))
+                return
+            }
+
+            // Fetch the eligible win-back offers for the product
+            Self.sharedInstance.eligibleWinBackOffers(forProduct: storeProduct) { eligibleWinBackOffers, error in
+                if let error = error {
+                    completion(
+                        nil,
+                        Self.createErrorContainer(error: error)
+                    )
+                    return
+                }
+
+                guard let eligibleWinBackOffers = eligibleWinBackOffers else {
+                    completion(
+                        [],
+                        nil
+                    )
+                    return
+                }
+
+                // Cache the win-back offers
+                for winBackOffer in eligibleWinBackOffers {
+                    if let winBackOfferIdentifier = winBackOffer.discount.offerIdentifier {
+                        self.winBackOffersByID[winBackOfferIdentifier] = winBackOffer
+                    }
+                }
+
+                // Return the win-back offers
+                let winBackDictionaries: [[String: Any]] = eligibleWinBackOffers.map { winBackOffer in
+                    winBackOffer.rc_dictionary  // Returns the discount dictionary
+                }
+
+                completion(winBackDictionaries, nil)
+            }
+        }
+    }
+
+    @objc(purchaseProduct:winBackOfferID:completionBlock:)
+    static func purchase(product productIdentifier: String,
+                         winBackOfferID: String,
+                         completion: @escaping ([String: Any]?, ErrorContainer?) -> Void) {
+        let hybridCompletion = Self.createPurchaseCompletionBlock(completion: completion)
+
+        self.product(with: productIdentifier) { storeProduct in
+            guard let storeProduct = storeProduct else {
+                completion(nil, productNotFoundError(description: "Couldn't find product.", userCancelled: false))
+                return
+            }
+
+            if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
+                guard let winBackOffer: WinBackOffer = self.winBackOffersByID[winBackOfferID] else {
+                    completion(
+                        nil,
+                        productNotFoundError(description: "Couldn't find win-back offer.", userCancelled: false)
+                    )
+                    return
+                }
+
+                let purchaseParams = PurchaseParams.Builder(product: storeProduct)
+                    .with(winBackOffer: winBackOffer)
+                    .build()
+
+                Self.sharedInstance.purchase(purchaseParams, completion: hybridCompletion)
+                return
+            }
+
+            Self.sharedInstance.purchase(product: storeProduct, completion: hybridCompletion)
+        }
+    }
+
+    @objc(purchasePackage:presentedOfferingContext:winBackOfferID:completionBlock:)
+    static func purchase(package packageIdentifier: String,
+                         presentedOfferingContext: [String: Any],
+                         winBackOfferID: String,
+                         completion: @escaping ([String: Any]?, ErrorContainer?) -> Void) {
+        let hybridCompletion = Self.createPurchaseCompletionBlock(completion: completion)
+
+        Self.package(
+            withIdentifier: packageIdentifier,
+            presentedOfferingContext: Self.toPresentedOfferingContext(presentedOfferingContext: presentedOfferingContext)
+        ) { package in
+            guard let package = package else {
+                let error = productNotFoundError(description: "Couldn't find package", userCancelled: false)
+                completion(nil, error)
+                return
+            }
+
+            if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
+                guard let winBackOffer: WinBackOffer = self.winBackOffersByID[winBackOfferID] else {
+                    completion(
+                        nil,
+                        productNotFoundError(description: "Couldn't find win-back offer.", userCancelled: false)
+                    )
+                    return
+                }
+
+                let purchaseParams = PurchaseParams.Builder(package: package)
+                    .with(winBackOffer: winBackOffer)
+                    .build()
+
+                Self.sharedInstance.purchase(purchaseParams, completion: hybridCompletion)
+                return
+            }
+
+            Self.sharedInstance.purchase(package: package, completion: hybridCompletion)
+        }
+    }
+}
+
+// MARK: - Redemption links
+@objc public extension CommonFunctionality {
+
+    @objc static func parseAsWebPurchaseRedemption(urlString: String) -> WebPurchaseRedemption? {
+        guard let url = URL(string: urlString) else {
+            return nil
+        }
+        return url.asWebPurchaseRedemption
+    }
+
+    @objc(isWebPurchaseRedemptionURL:)
+    static func isWebPurchaseRedemptionURL(urlString: String) -> Bool {
+        guard let url = URL(string: urlString) else { return false }
+
+        return url.asWebPurchaseRedemption != nil
+    }
+
+    @objc static func redeemWebPurchase(urlString: String,
+                                        completion: @escaping ([String: Any]?, ErrorContainer?) -> Void) {
+        guard let url = URL(string: urlString), let webPurchaseRedemption = url.asWebPurchaseRedemption else {
+            completion(nil, Self.createErrorContainer(error: ErrorCode.unsupportedError))
+            return
+        }
+
+        _ = Task<Void, Never> {
+            let result = await Self.sharedInstance.redeemWebPurchase(webPurchaseRedemption)
+            var resultMap: [String: Any] = ["result": result.resultName]
+            switch (result) {
+            case let .success(customerInfo):
+                resultMap["customerInfo"] = customerInfo.dictionary
+            case let .error(error):
+                resultMap["error"] = Self.createErrorContainer(error: error)
+            case let .expired(obfuscatedEmail):
+                resultMap["obfuscatedEmail"] = obfuscatedEmail
+            case .purchaseBelongsToOtherUser, .invalidToken:
+                // Do nothing
+                break
+            }
+            completion(resultMap, nil)
+        }
+    }
+
+}
+
+private extension WebPurchaseRedemptionResult {
+
+    var resultName: String {
+        switch self {
+        case .success: return "SUCCESS"
+        case .error: return "ERROR"
+        case .purchaseBelongsToOtherUser: return "PURCHASE_BELONGS_TO_OTHER_USER"
+        case .invalidToken: return "INVALID_TOKEN"
+        case .expired: return "EXPIRED"
+        }
+    }
 }
 
 private extension CommonFunctionality {
@@ -556,12 +841,50 @@ private extension CommonFunctionality {
         return Self.createErrorContainer(error: error, userCancelled: userCancelled)
     }
 
+    static func toPresentedOfferingContext(presentedOfferingContext: [String: Any?]?) -> PresentedOfferingContext? {
+        guard let presentedOfferingContext, let offeringIdentifier = presentedOfferingContext["offeringIdentifier"] as? String else {
+            return nil
+        }
+
+        let placementIdentifier = presentedOfferingContext["placementIdentifier"] as? String
+
+        let targetingContext: PresentedOfferingContext.TargetingContext?
+
+        if let dict = presentedOfferingContext["targetingContext"] as? [String: Any?],
+            let revision = dict["revision"] as? Int,
+            let ruleId = dict["ruleId"] as? String {
+            targetingContext = .init(revision: revision, ruleId: ruleId)
+        } else {
+            targetingContext = nil
+        }
+
+        return PresentedOfferingContext(
+            offeringIdentifier: offeringIdentifier,
+            placementIdentifier: placementIdentifier,
+            targetingContext: targetingContext
+        )
+    }
+
     static func package(withIdentifier packageIdentifier: String,
-                        offeringIdentifier: String,
+                        presentedOfferingContext: PresentedOfferingContext?,
                         completion: @escaping(Package?) -> Void) {
+        guard let presentedOfferingContext else {
+            return completion(nil)
+        }
+
         Self.sharedInstance.getOfferings { offerings, error in
-            let offering = offerings?.offering(identifier: offeringIdentifier)
-            let package = offering?.package(identifier: packageIdentifier)
+            let offering = offerings?.offering(identifier: presentedOfferingContext.offeringIdentifier)
+            let foundPackage = offering?.package(identifier: packageIdentifier)
+
+            let package = foundPackage.flatMap { pkg in
+                Package(
+                    identifier: pkg.identifier,
+                    packageType: pkg.packageType,
+                    storeProduct: pkg.storeProduct,
+                    presentedOfferingContext: presentedOfferingContext
+                )
+            }
+
             completion(package)
         }
     }
@@ -573,6 +896,13 @@ private extension CommonFunctionality {
         } else {
             return product.discounts.first { $0.offerIdentifier == identifier }
         }
+    }
+
+    static func transactionNotFoundError(description: String, userCancelled: Bool?) -> ErrorContainer {
+        let error = NSError(domain: ErrorCode.errorDomain,
+                            code: ErrorCode.unknownError.rawValue,
+                            userInfo: [NSLocalizedDescriptionKey: description])
+        return Self.createErrorContainer(error: error, userCancelled: userCancelled)
     }
 
     static func processRefundRequestResultWithCompletion(

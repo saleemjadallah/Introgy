@@ -25,10 +25,19 @@ final class BundleSandboxEnvironmentDetector: SandboxEnvironmentDetector {
 
     private let bundle: Atomic<Bundle>
     private let isRunningInSimulator: Bool
+    private let receiptFetcher: LocalReceiptFetcherType
+    private let macAppStoreDetector: MacAppStoreDetector?
 
-    init(bundle: Bundle = .main, isRunningInSimulator: Bool = SystemInfo.isRunningInSimulator) {
+    init(
+        bundle: Bundle = .main,
+        isRunningInSimulator: Bool = SystemInfo.isRunningInSimulator,
+        receiptFetcher: LocalReceiptFetcherType = LocalReceiptFetcher(),
+        macAppStoreDetector: MacAppStoreDetector? = nil
+    ) {
         self.bundle = .init(bundle)
         self.isRunningInSimulator = isRunningInSimulator
+        self.receiptFetcher = receiptFetcher
+        self.macAppStoreDetector = macAppStoreDetector
     }
 
     var isSandbox: Bool {
@@ -40,17 +49,53 @@ final class BundleSandboxEnvironmentDetector: SandboxEnvironmentDetector {
             return false
         }
 
-        // `true` for either `macOS` or `Catalyst`
-        let isMASReceipt = path.contains("MASReceipt/receipt")
-        if isMASReceipt {
-            return path.contains("Xcode/DerivedData")
+        #if os(macOS) || targetEnvironment(macCatalyst)
+        // this relies on an undocumented field in the receipt that provides the Environment.
+        // if it's not present, we go to a secondary check.
+        if let isProductionReceipt = self.isProductionReceipt {
+            return !isProductionReceipt
         } else {
-            return path.contains("sandboxReceipt")
+            return !self.isMacAppStore
         }
+
+        #else
+            return path.contains("sandboxReceipt")
+        #endif
     }
 
+    #if DEBUG
+    // Mutable in tests so it can be overriden
+    static var `default`: SandboxEnvironmentDetector = BundleSandboxEnvironmentDetector()
+    #else
     static let `default`: SandboxEnvironmentDetector = BundleSandboxEnvironmentDetector()
+    #endif
 
 }
 
 extension BundleSandboxEnvironmentDetector: Sendable {}
+
+// MARK: -
+
+#if os(macOS) || targetEnvironment(macCatalyst)
+
+private extension BundleSandboxEnvironmentDetector {
+
+    var isProductionReceipt: Bool? {
+        do {
+            let receiptEnvironment = try self.receiptFetcher.fetchAndParseLocalReceipt().environment
+            guard receiptEnvironment != .unknown else { return nil } // don't make assumptions if we're not sure
+            return receiptEnvironment == .production
+        } catch {
+            Logger.error(Strings.receipt.parse_receipt_locally_error(error: error))
+            return nil
+        }
+    }
+
+    var isMacAppStore: Bool {
+        let detector = self.macAppStoreDetector ?? DefaultMacAppStoreDetector()
+        return detector.isMacAppStore
+    }
+
+}
+
+#endif

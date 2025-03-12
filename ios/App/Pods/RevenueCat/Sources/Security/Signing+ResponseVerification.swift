@@ -18,12 +18,14 @@ extension HTTPResponse where Body == Data? {
     func verify(
         signing: SigningType,
         request: HTTPRequest,
+        requestHeaders: HTTPRequest.Headers,
         publicKey: Signing.PublicKey?
     ) -> VerifiedHTTPResponse<Body> {
         let verificationResult = Self.verificationResult(
             body: self.body,
-            statusCode: self.statusCode,
-            headers: self.responseHeaders,
+            statusCode: self.httpStatusCode,
+            requestHeaders: requestHeaders,
+            responseHeaders: self.responseHeaders,
             requestDate: self.requestDate,
             request: request,
             publicKey: publicKey,
@@ -36,7 +38,7 @@ extension HTTPResponse where Body == Data? {
                 request,
                 self.body,
                 self.responseHeaders,
-                statusCode
+                self.httpStatusCode
             ))
         }
         #endif
@@ -48,21 +50,20 @@ extension HTTPResponse where Body == Data? {
     private static func verificationResult(
         body: Data?,
         statusCode: HTTPStatusCode,
-        headers: HTTPClient.ResponseHeaders,
+        requestHeaders: HTTPClient.RequestHeaders,
+        responseHeaders: HTTPClient.ResponseHeaders,
         requestDate: Date?,
         request: HTTPRequest,
         publicKey: Signing.PublicKey?,
         signing: SigningType
     ) -> VerificationResult {
-        guard let publicKey = publicKey,
-              statusCode.isSuccessfulResponse,
-              #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) else {
+        guard let publicKey = publicKey, statusCode.isSuccessfulResponse else {
             return .notRequested
         }
 
         guard let signature = HTTPResponse.value(
             forCaseInsensitiveHeaderField: .signature,
-            in: headers
+            in: responseHeaders
         ) else {
             if request.path.supportsSignatureVerification {
                 Logger.warn(Strings.signing.signature_was_requested_but_not_provided(request))
@@ -82,9 +83,10 @@ extension HTTPResponse where Body == Data? {
                           with: .init(
                             path: request.path,
                             message: body,
+                            requestHeaders: requestHeaders,
                             requestBody: request.requestBody,
                             nonce: request.nonce,
-                            etag: HTTPResponse.value(forCaseInsensitiveHeaderField: .eTag, in: headers),
+                            etag: HTTPResponse.value(forCaseInsensitiveHeaderField: .eTag, in: responseHeaders),
                             requestDate: requestDate.millisecondsSince1970
                           ),
                           publicKey: publicKey) {

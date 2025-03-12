@@ -11,16 +11,20 @@ import RevenueCat
 
 @objc public extension Purchases {
 
-    @objc(configureWithAPIKey:appUserID:observerMode:userDefaultsSuiteName:platformFlavor:platformFlavorVersion:
-            usesStoreKit2IfAvailable:dangerousSettings:)
+    @objc(configureWithAPIKey:appUserID:purchasesAreCompletedBy:userDefaultsSuiteName:platformFlavor:
+            platformFlavorVersion:storeKitVersion:dangerousSettings:shouldShowInAppMessagesAutomatically:
+            verificationMode:diagnosticsEnabled:)
     static func configure(apiKey: String,
                           appUserID: String?,
-                          observerMode: Bool,
+                          purchasesAreCompletedBy: String?,
                           userDefaultsSuiteName: String?,
                           platformFlavor: String?,
                           platformFlavorVersion: String?,
-                          usesStoreKit2IfAvailable: Bool = false,
-                          dangerousSettings: DangerousSettings?) -> Purchases {
+                          storeKitVersion: String = "DEFAULT",
+                          dangerousSettings: DangerousSettings?,
+                          shouldShowInAppMessagesAutomatically: Bool = true,
+                          verificationMode: String?,
+                          diagnosticsEnabled: Bool = false) -> Purchases {
         var userDefaults: UserDefaults?
         if let userDefaultsSuiteName = userDefaultsSuiteName {
             userDefaults = UserDefaults(suiteName: userDefaultsSuiteName)
@@ -33,19 +37,44 @@ import RevenueCat
         if let appUserID = appUserID {
             configurationBuilder = configurationBuilder.with(appUserID: appUserID)
         }
-        configurationBuilder = configurationBuilder.with(observerMode: observerMode)
+
+        let storeKitVersion = StoreKitVersion(name: storeKitVersion) ?? .default
+        configurationBuilder = configurationBuilder.with(storeKitVersion: storeKitVersion)
+
+        if let purchasesAreCompletedBy = purchasesAreCompletedBy {
+            if let actualPurchasesAreCompletedBy = PurchasesAreCompletedBy(name: purchasesAreCompletedBy) {
+                configurationBuilder = configurationBuilder.with(
+                    purchasesAreCompletedBy: actualPurchasesAreCompletedBy,
+                    storeKitVersion: storeKitVersion
+                )
+            }
+        }
+
         if let userDefaults = userDefaults {
             configurationBuilder = configurationBuilder.with(userDefaults: userDefaults)
         }
-        configurationBuilder = (configurationBuilder as ConfigurationBuilderDeprecatable)
-            // Allows silencing deprecation warning, so `pod lib lint` does not fail.
-            .with(usesStoreKit2IfAvailable: usesStoreKit2IfAvailable)
         if let dangerousSettings = dangerousSettings {
             configurationBuilder = configurationBuilder.with(dangerousSettings: dangerousSettings)
         }
         if let platformFlavor = platformFlavor, let platformFlavorVersion = platformFlavorVersion {
             let platformInfo = Purchases.PlatformInfo(flavor: platformFlavor, version: platformFlavorVersion)
             configurationBuilder = configurationBuilder.with(platformInfo: platformInfo)
+        }
+        configurationBuilder = configurationBuilder.with(showStoreMessagesAutomatically:
+                                                            shouldShowInAppMessagesAutomatically)
+
+        if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *) {
+            configurationBuilder = configurationBuilder.with(diagnosticsEnabled: diagnosticsEnabled)
+        }
+
+        if let verificationMode {
+            if let mode = Configuration.EntitlementVerificationMode(name: verificationMode) {
+                if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *) {
+                    configurationBuilder = configurationBuilder.with(entitlementVerificationMode: mode)
+                }
+            } else {
+                NSLog("Attempted to configure with unknown verification mode: '\(verificationMode)'")
+            }
         }
 
         let purchases = self.configure(with: configurationBuilder.build())
@@ -54,6 +83,56 @@ import RevenueCat
         return purchases
     }
 
+    @available(*, deprecated, message: "Use the full configure method instead")
+    @objc(configureWithAPIKey:appUserID:purchasesAreCompletedBy:userDefaultsSuiteName:platformFlavor:
+            platformFlavorVersion:storeKitVersion:dangerousSettings:shouldShowInAppMessagesAutomatically:
+            verificationMode:)
+    static func configure(apiKey: String,
+                          appUserID: String?,
+                          purchasesAreCompletedBy: String?,
+                          userDefaultsSuiteName: String?,
+                          platformFlavor: String?,
+                          platformFlavorVersion: String?,
+                          storeKitVersion: String = "DEFAULT",
+                          dangerousSettings: DangerousSettings?,
+                          shouldShowInAppMessagesAutomatically: Bool = true,
+                          verificationMode: String?) -> Purchases {
+        return configure(apiKey: apiKey,
+                         appUserID: appUserID,
+                         purchasesAreCompletedBy: purchasesAreCompletedBy,
+                         userDefaultsSuiteName: userDefaultsSuiteName,
+                         platformFlavor: platformFlavor,
+                         platformFlavorVersion: platformFlavorVersion,
+                         storeKitVersion: storeKitVersion,
+                         dangerousSettings: dangerousSettings,
+                         shouldShowInAppMessagesAutomatically: shouldShowInAppMessagesAutomatically,
+                         verificationMode: verificationMode,
+                         diagnosticsEnabled: false)
+    }
+
+    @available(*, deprecated, message: "Use the full configure method instead")
+    @objc(configureWithAPIKey:appUserID:purchasesAreCompletedBy:userDefaultsSuiteName:platformFlavor:
+            platformFlavorVersion:storeKitVersion:dangerousSettings:shouldShowInAppMessagesAutomatically:)
+    static func configure(apiKey: String,
+                          appUserID: String?,
+                          purchasesAreCompletedBy: String?,
+                          userDefaultsSuiteName: String?,
+                          platformFlavor: String?,
+                          platformFlavorVersion: String?,
+                          storeKitVersion: String = "DEFAULT",
+                          dangerousSettings: DangerousSettings?,
+                          shouldShowInAppMessagesAutomatically: Bool = true) -> Purchases {
+        return configure(apiKey: apiKey,
+                         appUserID: appUserID,
+                         purchasesAreCompletedBy: purchasesAreCompletedBy,
+                         userDefaultsSuiteName: userDefaultsSuiteName,
+                         platformFlavor: platformFlavor,
+                         platformFlavorVersion: platformFlavorVersion,
+                         storeKitVersion: storeKitVersion,
+                         dangerousSettings: dangerousSettings,
+                         shouldShowInAppMessagesAutomatically: shouldShowInAppMessagesAutomatically,
+                         verificationMode: nil)
+    }
 }
 
 extension LogLevel {

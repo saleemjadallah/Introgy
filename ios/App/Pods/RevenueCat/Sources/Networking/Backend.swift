@@ -20,6 +20,8 @@ class Backend {
     let offlineEntitlements: OfflineEntitlementsAPI
     let customer: CustomerAPI
     let internalAPI: InternalAPI
+    let customerCenterConfig: CustomerCenterConfigAPI
+    let redeemWebPurchaseAPI: RedeemWebPurchaseAPI
 
     private let config: BackendConfiguration
 
@@ -31,16 +33,20 @@ class Backend {
         operationDispatcher: OperationDispatcher,
         attributionFetcher: AttributionFetcher,
         offlineCustomerInfoCreator: OfflineCustomerInfoCreator?,
+        diagnosticsTracker: DiagnosticsTrackerType?,
         dateProvider: DateProvider = DateProvider()
     ) {
         let httpClient = HTTPClient(apiKey: apiKey,
                                     systemInfo: systemInfo,
                                     eTagManager: eTagManager,
                                     signing: Signing(apiKey: apiKey, clock: systemInfo.clock),
-                                    requestTimeout: httpClientTimeout)
+                                    diagnosticsTracker: diagnosticsTracker,
+                                    requestTimeout: httpClientTimeout,
+                                    operationDispatcher: OperationDispatcher.default)
         let config = BackendConfiguration(httpClient: httpClient,
                                           operationDispatcher: operationDispatcher,
                                           operationQueue: QueueProvider.createBackendQueue(),
+                                          diagnosticsQueue: QueueProvider.createDiagnosticsQueue(),
                                           systemInfo: systemInfo,
                                           offlineCustomerInfoCreator: offlineCustomerInfoCreator,
                                           dateProvider: dateProvider)
@@ -53,13 +59,17 @@ class Backend {
         let offerings = OfferingsAPI(backendConfig: backendConfig)
         let offlineEntitlements = OfflineEntitlementsAPI(backendConfig: backendConfig)
         let internalAPI = InternalAPI(backendConfig: backendConfig)
+        let customerCenterConfig = CustomerCenterConfigAPI(backendConfig: backendConfig)
+        let redeemWebPurchaseAPI = RedeemWebPurchaseAPI(backendConfig: backendConfig)
 
         self.init(backendConfig: backendConfig,
                   customerAPI: customer,
                   identityAPI: identity,
                   offeringsAPI: offerings,
                   offlineEntitlements: offlineEntitlements,
-                  internalAPI: internalAPI)
+                  internalAPI: internalAPI,
+                  customerCenterConfig: customerCenterConfig,
+                  redeemWebPurchaseAPI: redeemWebPurchaseAPI)
     }
 
     required init(backendConfig: BackendConfiguration,
@@ -67,7 +77,9 @@ class Backend {
                   identityAPI: IdentityAPI,
                   offeringsAPI: OfferingsAPI,
                   offlineEntitlements: OfflineEntitlementsAPI,
-                  internalAPI: InternalAPI) {
+                  internalAPI: InternalAPI,
+                  customerCenterConfig: CustomerCenterConfigAPI,
+                  redeemWebPurchaseAPI: RedeemWebPurchaseAPI) {
         self.config = backendConfig
 
         self.customer = customerAPI
@@ -75,6 +87,8 @@ class Backend {
         self.offerings = offeringsAPI
         self.offlineEntitlements = offlineEntitlements
         self.internalAPI = internalAPI
+        self.customerCenterConfig = customerCenterConfig
+        self.redeemWebPurchaseAPI = redeemWebPurchaseAPI
     }
 
     func clearHTTPClientCaches() {
@@ -109,15 +123,17 @@ class Backend {
                                       completion: completion)
     }
 
-    func post(receiptData: Data,
+    func post(receipt: EncodedAppleReceipt,
               productData: ProductRequestData?,
               transactionData: PurchasedTransactionData,
               observerMode: Bool,
+              appTransaction: String? = nil,
               completion: @escaping CustomerAPI.CustomerInfoResponseHandler) {
-        self.customer.post(receiptData: receiptData,
+        self.customer.post(receipt: receipt,
                            productData: productData,
                            transactionData: transactionData,
                            observerMode: observerMode,
+                           appTransaction: appTransaction,
                            completion: completion)
     }
 
@@ -132,7 +148,6 @@ class Backend {
 extension Backend {
 
     /// - Throws: `NetworkError`
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     func healthRequest(signatureVerification: Bool) async throws {
         try await Async.call { completion in
             self.internalAPI.healthRequest(signatureVerification: signatureVerification) { error in
@@ -169,8 +184,16 @@ extension Backend {
 
         static func createBackendQueue() -> OperationQueue {
             let operationQueue = OperationQueue()
-            operationQueue.name = "Backend Queue"
+            operationQueue.name = "RC Backend Queue"
             operationQueue.maxConcurrentOperationCount = 1
+            return operationQueue
+        }
+
+        static func createDiagnosticsQueue() -> OperationQueue {
+            let operationQueue = OperationQueue()
+            operationQueue.name = "RC Diagnostics Queue"
+            operationQueue.maxConcurrentOperationCount = 1
+            operationQueue.qualityOfService = .background
             return operationQueue
         }
 

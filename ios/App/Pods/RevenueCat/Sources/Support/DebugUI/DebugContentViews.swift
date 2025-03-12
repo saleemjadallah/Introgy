@@ -39,8 +39,14 @@ struct DebugSwiftUIRootView: View {
                     case let .offering(offering):
                         DebugOfferingView(offering: offering)
 
+                    case let .offeringMetadata(offering):
+                        DebugOfferingMetadataView(offering: offering)
+
                     case let .package(package):
                         DebugPackageView(package: package)
+
+                    case let .paywall(paywall):
+                        DebugPaywallJSONView(paywall: paywall)
                     }
                 }
                 .background(
@@ -72,7 +78,9 @@ struct DebugSwiftUIRootView: View {
 private enum DebugViewPath: Hashable {
 
     case offering(Offering)
+    case offeringMetadata(Offering)
     case package(Package)
+    case paywall(PaywallData)
 
 }
 
@@ -124,10 +132,11 @@ internal struct DebugSummaryView: View {
                     LabeledContent("Observer mode", value: config.observerMode.description)
                     LabeledContent("Sandbox", value: config.sandbox.description)
                     LabeledContent("StoreKit 2", value: config.storeKit2Enabled ? "on" : "off")
+                    LabeledContent("Locale", value: config.locale.display)
                     LabeledContent("Offline Customer Info",
                                    value: config.offlineCustomerInfoSupport ? "enabled" : "disabled")
                     LabeledContent("Entitlement Verification Mode", value: config.verificationMode)
-                    LabeledContent("Receipt URL", value: config.receiptURL?.absoluteString ?? "")
+                    LabeledContent("Receipt URL", value: config.receiptURL?.relativeString ?? "")
                         #if os(macOS)
                         .contextMenu {
                             Button {
@@ -142,8 +151,9 @@ internal struct DebugSummaryView: View {
                             }
                         }
                         #endif
+                    LabeledContent("Receipt status", value: config.receiptStatus)
 
-                    ShareLink(item: config, preview: .init("Configuration")) {
+                    ShareLink(item: AnyEncodable(config), preview: .init("Configuration")) {
                         Label("Share", systemImage: "square.and.arrow.up")
                     }
                 }
@@ -163,7 +173,7 @@ internal struct DebugSummaryView: View {
             case let .loaded(info):
                 LabeledContent("User ID", value: self.model.currentAppUserID ?? "")
                 LabeledContent("Original User ID", value: info.originalAppUserId)
-                LabeledContent("Active Entitlements", value: info.entitlements.active.count.description)
+                LabeledContent("Entitlements", value: info.entitlementDescription)
 
                 if let latestExpiration = info.latestExpirationDate {
                     LabeledContent("Latest Expiration Date",
@@ -232,6 +242,22 @@ private struct DebugOfferingView: View {
             Section("Data") {
                 LabeledContent("Identifier", value: self.offering.id)
                 LabeledContent("Description", value: self.offering.serverDescription)
+
+                if !self.offering.metadata.isEmpty {
+                    NavigationLink(value: DebugViewPath.offeringMetadata(self.offering)) {
+                        Text("Metadata")
+                    }
+                } else {
+                    LabeledContent("Metadata", value: "{}")
+                }
+
+                if let paywall = self.offering.paywall {
+                    NavigationLink(value: DebugViewPath.paywall(paywall)) {
+                        Text("RevenueCatUI paywall")
+                    }
+                } else {
+                    LabeledContent("RevenueCatUI", value: "No paywall")
+                }
             }
 
             Section("Packages") {
@@ -310,6 +336,18 @@ private struct DebugOfferingView: View {
 }
 
 @available(iOS 16.0, macOS 13.0, *)
+private struct DebugOfferingMetadataView: View {
+
+    var offering: Offering
+
+    var body: some View {
+        DebugJSONView(value: AnyEncodable(self.offering.metadata))
+            .navigationTitle("Offering Metadata")
+    }
+
+}
+
+@available(iOS 16.0, macOS 13.0, *)
 private struct DebugPackageView: View {
 
     var package: Package
@@ -336,7 +374,7 @@ private struct DebugPackageView: View {
 
             Section("Purchasing") {
                 Button {
-                    _ = Task<Void, Never> {
+                    _ = Task<Void, Never> { @MainActor in
                         do {
                             self.purchasing = true
                             try await self.purchase()
@@ -369,6 +407,7 @@ private struct DebugPackageView: View {
             }
     }
 
+    @MainActor
     private func purchase() async throws {
         _ = try await Purchases.shared.purchase(package: self.package)
     }
@@ -376,11 +415,65 @@ private struct DebugPackageView: View {
 }
 
 @available(iOS 16.0, macOS 13.0, *)
-extension DebugViewModel.Configuration: Transferable {
+private struct DebugPaywallJSONView: View {
+
+    let paywall: PaywallData
+
+    var body: some View {
+        DebugJSONView(value: AnyEncodable(self.paywall))
+            .navigationTitle("RevenueCatUI Paywall")
+    }
+
+}
+
+@available(iOS 16.0, macOS 13.0, *)
+private struct DebugJSONView<Value: Encodable & Transferable>: View {
+
+    let value: Value
+
+    var body: some View {
+        ScrollView(.vertical) {
+            Text(self.json)
+                .multilineTextAlignment(.leading)
+                .font(.caption)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                .padding()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                ShareLink(item: self.value, preview: .init("JSON")) {
+                    Label("Export", systemImage: "square.and.arrow.up")
+                }
+            }
+        }
+    }
+
+    private var json: String {
+        return (try? self.value.prettyPrintedJSON) ?? "{}"
+    }
+
+}
+
+// MARK: - Locale
+
+private extension Locale {
+
+    var display: String {
+        return "\(self.identifier) (\(self.rc_currencyCode ?? "unknown"))"
+    }
+
+}
+
+// MARK: - Transferable
+
+@available(iOS 16.0, macOS 13.0, *)
+extension AnyEncodable: Transferable {
 
     static var transferRepresentation: some TransferRepresentation {
         return CodableRepresentation(
-            for: DebugViewModel.Configuration.self,
+            for: Self.self,
             contentType: .plainText,
             encoder: JSONEncoder.prettyPrinted,
             decoder: JSONDecoder.default
@@ -412,6 +505,25 @@ private struct ProductStyle: ProductViewStyle {
     }
 
 }
+#endif
+
+#if !ENABLE_CUSTOM_ENTITLEMENT_COMPUTATION
+
+private extension CustomerInfo {
+
+    var entitlementDescription: String {
+        let total = self.entitlements.all.count
+        let active = self.entitlements.active.values
+
+        let activeList = active.isEmpty
+        ? ""
+        : ": \(active.map(\.identifier).joined(separator: ", "))"
+
+        return "\(total) total, \(active.count) active\(activeList)"
+    }
+
+}
+
 #endif
 
 #endif

@@ -13,7 +13,6 @@
 
 import Foundation
 
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
 internal enum Async {
 
     /// Invokes an `async throws` method and calls `completion` with the result.
@@ -81,7 +80,7 @@ internal enum Async {
     static func call<Value, Error: Swift.Error>(
         method: (@escaping @Sendable (Result<Value, Error>) -> Void) -> Void
     ) async throws -> Value {
-        return try await withCheckedThrowingContinuation { continuation in
+        return try await withUnsafeThrowingContinuation { continuation in
             @Sendable
             func complete(_ result: Result<Value, Error>) {
                 continuation.resume(with: result)
@@ -102,7 +101,10 @@ internal enum Async {
     static func call<Value>(
         method: (@escaping @Sendable (Value) -> Void) -> Void
     ) async -> Value {
-        return await withCheckedContinuation { continuation in
+        // Note: We're using UnsafeContinuation instead of Checked because
+        // of a crash in iOS 18.0 devices when CheckedContinuations are used.
+        // See: https://github.com/RevenueCat/purchases-ios/issues/4177
+        return await withUnsafeContinuation { continuation in
             @Sendable
             func complete(_ value: Value) {
                 continuation.resume(with: .success(value))
@@ -112,9 +114,45 @@ internal enum Async {
         }
     }
 
+    /// Runs the given block `maximumRetries` times at most, at `pollInterval` times until the
+    /// block returns a tuple where the first argument `shouldRetry` is false, and the second is the expected value.
+    /// After the maximum retries, returns the last seen value.
+    ///
+    /// Example:
+    /// ```swift
+    /// let receipt = await Async.retry {
+    ///     let receipt = fetchReceipt()
+    ///     if receipt.contains(transaction) {
+    ///         return (shouldRetry: false, receipt)
+    ///     } else {
+    ///         return (shouldRetry: true, receipt)
+    ///     }
+    /// }
+    /// ```
+    static func retry<T>(
+        maximumRetries: Int = 5,
+        pollInterval: DispatchTimeInterval = .milliseconds(300),
+        until value: @Sendable () async -> (shouldRetry: Bool, result: T)
+    ) async -> T {
+        var lastValue: T
+        var retries = 0
+
+        repeat {
+            retries += 1
+            let (shouldRetry, result) = await value()
+            if shouldRetry {
+                lastValue = result
+                try? await Task.sleep(nanoseconds: UInt64(pollInterval.nanoseconds))
+            } else {
+                return result
+            }
+        } while !(retries > maximumRetries)
+
+        return lastValue
+    }
+
 }
 
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
 internal extension AsyncSequence {
 
     /// Returns the elements of the asynchronous sequence.
@@ -126,7 +164,6 @@ internal extension AsyncSequence {
 
 }
 
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
 internal extension AsyncSequence {
 
     func toAsyncStream() -> AsyncStream<Element> {

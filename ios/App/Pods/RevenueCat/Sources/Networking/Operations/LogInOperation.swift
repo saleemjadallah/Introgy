@@ -53,6 +53,9 @@ final class LogInOperation: CacheableNetworkOperation {
 
 }
 
+// Restating inherited @unchecked Sendable from Foundation's Operation
+extension LogInOperation: @unchecked Sendable {}
+
 private extension LogInOperation {
 
     func logIn(completion: @escaping () -> Void) {
@@ -84,7 +87,7 @@ private extension LogInOperation {
             .map { response in
                 (
                     response.body.copy(with: response.verificationResult),
-                    created: response.statusCode == .createdSuccess
+                    created: response.httpStatusCode == .createdSuccess
                 )
             }
             .mapError(BackendError.networkError)
@@ -117,7 +120,7 @@ extension LogInOperation {
 
 extension LogInOperation.Body: HTTPRequestBody {
 
-    var contentForSignature: [(key: String, value: String)] {
+    var contentForSignature: [(key: String, value: String?)] {
         return [
             (Self.CodingKeys.appUserID.stringValue, self.appUserID),
             (Self.CodingKeys.newAppUserID.stringValue, self.newAppUserID)

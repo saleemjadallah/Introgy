@@ -23,7 +23,9 @@ enum HTTPStatusCode {
     case temporaryRedirect
     case invalidRequest
     case unauthorized
+    case forbidden
     case notFoundError
+    case tooManyRequests
     case internalServerError
     case networkConnectTimeoutError
 
@@ -37,6 +39,7 @@ enum HTTPStatusCode {
         .temporaryRedirect,
         .invalidRequest,
         .unauthorized,
+        .forbidden,
         .notFoundError,
         .internalServerError,
         .networkConnectTimeoutError
@@ -59,7 +62,9 @@ extension HTTPStatusCode: RawRepresentable {
         case .temporaryRedirect: return 307
         case .invalidRequest: return 400
         case .unauthorized: return 401
+        case .forbidden: return 403
         case .notFoundError: return 404
+        case .tooManyRequests: return 429
         case .internalServerError: return 500
         case .networkConnectTimeoutError: return 599
 
@@ -98,16 +103,6 @@ extension HTTPStatusCode {
         // The reason is because it's likely due to a client error, so continuing to retry
         // won't yield any different results and instead kill pandas.
         return !(self.isServerError || self == .notFoundError)
-    }
-
-}
-
-extension URLResponse {
-
-    var httpStatusCode: HTTPStatusCode? {
-        guard let response = self as? HTTPURLResponse else { return nil }
-
-        return .init(rawValue: response.statusCode)
     }
 
 }

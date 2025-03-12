@@ -24,11 +24,7 @@ internal struct SK1StoreProductDiscount: StoreProductDiscountType {
 
         self.underlyingSK1Discount = sk1Discount
 
-        if #available(iOS 12.2, macOS 10.14.4, tvOS 12.2, *) {
-            self.offerIdentifier = sk1Discount.identifier
-        } else {
-            self.offerIdentifier = nil
-        }
+        self.offerIdentifier = sk1Discount.identifier
         self.currencyCode = sk1Discount.optionalLocale?.rc_currencyCode
         self.price = sk1Discount.price as Decimal
         self.paymentMode = paymentMode
@@ -75,7 +71,7 @@ private extension StoreProductDiscount.PaymentMode {
         case .freeTrial:
             self = .freeTrial
         @unknown default:
-            Logger.appleWarning(Strings.storeKit.skunknown_payment_mode(String.init(describing: paymentMode)))
+            Logger.appleWarning(Strings.storeKit.skunknown_payment_mode(String(paymentMode.rawValue)))
             return nil
         }
     }

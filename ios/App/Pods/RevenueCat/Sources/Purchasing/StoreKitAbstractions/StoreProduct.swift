@@ -81,18 +81,14 @@ public typealias SK2Product = StoreKit.Product
     @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
     @objc public var isFamilyShareable: Bool { self.product.isFamilyShareable }
 
-    @available(iOS 12.0, macCatalyst 13.0, tvOS 12.0, macOS 10.14, watchOS 6.2, *)
     @objc public var subscriptionGroupIdentifier: String? { self.product.subscriptionGroupIdentifier}
 
     @objc public var priceFormatter: NumberFormatter? { self.product.priceFormatter }
 
-    @available(iOS 11.2, macOS 10.13.2, tvOS 11.2, watchOS 6.2, *)
     @objc public var subscriptionPeriod: SubscriptionPeriod? { self.product.subscriptionPeriod }
 
-    @available(iOS 11.2, macOS 10.13.2, tvOS 11.2, watchOS 6.2, *)
     @objc public var introductoryDiscount: StoreProductDiscount? { self.product.introductoryDiscount }
 
-    @available(iOS 12.2, macOS 10.14.4, tvOS 12.2, watchOS 6.2, *)
     @objc public var discounts: [StoreProductDiscount] { self.product.discounts }
 
     // switflint:enable missing_docs
@@ -131,6 +127,7 @@ internal protocol StoreProductType: Sendable {
     /// For a string representation of the price to display to customers, use ``localizedPriceString``.
     ///
     /// #### Related Symbols
+    /// - ``StoreProduct/pricePerWeek``
     /// - ``StoreProduct/pricePerMonth``
     /// - ``StoreProduct/pricePerYear``
     var price: Decimal { get }
@@ -164,7 +161,8 @@ internal protocol StoreProductType: Sendable {
 
     /// Provides a `NumberFormatter`, useful for formatting the price for displaying.
     /// - Note: This creates a new formatter for every product, which can be slow.
-    /// - Returns: `nil` for StoreKit 2 backed products if the currency code could not be determined.
+    /// - Note: This will only be `nil` for StoreKit 2 backed products before iOS 16
+    /// if the currency code could not be determined. In every other instance, it will never be `nil`.
     var priceFormatter: NumberFormatter? { get }
 
     /// The period details for products that are subscriptions.
@@ -202,10 +200,25 @@ public extension StoreProduct {
     /// - Note: this is meant for  Objective-C. For Swift, use ``price`` instead.
     ///
     /// #### Related Symbols
+    /// - ``pricePerWeek``
     /// - ``pricePerMonth``
     /// - ``pricePerYear``
     @objc(price) var priceDecimalNumber: NSDecimalNumber {
         return self.price as NSDecimalNumber
+    }
+
+    /// Calculates the price of this subscription product per day.
+    /// - Returns: `nil` if the product is not a subscription.
+    @available(iOS 11.2, macOS 10.13.2, tvOS 11.2, watchOS 6.2, *)
+    @objc var pricePerDay: NSDecimalNumber? {
+        return self.subscriptionPeriod?.pricePerDay(withTotalPrice: self.price) as NSDecimalNumber?
+    }
+
+    /// Calculates the price of this subscription product per week.
+    /// - Returns: `nil` if the product is not a subscription.
+    @available(iOS 11.2, macOS 10.13.2, tvOS 11.2, watchOS 6.2, *)
+    @objc var pricePerWeek: NSDecimalNumber? {
+        return self.subscriptionPeriod?.pricePerWeek(withTotalPrice: self.price) as NSDecimalNumber?
     }
 
     /// Calculates the price of this subscription product per month.
@@ -225,20 +238,53 @@ public extension StoreProduct {
     /// The price of the `introductoryPrice` formatted using ``priceFormatter``.
     /// - Returns: `nil` if there is no `introductoryPrice`.
     @objc var localizedIntroductoryPriceString: String? {
-        guard #available(iOS 12.2, macOS 10.14.4, tvOS 12.2, watchOS 6.2, *),
-              let formatter = self.priceFormatter,
-              let intro = self.introductoryDiscount
-        else {
-            return nil
-        }
+        guard #available(iOS 12.2, macOS 10.14.4, tvOS 12.2, watchOS 6.2, *) else { return nil }
+        return self.formattedString(for: self.introductoryDiscount?.priceDecimalNumber)
+    }
 
-        return formatter.string(from: intro.price as NSDecimalNumber)
+    /// The formatted price per week using ``StoreProduct/priceFormatter``.
+    /// ### Related Symbols
+    /// - ``pricePerWeek``
+    /// - ``localizedPricePerMonth``
+    /// - ``localizedPricePerYear``
+    @available(iOS 11.2, macOS 10.13.2, tvOS 11.2, watchOS 6.2, *)
+    @objc var localizedPricePerDay: String? {
+        return self.formattedString(for: self.pricePerDay)
+    }
+
+    /// The formatted price per week using ``StoreProduct/priceFormatter``.
+    /// ### Related Symbols
+    /// - ``pricePerWeek``
+    /// - ``localizedPricePerMonth``
+    /// - ``localizedPricePerYear``
+    @available(iOS 11.2, macOS 10.13.2, tvOS 11.2, watchOS 6.2, *)
+    @objc var localizedPricePerWeek: String? {
+        return self.formattedString(for: self.pricePerWeek)
+    }
+
+    /// The formatted price per month using ``StoreProduct/priceFormatter``.
+    /// ### Related Symbols
+    /// - ``pricePerMonth``
+    /// - ``localizedPricePerWeek``
+    /// - ``localizedPricePerYear``
+    @available(iOS 11.2, macOS 10.13.2, tvOS 11.2, watchOS 6.2, *)
+    @objc var localizedPricePerMonth: String? {
+        return self.formattedString(for: self.pricePerMonth)
+    }
+
+    /// The formatted price per year using ``StoreProduct/priceFormatter``.
+    /// ### Related Symbols
+    /// - ``pricePerYear``
+    /// - ``localizedPricePerWeek``
+    /// - ``localizedPricePerMonth``
+    @available(iOS 11.2, macOS 10.13.2, tvOS 11.2, watchOS 6.2, *)
+    @objc var localizedPricePerYear: String? {
+        return self.formattedString(for: self.pricePerYear)
     }
 
 }
 
 #if !ENABLE_CUSTOM_ENTITLEMENT_COMPUTATION
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
 public extension StoreProduct {
     /// Finds the subset of ``discounts`` that's eligible for the current user.
     /// - Note: if checking for eligibility for a `StoreProductDiscount` fails (for example, if network is down),
@@ -305,5 +351,19 @@ public extension StoreProduct {
     @available(watchOS, unavailable, message: "Use localizedPriceString instead")
     @available(macOS, unavailable, message: "Use localizedPriceString instead")
     @objc var priceLocale: Locale { fatalError() }
+
+}
+
+private extension StoreProduct {
+
+    func formattedString(for price: NSDecimalNumber?) -> String? {
+        guard let formatter = self.priceFormatter,
+              let price = price
+        else {
+            return nil
+        }
+
+        return formatter.string(from: price as NSDecimalNumber)
+    }
 
 }

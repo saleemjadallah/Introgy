@@ -9,6 +9,16 @@
 import Foundation
 import RevenueCat
 
+@objc public extension Offerings {
+    
+    // Re-exports currentOfferingForPlacement function for use in hybrids.
+
+    @objc func currentOfferingForPlacement(_ placementIdentifier: String) -> Offering? {
+        return self.currentOffering(forPlacement: placementIdentifier)
+    }
+
+}
+
 internal extension Offerings {
 
     var dictionary: [String: Any] {
@@ -16,6 +26,7 @@ internal extension Offerings {
         if let current = current {
             result["current"] = current.dictionary
         }
+        
         return result
     }
 }

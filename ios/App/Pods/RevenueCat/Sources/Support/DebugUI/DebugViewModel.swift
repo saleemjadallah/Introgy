@@ -27,6 +27,7 @@ final class DebugViewModel: ObservableObject {
         var observerMode: Bool
         var sandbox: Bool
         var storeKit2Enabled: Bool
+        var locale: Locale
         var offlineCustomerInfoSupport: Bool
         var verificationMode: String
         var receiptURL: URL?
@@ -58,6 +59,7 @@ final class DebugViewModel: ObservableObject {
         set { self._navigationPath = newValue }
     }
 
+    @MainActor
     func load() async {
         self.configuration = .loaded(.create())
 
@@ -103,6 +105,24 @@ extension DebugViewModel {
 
 }
 
+@available(iOS 16.0, macOS 13.0, *)
+extension DebugViewModel.Configuration {
+
+    var receiptStatus: String {
+        switch self.receiptURL {
+        case .none:
+            return "no URL"
+        case let .some(url):
+            if FileManager.default.fileExists(atPath: url.relativePath) {
+                return "present"
+            } else {
+                return "missing"
+            }
+        }
+    }
+
+}
+
 // MARK: -
 
 enum LoadingState<Value, Error: Swift.Error> {
@@ -115,7 +135,6 @@ enum LoadingState<Value, Error: Swift.Error> {
 
 extension LoadingState where Error == NSError {
 
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, *)
     static func create(_ loader: @Sendable () async throws -> Value) async -> Self {
         do {
             return .loaded(try await loader())
@@ -133,7 +152,8 @@ private extension DebugViewModel.Configuration {
         return .init(
             observerMode: purchases.observerMode,
             sandbox: purchases.isSandbox,
-            storeKit2Enabled: purchases.storeKit2Setting.isEnabledAndAvailable,
+            storeKit2Enabled: purchases.isStoreKit2EnabledAndAvailable,
+            locale: .autoupdatingCurrent,
             offlineCustomerInfoSupport: purchases.offlineCustomerInfoEnabled,
             verificationMode: purchases.responseVerificationMode.display,
             receiptURL: purchases.receiptURL
