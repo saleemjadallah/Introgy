@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -12,13 +13,15 @@ import {
   User, 
   Settings, 
   Award, 
-  HelpCircle
+  HelpCircle,
+  DollarSign
 } from "lucide-react";
 
 import ProfileSection from "@/components/profile/ProfileSection";
 import SettingsSection from "@/components/profile/SettingsSection";
 import BadgesSection from "@/components/profile/BadgesSection";
 import HelpFaqSection from "@/components/profile/HelpFaqSection";
+import PricingSection from "@/components/profile/PricingSection";
 import { earnBadge } from "@/services/badgeService";
 import { useAuth } from "@/contexts/auth";
 
@@ -81,7 +84,7 @@ const Profile = () => {
           </p>
         </div>
         
-        <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-8">
+        <TabsList className="grid grid-cols-2 md:grid-cols-5 mb-8">
           <TabsTrigger value="profile" className="gap-2">
             <User size={16} /> Profile
           </TabsTrigger>
@@ -90,6 +93,9 @@ const Profile = () => {
           </TabsTrigger>
           <TabsTrigger value="badges" className="gap-2">
             <Award size={16} /> Badges
+          </TabsTrigger>
+          <TabsTrigger value="pricing" className="gap-2">
+            <DollarSign size={16} /> Pricing
           </TabsTrigger>
           <TabsTrigger value="help" className="gap-2">
             <HelpCircle size={16} /> Help & FAQ
@@ -106,6 +112,10 @@ const Profile = () => {
         
         <TabsContent value="badges">
           <BadgesSection onEarnDemo={handleEarnDemo} />
+        </TabsContent>
+        
+        <TabsContent value="pricing">
+          <PricingSection />
         </TabsContent>
         
         <TabsContent value="help">

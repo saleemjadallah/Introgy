@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "./UserAvatar";
@@ -10,11 +9,12 @@ import {
   Award,
   Shield,
   Bell,
-  BellOff
+  BellOff,
+  DollarSign
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useAuth } from "@/contexts/auth"; // Updated import path
+import { useAuth } from "@/contexts/auth"; 
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { getRecentlyEarnedBadges } from "@/data/badgesData";
@@ -29,7 +29,7 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
   const [notifications, setNotifications] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
-  const recentBadges = getRecentlyEarnedBadges(7); // badges earned in the last 7 days
+  const recentBadges = getRecentlyEarnedBadges(7);
   const hasNewBadges = recentBadges.length > 0;
   
   useEffect(() => {
@@ -125,6 +125,11 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
             <Link to="/profile?tab=settings" className="flex items-center gap-2 p-2 text-sm hover:bg-accent rounded-md">
               <Settings size={18} />
               <span>Settings</span>
+            </Link>
+            
+            <Link to="/profile?tab=pricing" className="flex items-center gap-2 p-2 text-sm hover:bg-accent rounded-md">
+              <DollarSign size={18} />
+              <span>Pricing Plans</span>
             </Link>
             
             <Link to="/profile?tab=privacy" className="flex items-center gap-2 p-2 text-sm hover:bg-accent rounded-md">
