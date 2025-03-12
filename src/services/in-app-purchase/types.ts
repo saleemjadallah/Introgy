@@ -35,7 +35,7 @@ export interface PurchaseListener {
   (purchase: Purchase): void;
 }
 
-// Types aligned with the actual RevenueCat Capacitor plugin
+// Types aligned with the RevenueCat Capacitor plugin
 export interface CustomerInfo {
   entitlements: {
     all: Record<string, Entitlement>;
@@ -58,13 +58,50 @@ export interface Entitlement {
   originalPurchaseDate: string;
 }
 
-// RevenueCat Capacitor plugin uses a different structure for offerings
-export interface PurchaseResult {
+// RevenueCat actual response types
+export interface PurchasingData {
   customerInfo: CustomerInfo;
   productIdentifier: string;
 }
 
-// These are updated types to match the actual RevenueCat types
+// Actual RevenueCat types to match the Capacitor plugin API
+export interface PurchasesOfferings {
+  current: {
+    identifier: string;
+    availablePackages: PurchasesPackage[];
+  } | null;
+  all: Record<string, {
+    identifier: string;
+    availablePackages: PurchasesPackage[];
+  }>;
+}
+
+export interface PurchasesPackage {
+  identifier: string;
+  packageType: string;
+  product: PurchasesStoreProduct;
+  offering?: string;
+}
+
+export interface PurchasesStoreProduct {
+  identifier: string;
+  description: string;
+  title: string;
+  price: number;
+  priceString: string;
+  currencyCode: string;
+}
+
+// Package purchasing options
+export interface PurchasePackageOptions {
+  packageType?: string;
+  aPackage: {
+    identifier: string;
+  };
+  presentedOfferingIdentifier?: string;
+}
+
+// RevenueCat Capacitor plugin uses a different structure
 export interface RevenueCatOfferings {
   current: RevenueCatOffering | null;
   all: Record<string, RevenueCatOffering>;
