@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Purchase, VerificationResult, RevenueCatCustomerInfo } from './types';
+import { Purchase, VerificationResult, CustomerInfo } from './types';
 
 export async function verifyPurchase(
   purchase: Purchase, 
@@ -49,7 +49,7 @@ export async function verifyPurchase(
   }
 }
 
-export function processCustomerInfo(customerInfo: RevenueCatCustomerInfo): VerificationResult {
+export function processCustomerInfo(customerInfo: CustomerInfo): VerificationResult {
   try {
     // Check if the premium entitlement is active
     const premiumEntitlement = customerInfo.entitlements.active['premium'];

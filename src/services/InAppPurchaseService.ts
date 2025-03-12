@@ -5,9 +5,13 @@ import {
   Purchase, 
   VerificationResult, 
   PurchaseListener,
-  RevenueCatOfferings,
-  RevenueCatPurchaseResult,
-  RevenueCatCustomerInfo
+  PurchasesOfferings,
+  PurchasesOffering,
+  PurchasesPackage,
+  PurchasePackageOptions,
+  CustomerInfo,
+  PurchaseResult,
+  Entitlement
 } from './in-app-purchase/types';
 import { getMockProducts, ENTITLEMENTS, OFFERINGS } from './in-app-purchase/mockProducts';
 import { verifyPurchase, processCustomerInfo } from './in-app-purchase/purchaseVerification';
@@ -54,9 +58,9 @@ class InAppPurchaseService {
       });
       
       // Set up a listener for purchase events
-      Purchases.addCustomerInfoUpdateListener((info: RevenueCatCustomerInfo) => {
+      Purchases.addCustomerInfoUpdateListener((info: CustomerInfo) => {
         console.log('RevenueCat customer info updated:', info);
-        const purchases = convertCustomerInfoToPurchases(info);
+        const purchases = this.convertCustomerInfoToPurchases(info);
         purchases.forEach(purchase => this.notifyListeners(purchase));
       });
       
@@ -82,6 +86,27 @@ class InAppPurchaseService {
     this.listeners.forEach(listener => listener(purchase));
   }
 
+  // Convert RevenueCat customer info to our Purchase type
+  private convertCustomerInfoToPurchases(customerInfo: CustomerInfo): Purchase[] {
+    try {
+      if (!customerInfo.activeSubscriptions || customerInfo.activeSubscriptions.length === 0) {
+        return [];
+      }
+      
+      return customerInfo.activeSubscriptions.map(productId => {
+        return {
+          productId,
+          transactionId: `revenuecat-${Date.now()}`,
+          timestamp: Date.now(),
+          platform: this.platform === 'web' ? undefined : this.platform
+        };
+      });
+    } catch (err) {
+      console.error('Error converting customer info to purchases:', err);
+      return [];
+    }
+  }
+
   async getProducts(): Promise<Product[]> {
     if (!this.isNative) {
       return getMockProducts();
@@ -97,7 +122,7 @@ class InAppPurchaseService {
       }
       
       // Fetch offerings from RevenueCat
-      const { offerings } = await Purchases.getOfferings() as { offerings: RevenueCatOfferings };
+      const offerings = await Purchases.getOfferings() as PurchasesOfferings;
       
       if (!offerings || !offerings.current) {
         console.log('No RevenueCat offerings available, using mock products');
@@ -153,7 +178,7 @@ class InAppPurchaseService {
       console.log('Purchasing product with RevenueCat:', productId);
       
       // Get the offerings first
-      const { offerings } = await Purchases.getOfferings() as { offerings: RevenueCatOfferings };
+      const offerings = await Purchases.getOfferings() as PurchasesOfferings;
       
       if (!offerings || !offerings.current) {
         throw new Error('No RevenueCat offerings available');
@@ -169,21 +194,18 @@ class InAppPurchaseService {
       }
       
       // Purchase the package
-      const { customerInfo, productIdentifier } = await Purchases.purchasePackage({ 
-        packageIdentifier: packageToPurchase.identifier 
-      }) as { 
-        customerInfo: RevenueCatCustomerInfo,
-        productIdentifier: string
-      };
+      const purchaseResult = await Purchases.purchasePackage({
+        identifier: packageToPurchase.identifier
+      }) as PurchaseResult;
       
-      console.log('RevenueCat purchase successful:', productIdentifier);
+      console.log('RevenueCat purchase successful:', purchaseResult.productIdentifier);
       
       // Create our Purchase object
       const purchase: Purchase = {
-        productId: productIdentifier,
+        productId: purchaseResult.productIdentifier,
         transactionId: `revenuecat-${Date.now()}`,
         timestamp: Date.now(),
-        platform: this.platform
+        platform: this.platform === 'web' ? undefined : this.platform
       };
       
       // Notify listeners
@@ -207,10 +229,10 @@ class InAppPurchaseService {
       }
       
       // Get the customer info from RevenueCat
-      const customerInfo = await Purchases.getCustomerInfo() as RevenueCatCustomerInfo;
+      const customerInfo = await Purchases.getCustomerInfo() as CustomerInfo;
       
       // Process the customer info
-      const verificationResult = processCustomerInfo(customerInfo);
+      const verificationResult = this.processCustomerInfo(customerInfo);
       
       // If verification successful, store in database
       if (verificationResult.success) {
@@ -230,6 +252,45 @@ class InAppPurchaseService {
     }
   }
 
+  private processCustomerInfo(customerInfo: CustomerInfo): VerificationResult {
+    try {
+      // Check if the premium entitlement is active
+      const premiumEntitlement = customerInfo.entitlements.active[ENTITLEMENTS.PREMIUM];
+      
+      if (!premiumEntitlement) {
+        return {
+          success: false,
+          planType: 'monthly',
+          expiresAt: new Date().toISOString(),
+          error: 'No active premium entitlement'
+        };
+      }
+      
+      // Determine plan type based on subscription period
+      const planType: 'monthly' | 'yearly' = 
+        premiumEntitlement.periodType.includes('annual') ? 'yearly' : 'monthly';
+      
+      // Get expiration date
+      const expiresAt = premiumEntitlement.expirationDate || 
+        new Date(Date.now() + 31536000000).toISOString(); // Default to 1 year if no expiration
+      
+      return {
+        success: true,
+        planType,
+        expiresAt,
+        error: undefined
+      };
+    } catch (err) {
+      console.error('Error processing customer info:', err);
+      return {
+        success: false,
+        planType: 'monthly',
+        expiresAt: new Date().toISOString(),
+        error: err.message
+      };
+    }
+  }
+
   async restorePurchases(): Promise<Purchase[]> {
     if (!this.isNative) {
       console.log('Restore attempted in non-native environment');
@@ -244,10 +305,10 @@ class InAppPurchaseService {
       console.log('Restoring purchases with RevenueCat');
       
       // Restore purchases with RevenueCat
-      const customerInfo = await Purchases.restorePurchases() as RevenueCatCustomerInfo;
+      const customerInfo = await Purchases.restorePurchases() as CustomerInfo;
       
       // Convert to our Purchase type
-      const purchases = convertCustomerInfoToPurchases(customerInfo);
+      const purchases = this.convertCustomerInfoToPurchases(customerInfo);
       
       // Notify listeners
       purchases.forEach(purchase => this.notifyListeners(purchase));
@@ -272,7 +333,7 @@ class InAppPurchaseService {
       }
       
       // Get customer info from RevenueCat
-      const customerInfo = await Purchases.getCustomerInfo() as RevenueCatCustomerInfo;
+      const customerInfo = await Purchases.getCustomerInfo() as CustomerInfo;
       
       // Check if the premium entitlement is active
       return !!customerInfo.entitlements.active[ENTITLEMENTS.PREMIUM];

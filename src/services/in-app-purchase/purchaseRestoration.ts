@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Purchase, PRODUCT_IDS, RevenueCatCustomerInfo } from './types';
+import { Purchase, PRODUCT_IDS, CustomerInfo } from './types';
 
 export async function restorePurchases(platform: 'ios' | 'android' | 'web'): Promise<Purchase[]> {
   try {
@@ -31,7 +31,7 @@ export async function restorePurchases(platform: 'ios' | 'android' | 'web'): Pro
 }
 
 // Convert RevenueCat customer info to our Purchase type
-export function convertCustomerInfoToPurchases(customerInfo: RevenueCatCustomerInfo): Purchase[] {
+export function convertCustomerInfoToPurchases(customerInfo: CustomerInfo): Purchase[] {
   try {
     if (!customerInfo.activeSubscriptions || customerInfo.activeSubscriptions.length === 0) {
       return [];

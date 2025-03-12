@@ -35,8 +35,50 @@ export interface PurchaseListener {
   (purchase: Purchase): void;
 }
 
-// RevenueCat specific types
-export interface RevenueCatProduct {
+// Types for interfacing with RevenueCat Capacitor plugin
+// Based on the actual plugin types
+export interface CustomerInfo {
+  entitlements: {
+    all: Record<string, Entitlement>;
+    active: Record<string, Entitlement>;
+  };
+  activeSubscriptions: string[];
+  allPurchasedProductIdentifiers: string[];
+  latestExpirationDate: string | null;
+  firstSeen: string;
+  originalAppUserId: string;
+}
+
+export interface Entitlement {
+  identifier: string;
+  isActive: boolean;
+  willRenew: boolean;
+  periodType: string;
+  expirationDate: string | null;
+  latestPurchaseDate: string;
+  originalPurchaseDate: string;
+}
+
+export interface PurchasesOfferings {
+  current: PurchasesOffering | null;
+  all: Record<string, PurchasesOffering>;
+}
+
+export interface PurchasesOffering {
+  identifier: string;
+  serverDescription: string;
+  metadata: Record<string, string>;
+  availablePackages: PurchasesPackage[];
+}
+
+export interface PurchasesPackage {
+  identifier: string;
+  packageType: string;
+  product: PurchasesStoreProduct;
+  offering: string;
+}
+
+export interface PurchasesStoreProduct {
   identifier: string;
   description: string;
   title: string;
@@ -49,55 +91,12 @@ export interface RevenueCatProduct {
   introPriceCycles?: number;
 }
 
-export interface RevenueCatPackage {
+export interface PurchasePackageOptions {
   identifier: string;
-  packageType: string;
-  product: RevenueCatProduct;
-  offering: string;
+  offeringIdentifier?: string;
 }
 
-export interface RevenueCatOffering {
-  identifier: string;
-  serverDescription: string;
-  metadata: Record<string, string>;
-  availablePackages: RevenueCatPackage[];
-}
-
-export interface RevenueCatOfferings {
-  current: RevenueCatOffering;
-  all: Record<string, RevenueCatOffering>;
-}
-
-export interface RevenueCatPurchaseResult {
+export interface PurchaseResult {
+  customerInfo: CustomerInfo;
   productIdentifier: string;
-  transactionIdentifier: string;
-  purchaseDate: number;
-}
-
-export interface RevenueCatCustomerInfo {
-  entitlements: {
-    all: Record<string, {
-      identifier: string;
-      isActive: boolean;
-      willRenew: boolean;
-      periodType: string;
-      expirationDate: string | null;
-      latestPurchaseDate: string;
-      originalPurchaseDate: string;
-    }>;
-    active: Record<string, {
-      identifier: string;
-      isActive: boolean;
-      willRenew: boolean;
-      periodType: string;
-      expirationDate: string | null;
-      latestPurchaseDate: string;
-      originalPurchaseDate: string;
-    }>;
-  };
-  activeSubscriptions: string[];
-  allPurchasedProductIdentifiers: string[];
-  latestExpirationDate: string | null;
-  firstSeen: string;
-  originalAppUserId: string;
 }
