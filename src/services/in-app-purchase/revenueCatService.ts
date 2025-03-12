@@ -7,7 +7,8 @@ import {
   PurchasePackageOptions,
   RevenueCatPackage,
   PurchasesIntroPrice,
-  PRODUCT_CATEGORY
+  PRODUCT_CATEGORY,
+  DEFAULT_INTRO_PRICE
 } from './types';
 
 class RevenueCatService {
@@ -56,8 +57,8 @@ class RevenueCatService {
 
   async purchasePackage(options: PurchasePackageOptions) {
     try {
-      // Ensure the product has all required properties for RevenueCat
-      const purchaseOptions = {
+      // Create a valid options object with all required properties for RevenueCat
+      const purchaseOptions: PurchasePackageOptions = {
         aPackage: {
           ...options.aPackage,
           product: {
@@ -68,12 +69,15 @@ class RevenueCatService {
             productType: 'subscription',
             subscriptionPeriod: options.aPackage.packageType === 'ANNUAL' ? 'P1Y' : 'P1M',
             defaultOption: options.aPackage.product.defaultOption || true,
-            subscriptionOptions: options.aPackage.product.subscriptionOptions || []
+            subscriptionOptions: options.aPackage.product.subscriptionOptions || [],
+            // Ensure introPrice is always defined
+            introPrice: options.aPackage.product.introPrice || DEFAULT_INTRO_PRICE
           }
         },
         presentedOfferingIdentifier: options.presentedOfferingIdentifier
       };
       
+      console.log('Purchasing package with options:', JSON.stringify(purchaseOptions));
       const purchaseResult = await Purchases.purchasePackage(purchaseOptions);
       return purchaseResult;
     } catch (error) {

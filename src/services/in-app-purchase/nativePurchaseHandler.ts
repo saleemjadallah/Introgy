@@ -8,7 +8,8 @@ import {
   PACKAGE_TYPE,
   ENTITLEMENTS,
   PRODUCT_CATEGORY,
-  VerificationResult
+  VerificationResult,
+  DEFAULT_INTRO_PRICE
 } from './types';
 import { revenueCatService } from './revenueCatService';
 import { convertCustomerInfoToPurchases } from './customerInfoUtils';
@@ -63,8 +64,8 @@ export async function purchaseNative(
         subscriptionPeriod: productId.includes('yearly') ? 'P1Y' : 'P1M',
         defaultOption: true,
         subscriptionOptions: [],
-        // RevenueCat requires introPrice to be either PurchasesIntroPrice or undefined
-        introPrice: packageToPurchase.product.introPrice
+        // Always provide a valid introPrice
+        introPrice: packageToPurchase.product.introPrice || DEFAULT_INTRO_PRICE
       }
     };
     

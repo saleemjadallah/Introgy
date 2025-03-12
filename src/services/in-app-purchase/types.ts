@@ -1,3 +1,4 @@
+
 export const PRODUCT_IDS = {
   PREMIUM_MONTHLY: 'app.introgy.premium.monthly',
   PREMIUM_YEARLY: 'app.introgy.premium.yearly',
@@ -114,6 +115,16 @@ export interface PurchasesIntroPrice {
   periodNumberOfUnits: number;
 }
 
+// Default intro price for when one is not provided
+export const DEFAULT_INTRO_PRICE: PurchasesIntroPrice = {
+  price: 0,
+  priceString: "$0.00",
+  period: "P0D",
+  cycles: 0,
+  periodUnit: "DAY",
+  periodNumberOfUnits: 0
+};
+
 // Updated to match RevenueCat's PurchasesStoreProduct
 export interface RevenueCatProduct {
   identifier: string;
@@ -122,7 +133,7 @@ export interface RevenueCatProduct {
   price: number;
   priceString: string;
   currencyCode: string;
-  introPrice?: PurchasesIntroPrice;
+  introPrice: PurchasesIntroPrice;  // Made required as per the error
   introPriceString?: string;
   introPricePeriod?: string;
   introPriceCycles?: number;
