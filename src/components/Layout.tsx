@@ -27,7 +27,7 @@ const Layout = () => {
       </Link>;
   };
   return <div className="min-h-screen bg-background flex flex-col">
-      <header className="flex items-center justify-between py-0 px-[12px] rounded-none mx-[5px]">
+      <header className="flex items-center justify-between py-0 px-[12px]">
         <div className="flex items-center">
           <Logo />
         </div>
