@@ -16,12 +16,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let apiKey = "appl_wHXBFRFAOUUpWRqauPXyZEUElmq"
         
         // Configure with standard options
-        // Configure RevenueCat using the direct method available in 4.26.1
-        Purchases.configure(
-            withAPIKey: apiKey,
-            appUserID: nil as String?,
-            observerMode: true
-        )
+        // Use simple initialization to avoid enum type issues
+        Purchases.configure(withAPIKey: apiKey)
         
         return true
     }
