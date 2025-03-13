@@ -1,6 +1,6 @@
 
 import { Capacitor } from '@capacitor/core';
-import { Purchases } from '@revenuecat/purchases-capacitor';
+import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { 
   CustomerInfo, 
   Purchase,
@@ -19,11 +19,19 @@ class RevenueCatService {
 
   async initialize(): Promise<boolean> {
     try {
-      // Use consistent API keys with native initialization
-      const apiKey = this.platform === 'ios' 
-        ? 'appl_wHXBFRFAOUUpWRqauPXyZEUElmq' // iOS API key
-        : 'goog_YkwgHvPZnlbmIfTBBQLPKHulLkX'; // Android API key
+      // Set debug log level first
+      await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
       
+      // Use consistent API keys with native initialization
+      let apiKey = '';
+      
+      if (this.platform === 'ios') {
+        apiKey = 'appl_wHXBFRFAOUUpWRqauPXyZEUElmq'; // iOS API key
+      } else if (this.platform === 'android') {
+        apiKey = 'goog_YkwgHvPZnlbmIfTBBQLPKHulLkX'; // Android API key
+      }
+      
+      // Configure with platform-specific API key
       await Purchases.configure({
         apiKey,
         appUserID: null, // Will use anonymous ID initially
@@ -31,7 +39,7 @@ class RevenueCatService {
       });
       
       this.isInitialized = true;
-      console.log('RevenueCat SDK initialized successfully');
+      console.log('RevenueCat SDK initialized successfully with API key:', apiKey);
       return true;
     } catch (error) {
       console.error('Error initializing RevenueCat:', error);

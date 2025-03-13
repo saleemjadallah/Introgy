@@ -2,20 +2,40 @@
 import { useEffect } from 'react';
 import { capacitorService } from '@/services/CapacitorService';
 import { useAuth } from '@/contexts/auth';
+import { inAppPurchaseService } from '@/services/InAppPurchaseService';
 
 const CapacitorInit = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    // Hide the splash screen after app is ready
-    const hideSplash = async () => {
-      // Wait for the UI to be fully loaded
-      setTimeout(async () => {
-        await capacitorService.hideSplashScreen();
-      }, 500);
+    // Initialize all required services
+    const initializeServices = async () => {
+      try {
+        // Initialize RevenueCat first
+        if (capacitorService.isNativePlatform()) {
+          console.log('Initializing RevenueCat...');
+          
+          // This will trigger initialization via InAppPurchaseService -> purchaseService -> revenueCatService
+          await inAppPurchaseService.getProducts();
+          
+          // Check entitlement status immediately
+          const isEntitled = await inAppPurchaseService.checkEntitlementStatus();
+          console.log('User is entitled to premium features:', isEntitled);
+        }
+        
+        // Then do other initialization tasks
+        // Hide the splash screen after app is ready and services are initialized
+        setTimeout(async () => {
+          await capacitorService.hideSplashScreen();
+        }, 500);
+      } catch (error) {
+        console.error('Error during service initialization:', error);
+        // Still hide splash screen even if there's an error
+        capacitorService.hideSplashScreen();
+      }
     };
     
-    hideSplash();
+    initializeServices();
     
     // Set status bar style based on system theme
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
