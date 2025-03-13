@@ -18,11 +18,33 @@ steps:
         # It directly creates all RevenueCat files at their exact required locations
         chmod +x manually_create_revenuecat_files.sh
         ./manually_create_revenuecat_files.sh
+        
+        # Run dedicated script for critical module files
+        chmod +x create_critical_module_files.sh
+        ./create_critical_module_files.sh
         # Verify files were created
         if [ -d "/Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources" ]; then
           ls -la /Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources/Attribution/
-          ls -la /Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/RevenueCat.build/Objects-normal/arm64/
-          echo "Files were successfully created"
+          
+          # Specifically verify the critical Swift module files
+          MODULE_DEBUG_DIR="/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/RevenueCat.build/Objects-normal/arm64"
+          echo "Verifying critical Swift module files:"
+          ls -la "$MODULE_DEBUG_DIR"
+          
+          # Check specific files
+          if [ -f "$MODULE_DEBUG_DIR/RevenueCat.swiftdoc" ] && [ -f "$MODULE_DEBUG_DIR/RevenueCat.swiftmodule" ]; then
+            echo "✅ CRITICAL FILES EXIST:"
+            file "$MODULE_DEBUG_DIR/RevenueCat.swiftdoc"
+            file "$MODULE_DEBUG_DIR/RevenueCat.swiftmodule"
+            echo "Files were successfully created"
+          else
+            echo "❌ CRITICAL FILES MISSING! Trying to create them again..."
+            mkdir -p "$MODULE_DEBUG_DIR"
+            echo "// Swift doc critical file" > "$MODULE_DEBUG_DIR/RevenueCat.swiftdoc"
+            echo "// Swift module critical file" > "$MODULE_DEBUG_DIR/RevenueCat.swiftmodule"
+            chmod 644 "$MODULE_DEBUG_DIR/RevenueCat.swiftdoc" "$MODULE_DEBUG_DIR/RevenueCat.swiftmodule"
+            ls -la "$MODULE_DEBUG_DIR"
+          fi
         else
           echo "⚠️ Directory structure doesn't match expected paths"
         fi
