@@ -33,11 +33,11 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="border-b px-4 py-3 flex items-center justify-between bg-card">
-        <div className="flex items-center gap-2">
+      <header className="px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center">
           <Logo />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           <Button 
             variant="ghost" 
             size="icon" 
