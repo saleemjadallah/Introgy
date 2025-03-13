@@ -1,5 +1,16 @@
+
 // Stub file created for build compatibility
 import Foundation
-// Empty implementation to satisfy the compiler
-// Real implementation will be loaded from the framework at runtime
 
+// Basic DeviceCache class to satisfy the compiler
+class DeviceCache {
+    static let shared = DeviceCache()
+    
+    func cachedObject(forKey key: String) -> Any? {
+        return nil
+    }
+    
+    func cache(object: Any?, forKey key: String) {
+        // Empty implementation
+    }
+}

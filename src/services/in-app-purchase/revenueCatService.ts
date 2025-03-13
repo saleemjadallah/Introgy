@@ -1,3 +1,4 @@
+
 import { Capacitor } from '@capacitor/core';
 import { Purchases } from '@revenuecat/purchases-capacitor';
 import { 
@@ -25,7 +26,8 @@ class RevenueCatService {
       
       await Purchases.configure({
         apiKey,
-        appUserID: null // Will use anonymous ID initially
+        appUserID: null, // Will use anonymous ID initially
+        observerMode: true // Match the native configuration
       });
       
       this.isInitialized = true;
