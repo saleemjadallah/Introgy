@@ -14,6 +14,13 @@ steps:
   - name: Pre-Build Setup
     run:
       command: |
+        # Make scripts executable
+        chmod +x revenuecat_build_phase.sh
+        chmod +x create_run_script_phase.sh
+        
+        # Add the build phase to the Xcode project
+        ./create_run_script_phase.sh
+        
         # Directory information for debugging
         echo "Current directory: $(pwd)"
         echo "Workspace directory: $CI_WORKSPACE"
