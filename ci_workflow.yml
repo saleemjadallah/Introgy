@@ -11,6 +11,25 @@ settings:
 
 # Define the build steps
 steps:
+  - name: Fix Missing RevenueCat Files (PRE-EVERYTHING)
+    run:
+      command: |
+        # This must run BEFORE anything else, including the pod update
+        chmod +x fix_revenuecat_missing_files.sh
+        ./fix_revenuecat_missing_files.sh
+        
+        # Add the RevenueCat files to the Xcode project
+        chmod +x add_revenuecat_files_to_pbxproj.sh
+        ./add_revenuecat_files_to_pbxproj.sh
+        
+        # Explicitly check that critical file exists
+        if [ -f "/Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources/Attribution/ASIdManagerProxy.swift" ]; then
+          echo "✅ VERIFIED: Critical file exists!"
+          cat "/Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources/Attribution/ASIdManagerProxy.swift"
+        else
+          echo "❌ CRITICAL ERROR: File still missing after fix attempt!"
+        fi
+
   - name: Setup RevenueCat 5.19.0
     run:
       command: |
