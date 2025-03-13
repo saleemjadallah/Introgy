@@ -59,10 +59,21 @@ steps:
         cp CapacitorCordova-PrivacyInfo.xcprivacy "/Volumes/workspace/repository/node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/PrivacyInfo.xcprivacy"
         echo "Added CapacitorCordova privacy file"
         
-        # Copy RevenueCat source files
+        # Copy RevenueCat source files and declare them as outputs
         mkdir -p "/Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources"
         cp -r revenuecat_sources/Sources/* "/Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources/"
         echo "Added RevenueCat source files"
+        
+        # Create output file declarations to satisfy the build system
+        mkdir -p "/Volumes/workspace/repository/RevenueCatOutputs"
+        echo "$(date)" > "/Volumes/workspace/repository/RevenueCatOutputs/processed.txt"
+        # Touch each source file in the outputs directory to declare them as outputs
+        for file in $(find revenuecat_sources/Sources -name "*.swift"); do
+          output_file="/Volumes/workspace/repository/RevenueCatOutputs/${file#revenuecat_sources/}"
+          mkdir -p "$(dirname "$output_file")"
+          touch "$output_file"
+        done
+        echo "Created output declarations for RevenueCat files"
       destination: macos
 
   - name: Build and Archive
