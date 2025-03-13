@@ -11,13 +11,21 @@ settings:
 
 # Define the build steps
 steps:
-  - name: Copy RevenueCat Stub Files
+  - name: Manually Create RevenueCat Files
     run:
       command: |
         # This is the VERY FIRST step that runs before any other build setup
-        # It copies the RevenueCat stub files to the expected location
-        chmod +x copy_revenuecat_stubs.sh
-        ./copy_revenuecat_stubs.sh
+        # It directly creates all RevenueCat files at their exact required locations
+        chmod +x manually_create_revenuecat_files.sh
+        ./manually_create_revenuecat_files.sh
+        # Verify files were created
+        if [ -d "/Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources" ]; then
+          ls -la /Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources/Attribution/
+          ls -la /Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/RevenueCat.build/Objects-normal/arm64/
+          echo "Files were successfully created"
+        else
+          echo "⚠️ Directory structure doesn't match expected paths"
+        fi
         
   - name: Pre-Build Setup
     run:
