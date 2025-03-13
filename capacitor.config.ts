@@ -36,7 +36,11 @@ const config: CapacitorConfig = {
       iconColor: "#488AFF"
     },
     PurchasesPlugin: {
-      // RevenueCat configuration can be added here if needed
+      // RevenueCat configuration
+      apiKey: {
+        apple: "your_api_key_here" // Replace with your actual API key
+      },
+      observerMode: true
     },
     App: {
       appName: "Introgy",
