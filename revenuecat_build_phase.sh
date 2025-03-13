@@ -190,11 +190,33 @@ mkdir -p "${DERIVED_SOURCES_DIR:-$DERIVED_FILE_DIR}/RevenueCat.build/Objects-nor
 touch "${DERIVED_SOURCES_DIR:-$DERIVED_FILE_DIR}/RevenueCat.build/Objects-normal/arm64/RevenueCat.swiftdoc"
 touch "${DERIVED_SOURCES_DIR:-$DERIVED_FILE_DIR}/RevenueCat.build/Objects-normal/arm64/RevenueCat.swiftmodule"
 
-# Also create at the known Xcode Cloud path
+# Also create at all known Xcode Cloud paths
 if [ -d "/Volumes/workspace" ]; then
+  # For Release builds
   mkdir -p "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/App/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/RevenueCat.build/Objects-normal/arm64"
   touch "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/App/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/RevenueCat.build/Objects-normal/arm64/RevenueCat.swiftdoc"
   touch "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/App/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/RevenueCat.build/Objects-normal/arm64/RevenueCat.swiftmodule"
+  
+  # For Debug builds
+  mkdir -p "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/RevenueCat.build/Objects-normal/arm64"
+  touch "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/RevenueCat.build/Objects-normal/arm64/RevenueCat.swiftdoc"
+  touch "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/RevenueCat.build/Objects-normal/arm64/RevenueCat.swiftmodule"
+  
+  # Create in all configurations for maximum compatibility
+  for config in Debug Release; do
+    for platform in iphoneos iphonesimulator; do
+      mkdir -p "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/${config}-${platform}/RevenueCat.build/Objects-normal/arm64"
+      touch "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/${config}-${platform}/RevenueCat.build/Objects-normal/arm64/RevenueCat.swiftdoc"
+      touch "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/${config}-${platform}/RevenueCat.build/Objects-normal/arm64/RevenueCat.swiftmodule"
+      
+      # Also create for x86_64 (simulator architecture)
+      mkdir -p "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/${config}-${platform}/RevenueCat.build/Objects-normal/x86_64"
+      touch "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/${config}-${platform}/RevenueCat.build/Objects-normal/x86_64/RevenueCat.swiftdoc"
+      touch "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/${config}-${platform}/RevenueCat.build/Objects-normal/x86_64/RevenueCat.swiftmodule"
+    done
+  done
+  
+  echo "Created Swift module files in all possible build directories"
 fi
 
 echo "✅ RevenueCat build phase completed successfully"
