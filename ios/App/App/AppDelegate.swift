@@ -16,11 +16,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let apiKey = "appl_wHXBFRFAOUUpWRqauPXyZEUElmq"
         
         // Configure with standard options
-        Purchases.configure(
-            withAPIKey: apiKey,
-            appUserID: nil,
-            observerMode: true
-        )
+        // Use the current RevenueCat 4.x configure method
+        if #available(iOS 15.0, *) {
+            Purchases.configure(
+                withAPIKey: apiKey,
+                appUserID: nil,
+                useStoreKit2IfAvailable: true,
+                observerMode: true
+            )
+        } else {
+            // Fallback for older iOS versions
+            Purchases.configure(
+                withAPIKey: apiKey,
+                appUserID: nil,
+                observerMode: true
+            )
+        }
         
         return true
     }
