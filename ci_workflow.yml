@@ -58,6 +58,11 @@ steps:
         mkdir -p "/Volumes/workspace/repository/node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova"
         cp CapacitorCordova-PrivacyInfo.xcprivacy "/Volumes/workspace/repository/node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/PrivacyInfo.xcprivacy"
         echo "Added CapacitorCordova privacy file"
+        
+        # Copy RevenueCat source files
+        mkdir -p "/Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources"
+        cp -r revenuecat_sources/Sources/* "/Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources/"
+        echo "Added RevenueCat source files"
       destination: macos
 
   - name: Build and Archive
