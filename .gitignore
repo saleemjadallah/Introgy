@@ -25,6 +25,9 @@ ios/App/Pods
 !ios/App/Pods/RevenueCat
 !ios/App/Pods/RevenueCat/Sources
 !ios/App/Pods/RevenueCat/Sources/PrivacyInfo.xcprivacy
+!ios/App/Pods/Target Support Files
+!ios/App/Pods/Target Support Files/RevenueCat
+!ios/App/Pods/Target Support Files/RevenueCat/ResourceBundle-RevenueCat-RevenueCat-Info.plist
 dist
 dist-ssr
 *.local

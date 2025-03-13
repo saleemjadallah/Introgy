@@ -48,6 +48,11 @@ steps:
         mkdir -p /Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources
         cp PrivacyInfo.xcprivacy /Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources/
         echo "Added RevenueCat PrivacyInfo.xcprivacy file"
+        
+        # Ensure RevenueCat resource bundle files exist
+        mkdir -p "/Volumes/workspace/repository/ios/App/Pods/Target Support Files/RevenueCat"
+        cp ResourceBundle-RevenueCat-RevenueCat-Info.plist "/Volumes/workspace/repository/ios/App/Pods/Target Support Files/RevenueCat/"
+        echo "Added RevenueCat resource bundle info plist"
       destination: macos
 
   - name: Build and Archive
