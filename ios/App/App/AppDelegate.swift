@@ -19,8 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Purchases.configure(
             withAPIKey: apiKey,
             appUserID: nil,
-            observerMode: true,
-            userDefaults: nil
+            observerMode: true
         )
         
         return true
