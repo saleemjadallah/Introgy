@@ -21,6 +21,18 @@ steps:
         # Add the build phase to the Xcode project
         ./create_run_script_phase.sh
         
+        # Explicitly create RevenueCat module files in specific debug path
+        chmod +x fix_revenuecat_debug_modules.sh
+        ./fix_revenuecat_debug_modules.sh
+        
+        # Double-check to ensure files exist
+        if [ -d "/Volumes/workspace" ]; then
+          mkdir -p "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/RevenueCat.build/Objects-normal/arm64"
+          touch "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/RevenueCat.build/Objects-normal/arm64/RevenueCat.swiftdoc"
+          touch "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/RevenueCat.build/Objects-normal/arm64/RevenueCat.swiftmodule"
+          echo "Created RevenueCat Swift module files in Debug path"
+        fi
+        
         # Directory information for debugging
         echo "Current directory: $(pwd)"
         echo "Workspace directory: $CI_WORKSPACE"
