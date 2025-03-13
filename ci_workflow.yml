@@ -43,6 +43,11 @@ steps:
             echo "Copied $(basename $header)"
           fi
         done
+        
+        # Ensure RevenueCat privacy file exists
+        mkdir -p /Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources
+        cp PrivacyInfo.xcprivacy /Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources/
+        echo "Added RevenueCat PrivacyInfo.xcprivacy file"
       destination: macos
 
   - name: Build and Archive
