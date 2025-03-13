@@ -38,7 +38,7 @@ const config: CapacitorConfig = {
     PurchasesPlugin: {
       // RevenueCat configuration
       apiKey: {
-        apple: "your_api_key_here" // Replace with your actual API key
+        apple: "appl_wHXBFRFAOUUpWRqauPXyZEUElmq" // API key for iOS
       },
       observerMode: true
     },
