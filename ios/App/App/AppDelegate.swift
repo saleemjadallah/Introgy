@@ -16,13 +16,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let apiKey = "appl_wHXBFRFAOUUpWRqauPXyZEUElmq"
         
         // Configure with standard options
-        // Configure RevenueCat with the exact method signature available in RevenueCat 4.26.1
-        let configuration = Purchases.Configuration.Builder(withAPIKey: apiKey)
-            .with(appUserID: nil)
-            .with(observerMode: true)
-            .build()
-        
-        Purchases.configure(with: configuration)
+        // Configure RevenueCat using the direct method available in 4.26.1
+        Purchases.configure(
+            withAPIKey: apiKey,
+            appUserID: nil as String?,
+            observerMode: true
+        )
         
         return true
     }
