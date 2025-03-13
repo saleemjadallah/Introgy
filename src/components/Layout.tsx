@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { Battery, Users, Brain, LineChart, Home, Bell, User } from "lucide-react";
@@ -5,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/profile/UserAvatar";
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
+import { Logo } from "@/components/ui/Logo";
 
 const Layout = () => {
   const location = useLocation();
@@ -33,7 +35,7 @@ const Layout = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <header className="border-b px-4 py-3 flex items-center justify-between bg-card">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-semibold">Introgy</h1>
+          <Logo />
         </div>
         <div className="flex items-center gap-2">
           <Button 
