@@ -1,7 +1,7 @@
 name: Xcode Cloud Build
 
 # This workflow configuration helps Xcode Cloud find the correct project
-# Updated with comprehensive header file fixes for /Volumes/workspace/repository path
+# Updated to access headers directly from node_modules
 
 settings:
   xcode:
@@ -17,45 +17,23 @@ steps:
         # Directory information for debugging
         echo "Current directory: $(pwd)"
         echo "Workspace directory: $CI_WORKSPACE"
-        echo "Listing key directories:"
-        ls -la /Volumes/workspace/repository || echo "Repository directory not found"
         
-        # Try to find where node_modules is located
-        POSSIBLE_PATHS=(
-          "/Volumes/workspace/repository/node_modules"
-          "$CI_WORKSPACE/node_modules"
-          "$(pwd)/node_modules"
-        )
+        # For safety, create a copy of the header files directly in the Pods directory
+        mkdir -p /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova
         
-        NODE_MODULES_FOUND="false"
-        for path in "${POSSIBLE_PATHS[@]}"; do
-          if [ -d "$path" ]; then
-            echo "Found node_modules at: $path"
-            NODE_MODULES_FOUND="true"
-            break
+        # Copy header files from node_modules to Pods directory for redundancy
+        for header in node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/Classes/Public/*.h; do
+          if [ -f "$header" ]; then
+            cp "$header" /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova/
+            echo "Copied $(basename $header)"
           fi
         done
         
-        if [ "$NODE_MODULES_FOUND" = "false" ]; then
-          echo "WARNING: node_modules not found in expected locations"
+        # Copy main header file
+        if [ -f "node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/CapacitorCordova.h" ]; then
+          cp node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/CapacitorCordova.h /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova/
+          echo "Copied CapacitorCordova.h"
         fi
-        
-        # Create stub Cordova header files in expected locations
-        mkdir -p /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova
-        
-        # Place standalone header
-        cp cordova_header_standalone.h /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova/CapacitorCordova.h
-        cp cordova_header_standalone.h /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova/CDVViewController.h
-        cp cordova_header_standalone.h /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova/CDVInvokedUrlCommand.h
-        cp cordova_header_standalone.h /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova/NSDictionary+CordovaPreferences.h
-        cp cordova_header_standalone.h /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova/CDVCommandDelegate.h
-        cp cordova_header_standalone.h /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova/CDVPlugin.h
-        cp cordova_header_standalone.h /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova/CDVPluginResult.h
-        cp cordova_header_standalone.h /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova/CDVConfigParser.h
-        cp cordova_header_standalone.h /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova/CDVWebViewProcessPoolFactory.h
-        
-        # Run the Cordova header fix script
-        ./xcode_cloud_cordova_fix.sh
       destination: macos
 
   - name: Build and Archive
@@ -65,5 +43,5 @@ steps:
       scheme: App
       destination: 'platform=iOS Simulator,name=iPhone 15'
       xcconfig:
-        HEADER_SEARCH_PATHS: "$(inherited) $(SRCROOT)/Pods/Headers/Public/CapacitorCordova $(PODS_ROOT)/Headers/Public/CapacitorCordova"
+        HEADER_SEARCH_PATHS: "$(inherited) $(SRCROOT)/Pods/Headers/Public/CapacitorCordova $(PODS_ROOT)/Headers/Public/CapacitorCordova $(SRCROOT)/../../node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/Classes/Public $(SRCROOT)/../../node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova"
         OTHER_CFLAGS: "$(inherited) -isystem \"$(PODS_ROOT)/Headers/Public/CapacitorCordova\""

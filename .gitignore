@@ -8,6 +8,15 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+!node_modules/@revenuecat
+!node_modules/@revenuecat/purchases-capacitor
+!node_modules/@revenuecat/purchases-capacitor/ios
+!node_modules/@capacitor
+!node_modules/@capacitor/ios
+!node_modules/@capacitor/ios/CapacitorCordova
+!node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova
+!node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/Classes
+!node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/Classes/Public
 dist
 dist-ssr
 *.local
