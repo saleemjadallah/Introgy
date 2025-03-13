@@ -5,9 +5,9 @@ export const Logo = () => {
   return (
     <div className="flex items-center">
       <img 
-        src="/lovable-uploads/697f28fa-a3a7-4536-9aaa-0ce853c08cae.png" 
+        src="/lovable-uploads/31eec749-0940-4166-93b1-6ca80adee30d.png" 
         alt="Introgy Logo" 
-        className="h-10 w-10 rounded-md"
+        className="h-10 md:h-12"
       />
     </div>
   );
