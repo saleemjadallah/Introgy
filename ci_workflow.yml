@@ -11,6 +11,22 @@ settings:
 
 # Define the build steps
 steps:
+  - name: Add Critical Swift Module Files (PRIORITY)
+    run:
+      command: |
+        # Creating the specifically referenced Swift module files that cause build errors
+        chmod +x add_critical_swift_module_files.sh
+        ./add_critical_swift_module_files.sh
+        
+        # Verify files were created successfully
+        MODULE_DIR="/Volumes/workspace/DerivedData/Build/Intermediates.noindex/Pods.build/Debug-iphoneos/RevenueCat.build/Objects-normal/arm64"
+        if [ -f "$MODULE_DIR/RevenueCat.swiftdoc" ] && [ -f "$MODULE_DIR/RevenueCat.swiftmodule" ]; then
+          echo "✅ CRITICAL MODULE FILES VERIFIED!"
+          ls -la "$MODULE_DIR"
+        else
+          echo "❌ ERROR: Critical module files not created properly!"
+        fi
+
   - name: Fix Missing RevenueCat Files (PRE-EVERYTHING)
     run:
       command: |
@@ -89,9 +105,8 @@ steps:
         # Add the build phase to the Xcode project
         ./create_run_script_phase.sh
         
-        # Explicitly create RevenueCat module files in specific debug path
-        chmod +x fix_revenuecat_debug_modules.sh
-        ./fix_revenuecat_debug_modules.sh
+        # Skip this step since we already created the files in an earlier step
+        echo "Skipping fix_revenuecat_debug_modules.sh since files were already created"
         
         # Double-check to ensure files exist
         if [ -d "/Volumes/workspace" ]; then
