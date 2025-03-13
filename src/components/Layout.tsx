@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { Battery, Users, Brain, LineChart, Home, Bell, User } from "lucide-react";
@@ -7,51 +6,36 @@ import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/profile/UserAvatar";
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
 import { Logo } from "@/components/ui/Logo";
-
 const Layout = () => {
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-
-  const NavItem = ({ to, icon: Icon, label }: { to: string; icon: React.ElementType; label: string }) => {
+  const NavItem = ({
+    to,
+    icon: Icon,
+    label
+  }: {
+    to: string;
+    icon: React.ElementType;
+    label: string;
+  }) => {
     const isActive = location.pathname === to;
-    
-    return (
-      <Link to={to} className="w-full">
-        <Button 
-          variant="ghost" 
-          className={cn(
-            "w-full justify-start gap-2", 
-            isActive ? "bg-accent" : "hover:bg-accent/50"
-          )}
-        >
+    return <Link to={to} className="w-full">
+        <Button variant="ghost" className={cn("w-full justify-start gap-2", isActive ? "bg-accent" : "hover:bg-accent/50")}>
           <Icon size={18} />
           <span>{label}</span>
         </Button>
-      </Link>
-    );
+      </Link>;
   };
-
-  return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <header className="px-4 py-3 flex items-center justify-between">
+  return <div className="min-h-screen bg-background flex flex-col">
+      <header className="flex items-center justify-between py-0 px-[12px] rounded-none mx-[5px]">
         <div className="flex items-center">
           <Logo />
         </div>
         <div className="flex items-center">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="relative"
-            onClick={() => setIsProfileOpen(!isProfileOpen)}
-          >
+          <Button variant="ghost" size="icon" className="relative" onClick={() => setIsProfileOpen(!isProfileOpen)}>
             <UserAvatar />
           </Button>
-          {isProfileOpen && (
-            <ProfileDropdown 
-              isOpen={isProfileOpen}
-              onClose={() => setIsProfileOpen(false)}
-            />
-          )}
+          {isProfileOpen && <ProfileDropdown isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />}
         </div>
       </header>
 
@@ -91,8 +75,6 @@ const Layout = () => {
           <Outlet />
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Layout;
