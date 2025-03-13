@@ -18,10 +18,11 @@ steps:
         echo "Current directory: $(pwd)"
         echo "Workspace directory: $CI_WORKSPACE"
         
-        # For safety, create a copy of the header files directly in the Pods directory
+        # For safety, create directories for header files directly in the Pods directory
         mkdir -p /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova
+        mkdir -p /Volumes/workspace/repository/ios/App/Pods/Headers/Public/Capacitor
         
-        # Copy header files from node_modules to Pods directory for redundancy
+        # Copy CapacitorCordova header files to Pods directory for redundancy
         for header in node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/Classes/Public/*.h; do
           if [ -f "$header" ]; then
             cp "$header" /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova/
@@ -29,11 +30,19 @@ steps:
           fi
         done
         
-        # Copy main header file
+        # Copy main CapacitorCordova header file
         if [ -f "node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/CapacitorCordova.h" ]; then
           cp node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/CapacitorCordova.h /Volumes/workspace/repository/ios/App/Pods/Headers/Public/CapacitorCordova/
           echo "Copied CapacitorCordova.h"
         fi
+        
+        # Copy Capacitor header files to Pods directory for redundancy
+        for header in node_modules/@capacitor/ios/Capacitor/Capacitor/*.h; do
+          if [ -f "$header" ]; then
+            cp "$header" /Volumes/workspace/repository/ios/App/Pods/Headers/Public/Capacitor/
+            echo "Copied $(basename $header)"
+          fi
+        done
       destination: macos
 
   - name: Build and Archive
@@ -43,5 +52,5 @@ steps:
       scheme: App
       destination: 'platform=iOS Simulator,name=iPhone 15'
       xcconfig:
-        HEADER_SEARCH_PATHS: "$(inherited) $(SRCROOT)/Pods/Headers/Public/CapacitorCordova $(PODS_ROOT)/Headers/Public/CapacitorCordova $(SRCROOT)/../../node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/Classes/Public $(SRCROOT)/../../node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova"
-        OTHER_CFLAGS: "$(inherited) -isystem \"$(PODS_ROOT)/Headers/Public/CapacitorCordova\""
+        HEADER_SEARCH_PATHS: "$(inherited) $(SRCROOT)/Pods/Headers/Public/CapacitorCordova $(PODS_ROOT)/Headers/Public/CapacitorCordova $(SRCROOT)/Pods/Headers/Public/Capacitor $(PODS_ROOT)/Headers/Public/Capacitor $(SRCROOT)/../../node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/Classes/Public $(SRCROOT)/../../node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova $(SRCROOT)/../../node_modules/@capacitor/ios/Capacitor/Capacitor"
+        OTHER_CFLAGS: "$(inherited) -isystem \"$(PODS_ROOT)/Headers/Public/CapacitorCordova\" -isystem \"$(PODS_ROOT)/Headers/Public/Capacitor\""

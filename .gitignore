@@ -17,6 +17,8 @@ node_modules
 !node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova
 !node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/Classes
 !node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/Classes/Public
+!node_modules/@capacitor/ios/Capacitor
+!node_modules/@capacitor/ios/Capacitor/Capacitor
 dist
 dist-ssr
 *.local
