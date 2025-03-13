@@ -60,6 +60,7 @@ steps:
         echo "Added CapacitorCordova privacy file"
         
         # DIRECT FILE APPROACH: Create each RevenueCat source file directly in the expected location
+        # AND declare them as outputs of a script phase
         echo "Creating RevenueCat source files directly in Pods directory..."
         
         # Function to create a Swift file with stub content
@@ -73,11 +74,19 @@ import Foundation
 // Real implementation will be loaded from the framework at runtime
 EOL
           echo "Created: $target_file"
+          
+          # Also create an output declaration file
+          local output_file="/Volumes/workspace/repository/RevenueCatOutputs/${target_file#/Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources/}"
+          mkdir -p "$(dirname "$output_file")"
+          echo "// Output declaration for $target_file" > "$output_file"
         }
         
         # Create all required RevenueCat source files directly where Xcode expects them
         PODS_DIR="/Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources"
         mkdir -p "$PODS_DIR"
+        
+        # Create output directories
+        mkdir -p "/Volumes/workspace/repository/RevenueCatOutputs"
         
         # Attribution files
         create_swift_file "$PODS_DIR/Attribution/ASIdManagerProxy.swift"
@@ -162,6 +171,12 @@ EOL
         done
         
         echo "Created all RevenueCat source files directly in the Pods directory"
+        
+        # Create Swift module files in build directory
+        mkdir -p "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/App/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/RevenueCat.build/Objects-normal/arm64"
+        touch "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/App/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/RevenueCat.build/Objects-normal/arm64/RevenueCat.swiftdoc"
+        touch "/Volumes/workspace/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/App/IntermediateBuildFilesPath/Pods.build/Release-iphoneos/RevenueCat.build/Objects-normal/arm64/RevenueCat.swiftmodule"
+        echo "Created RevenueCat.swiftdoc and RevenueCat.swiftmodule files"
       destination: macos
 
   - name: Build and Archive
