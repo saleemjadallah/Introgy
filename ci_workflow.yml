@@ -53,6 +53,11 @@ steps:
         mkdir -p "/Volumes/workspace/repository/ios/App/Pods/Target Support Files/RevenueCat"
         cp ResourceBundle-RevenueCat-RevenueCat-Info.plist "/Volumes/workspace/repository/ios/App/Pods/Target Support Files/RevenueCat/"
         echo "Added RevenueCat resource bundle info plist"
+        
+        # Ensure CapacitorCordova privacy file exists
+        mkdir -p "/Volumes/workspace/repository/node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova"
+        cp CapacitorCordova-PrivacyInfo.xcprivacy "/Volumes/workspace/repository/node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/PrivacyInfo.xcprivacy"
+        echo "Added CapacitorCordova privacy file"
       destination: macos
 
   - name: Build and Archive
