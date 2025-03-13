@@ -11,17 +11,28 @@ settings:
 
 # Define the build steps
 steps:
-  - name: Manually Create RevenueCat Files
+  - name: Setup RevenueCat 5.19.0
     run:
       command: |
-        # This is the VERY FIRST step that runs before any other build setup
-        # It directly creates all RevenueCat files at their exact required locations
+        # Setup proper RevenueCat version in Podfile and update pod
+        chmod +x setup_revenuecat_version.sh
+        ./setup_revenuecat_version.sh
+
+  - name: Manually Create RevenueCat Files (Fallback)
+    run:
+      command: |
+        # This fallback step creates files only if they're still missing after pod update
         chmod +x manually_create_revenuecat_files.sh
-        ./manually_create_revenuecat_files.sh
-        
-        # Run dedicated script for critical module files
         chmod +x create_critical_module_files.sh
-        ./create_critical_module_files.sh
+        
+        # Check if files already exist from pod installation
+        if [ ! -d "/Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources/Attribution" ]; then
+          echo "⚠️ RevenueCat files not found from pod installation, running fallback scripts..."
+          ./manually_create_revenuecat_files.sh
+          ./create_critical_module_files.sh
+        else
+          echo "✅ RevenueCat files exist from pod installation, skipping fallback scripts"
+        fi
         # Verify files were created
         if [ -d "/Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources" ]; then
           ls -la /Volumes/workspace/repository/ios/App/Pods/RevenueCat/Sources/Attribution/
