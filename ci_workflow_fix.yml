@@ -1,0 +1,28 @@
+name: Xcode Cloud Build
+
+# This workflow configuration helps Xcode Cloud find the correct project
+# Updated with comprehensive header file fixes
+
+settings:
+  xcode:
+    project: ios/App/App.xcodeproj
+    workspace: ios/App/App.xcworkspace
+    scheme: App
+
+# Define the build steps
+steps:
+  - name: Pre-Build Setup
+    run:
+      command: |
+        # Run the Cordova header fix script
+        ./xcode_cloud_cordova_fix.sh
+      destination: macos
+
+  - name: Build and Archive
+    build:
+      project: ios/App/App.xcodeproj
+      workspace: ios/App/App.xcworkspace
+      scheme: App
+      destination: 'platform=iOS Simulator,name=iPhone 15'
+      xcconfig:
+        HEADER_SEARCH_PATHS: "$(inherited) $(SRCROOT)/../CapacitorHeaders $(SRCROOT)/Pods/Headers/Public/CapacitorCordova $(SRCROOT)/../../node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/Classes/Public"
