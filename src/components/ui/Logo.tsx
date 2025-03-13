@@ -7,7 +7,7 @@ export const Logo = () => {
       <img 
         src="/lovable-uploads/01e725c3-d8f9-4af1-ba58-700c58eebb45.png" 
         alt="Introgy Logo" 
-        className="h-16 w-auto md:h-16"
+        className="h-28 w-auto md:h-28"
       />
     </div>
   );
