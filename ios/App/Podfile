@@ -18,7 +18,8 @@ def capacitor_pods
   pod 'CapacitorSplashScreen', :path => '../../node_modules/@capacitor/splash-screen'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
   pod 'RevenuecatPurchasesCapacitor', :path => '../../node_modules/@revenuecat/purchases-capacitor'
-  pod 'RevenueCat', '5.19.0' # Specify the exact version you've installed locally
+  # Update RevenueCat version to fix duplicate symbols
+  pod 'RevenueCat', '4.26.1', :modular_headers => true
 end
 
 target 'App' do
@@ -28,4 +29,14 @@ end
 
 post_install do |installer|
   assertDeploymentTarget(installer)
+  
+  # Disable building for custom entitlement computation
+  installer.pods_project.targets.each do |target|
+    if target.name == 'RevenueCat'
+      target.build_configurations.each do |config|
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'RC_DISABLE_CUSTOM_ENTITLEMENTS_COMPUTATION=1'
+      end
+    end
+  end
 end
