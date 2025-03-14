@@ -6,9 +6,11 @@ import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/profile/UserAvatar";
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
 import { Logo } from "@/components/ui/Logo";
+
 const Layout = () => {
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  
   const NavItem = ({
     to,
     icon: Icon,
@@ -26,12 +28,14 @@ const Layout = () => {
         </Button>
       </Link>;
   };
+
   return <div className="min-h-screen bg-background flex flex-col">
       <header className="flex items-center justify-between px-[12px] py-[14px]">
-        <div className="flex items-center">
+        <div className="flex-1"></div>
+        <div className="flex justify-center flex-1">
           <Logo />
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center justify-end flex-1">
           <Button variant="ghost" size="icon" className="relative" onClick={() => setIsProfileOpen(!isProfileOpen)}>
             <UserAvatar />
           </Button>
@@ -77,4 +81,5 @@ const Layout = () => {
       </div>
     </div>;
 };
+
 export default Layout;
