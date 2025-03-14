@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 echo "Running post-clone script..."
@@ -11,8 +12,8 @@ npm install
 
 # Run RevenueCat pre-build script
 echo "Running RevenueCat pre-build script..."
-chmod +x ios/App/xcode_cloud_pre_build.sh
-./ios/App/xcode_cloud_pre_build.sh
+chmod +x ios/App/revenuecat_build_phase.sh
+./ios/App/revenuecat_build_phase.sh
 
 # Install pods
 echo "Installing pods..."

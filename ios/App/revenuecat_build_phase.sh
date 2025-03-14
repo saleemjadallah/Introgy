@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 echo "Running RevenueCat Build Phase script..."
