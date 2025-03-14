@@ -1,13 +1,13 @@
 {
   "name": "RevenuecatPurchasesCapacitor",
-  "version": "10.1.0",
+  "version": "10.2.0",
   "summary": "Capacitor in-app purchases and subscriptions made easy. Support for iOS and Android.",
   "license": "MIT",
   "homepage": "https://github.com/RevenueCat/purchases-capacitor.git",
   "authors": "RevenueCat, Inc.",
   "source": {
     "git": "https://github.com/RevenueCat/purchases-capacitor.git",
-    "tag": "10.1.0"
+    "tag": "10.2.0"
   },
   "source_files": "ios/Plugin/**/*.{swift,h,m,c,cc,mm,cpp}",
   "platforms": {
@@ -16,7 +16,7 @@
   "dependencies": {
     "Capacitor": [],
     "PurchasesHybridCommon": [
-      "13.19.0"
+      "13.24.0"
     ]
   },
   "swift_versions": "5.1",
