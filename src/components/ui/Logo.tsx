@@ -7,7 +7,7 @@ export const Logo = () => {
       <img 
         src="/lovable-uploads/d9785a5a-955e-49b3-8f3d-1e6c30a6f63d.png" 
         alt="Introgy Logo" 
-        className="h-24"
+        className="h-28"
         style={{ objectFit: 'contain' }}
       />
     </div>
