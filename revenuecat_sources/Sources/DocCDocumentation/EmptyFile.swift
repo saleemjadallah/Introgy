@@ -1,7 +1,10 @@
-// This is a stub file created for Xcode Cloud build compatibility
-// The actual implementation is not required for the build process
-
-import Foundation
-
-// Empty implementation to satisfy the compiler
-// The real RevenueCat implementation will be used at runtime from the framework
+//
+//  EmptyFile.swift
+//  
+//
+//  Created by Andrés Boedo on 3/28/22.
+//
+// This is an empty source file used to make RevenueCat a valid
+// documentation build target.
+//
+// see Apple's example at https://github.com/apple/swift-docc-plugin/

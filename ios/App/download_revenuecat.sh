@@ -1,37 +1,28 @@
 #!/bin/bash
 
-echo "Downloading RevenueCat framework directly..."
+echo "Downloading RevenueCat source files..."
 
-REVENUECAT_VERSION="4.26.1"
-TEMP_DIR=$(mktemp -d)
-FRAMEWORK_URL="https://github.com/RevenueCat/purchases-ios/releases/download/${REVENUECAT_VERSION}/RevenueCat.xcframework.zip"
-TARGET_DIR="Frameworks"
+# Define directories
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+WORKSPACE_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+REVENUECAT_SOURCES_DIR="$WORKSPACE_DIR/revenuecat_sources"
+TEMP_DIR="/tmp/revenuecat_download"
 
-mkdir -p "$TARGET_DIR"
+# Create directories
+mkdir -p "$TEMP_DIR"
+mkdir -p "$REVENUECAT_SOURCES_DIR"
 
-echo "Downloading RevenueCat framework from $FRAMEWORK_URL..."
-curl -L "$FRAMEWORK_URL" -o "$TEMP_DIR/RevenueCat.xcframework.zip"
+# Download RevenueCat SDK
+echo "Downloading RevenueCat SDK..."
+curl -L "https://github.com/RevenueCat/purchases-ios/archive/refs/tags/5.19.0.zip" -o "$TEMP_DIR/revenuecat.zip"
 
-if [ ! -f "$TEMP_DIR/RevenueCat.xcframework.zip" ]; then
-  echo "❌ Failed to download RevenueCat framework"
-  exit 1
-fi
+# Unzip and copy files
+echo "Extracting files..."
+unzip -q "$TEMP_DIR/revenuecat.zip" -d "$TEMP_DIR"
+cp -R "$TEMP_DIR/purchases-ios-5.19.0/Sources" "$REVENUECAT_SOURCES_DIR/"
 
-echo "Extracting framework..."
-unzip -o "$TEMP_DIR/RevenueCat.xcframework.zip" -d "$TEMP_DIR"
-
-echo "Copying framework to $TARGET_DIR..."
-rm -rf "$TARGET_DIR/RevenueCat.xcframework"
-cp -R "$TEMP_DIR/RevenueCat.xcframework" "$TARGET_DIR/"
-
-echo "Cleaning up temporary files..."
+# Clean up
 rm -rf "$TEMP_DIR"
 
-# Verify the framework was successfully extracted
-if [ -d "$TARGET_DIR/RevenueCat.xcframework" ]; then
-  echo "✅ RevenueCat framework successfully downloaded and extracted to $TARGET_DIR/RevenueCat.xcframework"
-  echo "Now you can add this framework to your Xcode project manually if needed."
-else
-  echo "❌ Failed to extract RevenueCat framework"
-  exit 1
-fi
+echo "✅ RevenueCat source files downloaded successfully"
+exit 0

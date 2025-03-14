@@ -1,7 +1,19 @@
-// This is a stub file created for Xcode Cloud build compatibility
-// The actual implementation is not required for the build process
+//
+//  Copyright RevenueCat Inc. All Rights Reserved.
+//
+//  Licensed under the MIT License (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//      https://opensource.org/licenses/MIT
+//
+//  FeatureEvent.swift
+//
+//  Created by Cesar de la Vega on 6/11/24.
 
-import Foundation
+protocol FeatureEvent: Encodable, Sendable {
 
-// Empty implementation to satisfy the compiler
-// The real RevenueCat implementation will be used at runtime from the framework
+    var feature: Feature { get }
+    var eventDiscriminator: String? { get }
+
+}
