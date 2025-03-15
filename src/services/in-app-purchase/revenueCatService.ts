@@ -1,4 +1,3 @@
-
 import { Capacitor } from '@capacitor/core';
 import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { 
@@ -12,6 +11,10 @@ import {
   SubscriptionOption,
   DEFAULT_INTRO_PRICE
 } from './types';
+
+interface PurchasesWithPaywall {
+  showPaywall: (options: { offering: string }) => Promise<void>;
+}
 
 class RevenueCatService {
   private platform: 'ios' | 'android' = Capacitor.getPlatform() === 'ios' ? 'ios' : 'android';
@@ -131,24 +134,24 @@ class RevenueCatService {
     }
   }
 
-  // Updated method to correctly use the Capacitor RevenueCat plugin's API
   async presentPaywall(offeringIdentifier?: string) {
     try {
       if (!this.isInitialized) {
         await this.initialize();
       }
       
-      // The RevenueCat Capacitor plugin uses 'showPaywall' method, not presentPaywall
       if (this.platform === 'ios' || this.platform === 'android') {
-        // Check if the method exists and call it
-        if (typeof Purchases.showPaywall === 'function') {
-          await Purchases.showPaywall({ 
+        // Use a type assertion to access showPaywall method
+        const purchasesWithPaywall = Purchases as unknown as PurchasesWithPaywall;
+        
+        // Check if the method exists at runtime
+        if (typeof (Purchases as any).showPaywall === 'function') {
+          await purchasesWithPaywall.showPaywall({ 
             offering: offeringIdentifier || 'premium'
           });
           console.log('RevenueCat paywall presented successfully');
           return true;
         } else {
-          // Fallback for older versions of the plugin
           console.warn('RevenueCat showPaywall method not available on this version of the plugin');
           return false;
         }
