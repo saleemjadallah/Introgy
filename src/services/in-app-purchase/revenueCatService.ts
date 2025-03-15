@@ -132,21 +132,26 @@ class RevenueCatService {
   }
 
   // Updated method to correctly use the Capacitor RevenueCat plugin's API
-  // Instead of trying to use presentPaywall, we'll use showPaywall
   async presentPaywall(offeringIdentifier?: string) {
     try {
       if (!this.isInitialized) {
         await this.initialize();
       }
       
-      // showPaywall is the correct method name based on the RevenueCat Capacitor plugin
+      // The RevenueCat Capacitor plugin uses 'showPaywall' method, not presentPaywall
       if (this.platform === 'ios' || this.platform === 'android') {
-        // The method we need to use is showPaywall, not presentPaywall
-        await Purchases.showPaywall({ 
-          offering: offeringIdentifier || 'premium'
-        });
-        console.log('RevenueCat paywall presented successfully');
-        return true;
+        // Check if the method exists and call it
+        if (typeof Purchases.showPaywall === 'function') {
+          await Purchases.showPaywall({ 
+            offering: offeringIdentifier || 'premium'
+          });
+          console.log('RevenueCat paywall presented successfully');
+          return true;
+        } else {
+          // Fallback for older versions of the plugin
+          console.warn('RevenueCat showPaywall method not available on this version of the plugin');
+          return false;
+        }
       } else {
         console.warn('RevenueCat paywall is only available on iOS and Android');
         return false;
@@ -161,10 +166,10 @@ class RevenueCatService {
     try {
       const result = await this.getCustomerInfo();
       
-      // Fixed: access the CustomerInfo directly, not through a wrapper object
+      // Fixed: access the CustomerInfo object correctly based on the plugin's response structure
       const customerInfo = result.customerInfo;
       
-      // Check if the entitlement exists and is active
+      // Check if the entitlements object exists and the specific entitlement is active
       return (
         customerInfo?.entitlements?.active && 
         customerInfo.entitlements.active[entitlementId] !== undefined
