@@ -49,6 +49,11 @@ post_install do |installer|
     target.build_configurations.each do |config|
       # Ensure proper linking for dynamic frameworks
       config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+      
+      # Add StoreKit framework if missing
+      if !config.build_settings['OTHER_LDFLAGS']&.include?('-framework "StoreKit"')
+        config.build_settings['OTHER_LDFLAGS'] = "#{config.build_settings['OTHER_LDFLAGS']} -framework \"StoreKit\""
+      end
     end
   end
 end

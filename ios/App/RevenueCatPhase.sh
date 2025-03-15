@@ -44,5 +44,16 @@ if [ -f "${PODS_DIR}/Target Support Files/RevenueCat/RevenueCat.release.xcconfig
   fi
 fi
 
+# Add StoreKit framework to search paths if missing
+for CONFIG in debug release; do
+  CONFIG_FILE="${PODS_DIR}/Target Support Files/RevenueCat/RevenueCat.${CONFIG}.xcconfig"
+  if [ -f "$CONFIG_FILE" ]; then
+    if ! grep -q "OTHER_LDFLAGS.*framework \"StoreKit\"" "$CONFIG_FILE"; then
+      echo "Adding StoreKit framework to $CONFIG_FILE"
+      echo "OTHER_LDFLAGS = \$(inherited) -framework \"StoreKit\"" >> "$CONFIG_FILE"
+    fi
+  fi
+done
+
 echo "RevenueCat Build Phase completed"
 exit 0

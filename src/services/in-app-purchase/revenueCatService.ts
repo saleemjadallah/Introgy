@@ -1,4 +1,3 @@
-
 import { Capacitor } from '@capacitor/core';
 import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { 
@@ -39,6 +38,7 @@ class RevenueCatService {
       await Purchases.configure({
         apiKey,
         appUserID: null, // Will use anonymous ID initially
+        observerMode: false // Ensure observer mode is disabled for TestFlight
       });
       
       this.isInitialized = true;
@@ -135,25 +135,23 @@ class RevenueCatService {
     }
   }
 
-  async presentPaywall(offeringIdentifier?: string) {
+  async presentPaywall(offeringIdentifier?: string): Promise<boolean> {
     try {
       if (!this.isInitialized) {
         await this.initialize();
       }
       
       if (this.platform === 'ios' || this.platform === 'android') {
-        // Use a type assertion to access showPaywall method
-        const purchasesWithPaywall = Purchases as unknown as PurchasesWithPaywall;
-        
-        // Check if the method exists at runtime
+        // Use type assertion to access showPaywall method
         if (typeof (Purchases as any).showPaywall === 'function') {
-          await purchasesWithPaywall.showPaywall({ 
+          // Using 'as any' to bypass TypeScript checking for the method
+          await (Purchases as any).showPaywall({ 
             offering: offeringIdentifier || 'premium'
           });
           console.log('RevenueCat paywall presented successfully');
           return true;
         } else {
-          console.warn('RevenueCat showPaywall method not available on this version of the plugin');
+          console.warn('RevenueCat showPaywall method not available on this version of the plugin - make sure you have the latest version installed');
           return false;
         }
       } else {
