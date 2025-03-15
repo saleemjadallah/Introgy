@@ -32,10 +32,11 @@ class RevenueCatService {
       }
       
       // Configure with platform-specific API key
+      // Note: Removed observerMode which is not recognized in the type definition
+      // and replaced with the appropriate configuration based on RevenueCat SDK 5.x
       await Purchases.configure({
         apiKey,
         appUserID: null, // Will use anonymous ID initially
-        observerMode: true // Match the native configuration
       });
       
       this.isInitialized = true;
