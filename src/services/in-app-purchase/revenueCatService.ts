@@ -1,3 +1,4 @@
+
 import { Capacitor } from '@capacitor/core';
 import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { 
@@ -169,7 +170,7 @@ class RevenueCatService {
     try {
       const result = await this.getCustomerInfo();
       
-      // Fixed: access the CustomerInfo object correctly based on the plugin's response structure
+      // Get the customerInfo object from the result
       const customerInfo = result.customerInfo;
       
       // Check if the entitlements object exists and the specific entitlement is active
