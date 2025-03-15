@@ -32,8 +32,6 @@ class RevenueCatService {
       }
       
       // Configure with platform-specific API key
-      // Note: Removed observerMode which is not recognized in the type definition
-      // and replaced with the appropriate configuration based on RevenueCat SDK 5.x
       await Purchases.configure({
         apiKey,
         appUserID: null, // Will use anonymous ID initially
@@ -133,23 +131,19 @@ class RevenueCatService {
     }
   }
 
+  // Updated method to correctly use the Capacitor RevenueCat plugin's API
+  // Instead of trying to use presentPaywall, we'll use showPaywall
   async presentPaywall(offeringIdentifier?: string) {
     try {
       if (!this.isInitialized) {
         await this.initialize();
       }
       
-      if (this.platform === 'ios') {
-        // Present the paywall on iOS
-        await Purchases.presentPaywall({ 
-          offeringIdentifier: offeringIdentifier || 'premium'
-        });
-        console.log('RevenueCat paywall presented successfully');
-        return true;
-      } else if (this.platform === 'android') {
-        // Present the paywall on Android
-        await Purchases.presentPaywall({ 
-          offeringIdentifier: offeringIdentifier || 'premium'
+      // showPaywall is the correct method name based on the RevenueCat Capacitor plugin
+      if (this.platform === 'ios' || this.platform === 'android') {
+        // The method we need to use is showPaywall, not presentPaywall
+        await Purchases.showPaywall({ 
+          offering: offeringIdentifier || 'premium'
         });
         console.log('RevenueCat paywall presented successfully');
         return true;
@@ -165,7 +159,12 @@ class RevenueCatService {
 
   async checkEntitlementStatus(entitlementId: string = 'premium'): Promise<boolean> {
     try {
-      const customerInfo = await this.getCustomerInfo();
+      const result = await this.getCustomerInfo();
+      
+      // Fixed: access the CustomerInfo directly, not through a wrapper object
+      const customerInfo = result.customerInfo;
+      
+      // Check if the entitlement exists and is active
       return (
         customerInfo?.entitlements?.active && 
         customerInfo.entitlements.active[entitlementId] !== undefined
