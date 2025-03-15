@@ -1,3 +1,4 @@
+
 import { Capacitor } from '@capacitor/core';
 import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { 
@@ -38,7 +39,8 @@ class RevenueCatService {
       await Purchases.configure({
         apiKey,
         appUserID: null, // Will use anonymous ID initially
-        observerMode: false // Ensure observer mode is disabled for TestFlight
+        // Note: 'observerMode' has been replaced with 'purchasesAreCompletedBy' in RevenueCat 5.x
+        // Setting to default behavior (RevenueCat completes purchases)
       });
       
       this.isInitialized = true;
