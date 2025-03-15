@@ -42,6 +42,10 @@ class InAppPurchaseService {
     return purchaseService.setUserId(userId);
   }
 
+  async presentPaywall(offeringId?: string): Promise<boolean> {
+    return purchaseService.presentPaywall(offeringId);
+  }
+
   addPurchaseListener(listener: (purchase: Purchase) => void): void {
     purchaseService.addPurchaseListener(listener);
   }

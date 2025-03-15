@@ -133,6 +133,49 @@ class RevenueCatService {
     }
   }
 
+  async presentPaywall(offeringIdentifier?: string) {
+    try {
+      if (!this.isInitialized) {
+        await this.initialize();
+      }
+      
+      if (this.platform === 'ios') {
+        // Present the paywall on iOS
+        await Purchases.presentPaywall({ 
+          offeringIdentifier: offeringIdentifier || 'premium'
+        });
+        console.log('RevenueCat paywall presented successfully');
+        return true;
+      } else if (this.platform === 'android') {
+        // Present the paywall on Android
+        await Purchases.presentPaywall({ 
+          offeringIdentifier: offeringIdentifier || 'premium'
+        });
+        console.log('RevenueCat paywall presented successfully');
+        return true;
+      } else {
+        console.warn('RevenueCat paywall is only available on iOS and Android');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error presenting RevenueCat paywall:', error);
+      return false;
+    }
+  }
+
+  async checkEntitlementStatus(entitlementId: string = 'premium'): Promise<boolean> {
+    try {
+      const customerInfo = await this.getCustomerInfo();
+      return (
+        customerInfo?.entitlements?.active && 
+        customerInfo.entitlements.active[entitlementId] !== undefined
+      );
+    } catch (error) {
+      console.error('Error checking entitlement status:', error);
+      return false;
+    }
+  }
+
   addCustomerInfoUpdateListener(callback: (info: CustomerInfo) => void): void {
     Purchases.addCustomerInfoUpdateListener(callback);
   }

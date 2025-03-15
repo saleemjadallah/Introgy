@@ -87,12 +87,25 @@ class PurchaseService {
       return mockPurchase;
     }
 
-    return purchaseNative(
-      productId, 
-      this.isInitialized, 
-      this.platform as 'ios' | 'android',
-      this.listenerManager.notifyListeners.bind(this.listenerManager)
-    );
+    // For native platforms, we'll use the RevenueCat paywall instead
+    // of direct product purchase when possible
+    const offeringId = productId.includes('yearly') ? 'premium_yearly' : 'premium_monthly';
+    const paywallPresented = await revenueCatService.presentPaywall(offeringId);
+    
+    if (!paywallPresented) {
+      // Fall back to the direct purchase if the paywall can't be presented
+      return purchaseNative(
+        productId, 
+        this.isInitialized, 
+        this.platform as 'ios' | 'android',
+        this.listenerManager.notifyListeners.bind(this.listenerManager)
+      );
+    }
+    
+    // For paywall purchases, we don't return a purchase object
+    // as the flow is handled by RevenueCat and we'll receive updates 
+    // via the customerInfoUpdateListener
+    return null;
   }
 
   async verifyPurchase(purchase: Purchase, userId: string): Promise<VerificationResult> {
@@ -128,7 +141,8 @@ class PurchaseService {
       return restoredPurchases.length > 0;
     }
     
-    return checkNativeEntitlementStatus(this.isInitialized);
+    // For native platforms, use RevenueCat's entitlement check
+    return revenueCatService.checkEntitlementStatus('premium');
   }
 
   async setUserId(userId: string): Promise<void> {
@@ -138,6 +152,17 @@ class PurchaseService {
       await revenueCatService.setUserId(userId);
     } catch (error) {
       console.error('Error setting user ID:', error);
+    }
+  }
+
+  async presentPaywall(offeringId?: string): Promise<boolean> {
+    if (!this.isNative || !this.isInitialized) return false;
+    
+    try {
+      return await revenueCatService.presentPaywall(offeringId);
+    } catch (error) {
+      console.error('Error presenting paywall:', error);
+      return false;
     }
   }
 

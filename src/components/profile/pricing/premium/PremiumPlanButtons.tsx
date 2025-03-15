@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/auth";
 import { toast } from "sonner";
 import { Capacitor } from "@capacitor/core";
 import MobilePurchaseButton from "./MobilePurchaseButton";
+import PaywallButton from "./PaywallButton";
 
 interface PremiumPlanButtonsProps {
   isMobile: boolean;
@@ -27,7 +28,7 @@ const PremiumPlanButtons: React.FC<PremiumPlanButtonsProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const isNative = Capacitor.isNativePlatform();
 
-  // If we're on a native platform, use the native in-app purchase flow
+  // If we're on a native platform, use the RevenueCat paywall
   if (isNative) {
     if (isMobile) {
       return <MobilePurchaseButton planType="monthly" isPremium={isPremium} />;
@@ -35,8 +36,17 @@ const PremiumPlanButtons: React.FC<PremiumPlanButtonsProps> = ({
     
     return (
       <>
-        <MobilePurchaseButton planType="monthly" isPremium={isPremium} />
-        <MobilePurchaseButton planType="yearly" isPremium={isPremium} />
+        <PaywallButton 
+          planType="monthly" 
+          isPremium={isPremium} 
+          className="w-1/2"
+        />
+        <PaywallButton 
+          planType="yearly" 
+          isPremium={isPremium} 
+          variant="outline" 
+          className="w-1/2"
+        />
       </>
     );
   }
