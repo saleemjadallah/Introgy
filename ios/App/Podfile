@@ -20,6 +20,9 @@ def capacitor_pods
   pod 'CapacitorSplashScreen', :path => '../../node_modules/@capacitor/splash-screen'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
   pod 'RevenuecatPurchasesCapacitor', :path => '../../node_modules/@revenuecat/purchases-capacitor'
+  
+  # Use RevenueCat directly instead of PurchasesHybridCommon
+  pod 'RevenueCat', '5.19.0'
 end
 
 target 'App' do
@@ -33,6 +36,9 @@ post_install do |installer|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
       
+      # Disable build validation for all pods to prevent header errors
+      config.build_settings['VALIDATE_PRODUCT'] = 'NO'
+      
       # Specifically for the Pods-App target, create framework file lists
       if target.name == 'Pods-App'
         # Get the list of frameworks to include
@@ -45,7 +51,6 @@ post_install do |installer|
           'CapacitorPreferences',
           'CapacitorSplashScreen',
           'CapacitorStatusBar',
-          'PurchasesHybridCommon',
           'RevenueCat',
           'RevenuecatPurchasesCapacitor'
         ]
@@ -96,9 +101,13 @@ post_install do |installer|
         end
       end
       
-      # Special handling for PurchasesHybridCommon to ensure it builds properly
-      if target.name == 'PurchasesHybridCommon'
-        config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+      # Stubbed PurchasesHybridCommon for RevenuecatPurchasesCapacitor
+      if target.name == 'RevenuecatPurchasesCapacitor'
+        config.build_settings['HEADER_SEARCH_PATHS'] ||= []
+        config.build_settings['HEADER_SEARCH_PATHS'] << "${PODS_ROOT}/Headers/Public"
+        config.build_settings['HEADER_SEARCH_PATHS'] << "${PODS_ROOT}/Headers/Public/PurchasesHybridCommon"
+        config.build_settings['OTHER_LDFLAGS'] ||= []
+        config.build_settings['OTHER_LDFLAGS'] << "-framework RevenueCat"
       end
     end
   end

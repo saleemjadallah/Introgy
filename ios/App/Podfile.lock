@@ -30,6 +30,7 @@ DEPENDENCIES:
   - "CapacitorPreferences (from `../../node_modules/@capacitor/preferences`)"
   - "CapacitorSplashScreen (from `../../node_modules/@capacitor/splash-screen`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
+  - RevenueCat (= 5.19.0)
   - "RevenuecatPurchasesCapacitor (from `../../node_modules/@revenuecat/purchases-capacitor`)"
 
 SPEC REPOS:
@@ -70,6 +71,6 @@ SPEC CHECKSUMS:
   RevenueCat: 4be87c151dff652d2a5b7af46073db11f01ad93f
   RevenuecatPurchasesCapacitor: a3d1f606e31ad723e72018e6b5bdda76cd011d83
 
-PODFILE CHECKSUM: 030094959d4ae17efe9673a1a564bf1b113b6859
+PODFILE CHECKSUM: d619d0ebbb236c5b11c926d3e2bf7cf189c8d893
 
 COCOAPODS: 1.16.2

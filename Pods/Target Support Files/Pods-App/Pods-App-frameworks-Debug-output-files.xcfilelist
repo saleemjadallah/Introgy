@@ -1,0 +1,11 @@
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Capacitor.framework
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapacitorApp.framework
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cordova.framework
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapacitorDevice.framework
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapacitorLocalNotifications.framework
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapacitorPreferences.framework
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapacitorSplashScreen.framework
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapacitorStatusBar.framework
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PurchasesHybridCommon.framework
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RevenueCat.framework
+${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RevenuecatPurchasesCapacitor.framework
