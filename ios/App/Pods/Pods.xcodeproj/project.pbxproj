@@ -3818,8 +3818,7 @@
 				FRAMEWORK_INSTALL_OUTPUT_FILES = "Pods/Target Support Files/Pods-App/Pods-App-frameworks-Debug-output-files.xcfilelist";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"${PODS_ROOT}/RevenueCat\"",
-					"\"${PODS_ROOT}/RevenueCatUI\"",
+					"\"$(PODS_ROOT)/Target Support Files/Pods-App\"",
 				);
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				GENERATE_PKGINFO_FILE = YES;
@@ -3848,7 +3847,10 @@
 					"\"StoreKit\"",
 				);
 				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
+				PODS_BUILD_DIR = "$(BUILD_DIR)";
+				PODS_CONFIGURATION_BUILD_DIR = "$(PODS_BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				PODS_ROOT = "$(SRCROOT)/Pods";
+				PODS_XCFRAMEWORKS_BUILD_DIR = "$(PODS_CONFIGURATION_BUILD_DIR)/XCFrameworkIntermediates";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
@@ -4234,8 +4236,7 @@
 				FRAMEWORK_INSTALL_OUTPUT_FILES = "Pods/Target Support Files/Pods-App/Pods-App-frameworks-Release-output-files.xcfilelist";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"${PODS_ROOT}/RevenueCat\"",
-					"\"${PODS_ROOT}/RevenueCatUI\"",
+					"\"$(PODS_ROOT)/Target Support Files/Pods-App\"",
 				);
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				GENERATE_PKGINFO_FILE = YES;
@@ -4264,7 +4265,10 @@
 					"\"StoreKit\"",
 				);
 				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
+				PODS_BUILD_DIR = "$(BUILD_DIR)";
+				PODS_CONFIGURATION_BUILD_DIR = "$(PODS_BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				PODS_ROOT = "$(SRCROOT)/Pods";
+				PODS_XCFRAMEWORKS_BUILD_DIR = "$(PODS_CONFIGURATION_BUILD_DIR)/XCFrameworkIntermediates";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;

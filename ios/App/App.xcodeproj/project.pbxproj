@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		173595661A6DE5E077AFA368 /* Pods_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5334A32950DCD11CE2CD51B /* Pods_App.framework */; };
 		2FAD9763203C412B000D30F8 /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = 2FAD9762203C412B000D30F8 /* config.xml */; };
 		50379B232058CBB4000EE86E /* capacitor.config.json in Resources */ = {isa = PBXBuildFile; fileRef = 50379B222058CBB4000EE86E /* capacitor.config.json */; };
 		504EC3081FED79650016851F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3071FED79650016851F /* AppDelegate.swift */; };
@@ -20,6 +19,7 @@
 		82C4B3B42D8560BB00551E04 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 82C4B3B32D8560BB00551E04 /* RevenueCat */; };
 		82CA1DE62D85EAA1009BF7B8 /* Introgy.mobileprovision in Resources */ = {isa = PBXBuildFile; fileRef = 82CA1DE52D85EAA1009BF7B8 /* Introgy.mobileprovision */; };
 		82E285512D82A9D3004233C8 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 82E285502D82A9D3004233C8 /* RevenueCatUI */; };
+		A8FB5A59F2525AFF831924BE /* Pods_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9041555149F542EE218DE492 /* Pods_App.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,11 +32,11 @@
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
-		7B61A8E0F374CB6A37C980E6 /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
 		8262806A2D8593A000C725EA /* Storyboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
 		82CA1DE52D85EAA1009BF7B8 /* Introgy.mobileprovision */ = {isa = PBXFileReference; lastKnownFileType = file; path = Introgy.mobileprovision; sourceTree = "<group>"; };
-		A5334A32950DCD11CE2CD51B /* Pods_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D0F482C8C84E1BF3582720F2 /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
+		9041555149F542EE218DE492 /* Pods_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA81F8D6C57C2226D1A4D02E /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
+		DE93D2DD83524F846ECF162D /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,7 +47,7 @@
 				82E285512D82A9D3004233C8 /* RevenueCatUI in Frameworks */,
 				826145382D82BF2700302092 /* ReceiptParser in Frameworks */,
 				82C4B3B42D8560BB00551E04 /* RevenueCat in Frameworks */,
-				173595661A6DE5E077AFA368 /* Pods_App.framework in Frameworks */,
+				A8FB5A59F2525AFF831924BE /* Pods_App.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -57,8 +57,8 @@
 		2A83329C4439D926FCA1010D /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				D0F482C8C84E1BF3582720F2 /* Pods-App.debug.xcconfig */,
-				7B61A8E0F374CB6A37C980E6 /* Pods-App.release.xcconfig */,
+				DE93D2DD83524F846ECF162D /* Pods-App.debug.xcconfig */,
+				AA81F8D6C57C2226D1A4D02E /* Pods-App.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -69,7 +69,7 @@
 				504EC3061FED79650016851F /* App */,
 				504EC3051FED79650016851F /* Products */,
 				2A83329C4439D926FCA1010D /* Pods */,
-				654ECD7C51FFBBEAD2AB20B9 /* Frameworks */,
+				6DD1CE7392059F1F3929A296 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -98,10 +98,10 @@
 			path = App;
 			sourceTree = "<group>";
 		};
-		654ECD7C51FFBBEAD2AB20B9 /* Frameworks */ = {
+		6DD1CE7392059F1F3929A296 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A5334A32950DCD11CE2CD51B /* Pods_App.framework */,
+				9041555149F542EE218DE492 /* Pods_App.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -113,11 +113,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 504EC3161FED79650016851F /* Build configuration list for PBXNativeTarget "App" */;
 			buildPhases = (
-				99E2FD4D38C5AAC265880533 /* [CP] Check Pods Manifest.lock */,
+				8996DEA442B84BBDD33CAFAC /* [CP] Check Pods Manifest.lock */,
 				504EC3001FED79650016851F /* Sources */,
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
-				4BA4BA0BACB2291D146C716C /* [CP] Embed Pods Frameworks */,
+				0846167CB0BB75AA3C3252B7 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -195,7 +195,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		4BA4BA0BACB2291D146C716C /* [CP] Embed Pods Frameworks */ = {
+		0846167CB0BB75AA3C3252B7 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -212,7 +212,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		99E2FD4D38C5AAC265880533 /* [CP] Check Pods Manifest.lock */ = {
+		8996DEA442B84BBDD33CAFAC /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -318,6 +318,10 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/Target Support Files/Pods-App\"",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = NO;
@@ -335,6 +339,10 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PODS_BUILD_DIR = "$(BUILD_DIR)";
+				PODS_CONFIGURATION_BUILD_DIR = "$(PODS_BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				PODS_ROOT = "$(SRCROOT)/Pods";
+				PODS_XCFRAMEWORKS_BUILD_DIR = "$(PODS_CONFIGURATION_BUILD_DIR)/XCFrameworkIntermediates";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -404,7 +412,7 @@
 		};
 		504EC3171FED79650016851F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D0F482C8C84E1BF3582720F2 /* Pods-App.debug.xcconfig */;
+			baseConfigurationReference = DE93D2DD83524F846ECF162D /* Pods-App.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -445,7 +453,7 @@
 		};
 		504EC3181FED79650016851F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7B61A8E0F374CB6A37C980E6 /* Pods-App.release.xcconfig */;
+			baseConfigurationReference = AA81F8D6C57C2226D1A4D02E /* Pods-App.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;

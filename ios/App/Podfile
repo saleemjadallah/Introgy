@@ -108,6 +108,15 @@ post_install do |installer|
         config.build_settings['PRIVACY_MANIFEST_PATH'] = '${PODS_ROOT}/PurchasesHybridCommon/ios/PurchasesHybridCommon/PurchasesHybridCommon/PrivacyInfo.xcprivacy'
         config.build_settings['INFOPLIST_FILE'] = '${PODS_ROOT}/Target Support Files/PurchasesHybridCommon/ResourceBundle-PurchasesHybridCommon-PurchasesHybridCommon-Info.plist'
       end
+      
+      # Ensure framework file lists use correct paths
+      if target.name == 'Pods-App'
+        config.build_settings['FRAMEWORK_SEARCH_PATHS'] = ['$(inherited)', '"$(PODS_ROOT)/Target Support Files/Pods-App"']
+        config.build_settings['PODS_ROOT'] = '$(SRCROOT)/Pods'
+        config.build_settings['PODS_BUILD_DIR'] = '$(BUILD_DIR)'
+        config.build_settings['PODS_CONFIGURATION_BUILD_DIR'] = '$(PODS_BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)'
+        config.build_settings['PODS_XCFRAMEWORKS_BUILD_DIR'] = '$(PODS_CONFIGURATION_BUILD_DIR)/XCFrameworkIntermediates'
+      end
     end
     
     # Fix RevenueCat specific settings
