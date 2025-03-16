@@ -33,11 +33,9 @@ post_install do |installer|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
       
+      # Specifically for the Pods-App target, create framework file lists
       if target.name == 'Pods-App'
-        # Generate framework file lists
-        input_list = []
-        output_list = []
-        
+        # Get the list of frameworks to include
         frameworks = [
           'Capacitor',
           'CapacitorApp',
@@ -52,24 +50,55 @@ post_install do |installer|
           'RevenuecatPurchasesCapacitor'
         ]
         
-        # Add frameworks script
-        input_list << '${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks.sh'
-        
+        # Create input list
+        input_list = ["${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks.sh"]
         frameworks.each do |framework|
-          input_list << "${BUILT_PRODUCTS_DIR}/#{framework}/#{framework}.framework"
-          output_list << "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/#{framework}.framework"
+          if framework == 'CapacitorCordova'
+            input_list << "${BUILT_PRODUCTS_DIR}/#{framework}/Cordova.framework"
+          else
+            input_list << "${BUILT_PRODUCTS_DIR}/#{framework}/#{framework}.framework"
+          end
         end
         
-        # Create the xcfilelist files
-        File.write("Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config.name}-input-files.xcfilelist", input_list.join("\n"))
-        File.write("Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config.name}-output-files.xcfilelist", output_list.join("\n"))
+        # Create output list
+        output_list = []
+        frameworks.each do |framework|
+          if framework == 'CapacitorCordova'
+            output_list << "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cordova.framework"
+          else
+            output_list << "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/#{framework}.framework"
+          end
+        end
         
-        # Update build settings
-        config.build_settings['FRAMEWORK_SEARCH_PATHS'] = ['$(inherited)', '"$(PODS_ROOT)/Target Support Files/Pods-App"']
-        config.build_settings['PODS_ROOT'] = '$(SRCROOT)/Pods'
-        config.build_settings['PODS_BUILD_DIR'] = '$(BUILD_DIR)'
-        config.build_settings['PODS_CONFIGURATION_BUILD_DIR'] = '$(PODS_BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)'
-        config.build_settings['PODS_XCFRAMEWORKS_BUILD_DIR'] = '$(PODS_CONFIGURATION_BUILD_DIR)/XCFrameworkIntermediates'
+        # Create the xcfilelist files for both Debug and Release configurations
+        ['Debug', 'Release'].each do |config_name|
+          # Ensure the directory exists
+          FileUtils.mkdir_p("#{Dir.pwd}/Pods/Target Support Files/Pods-App")
+          
+          # Write the input and output files
+          File.write("#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-input-files.xcfilelist", input_list.join("\n"))
+          File.write("#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-output-files.xcfilelist", output_list.join("\n"))
+          
+          # Create a symlink in the Volumes path if it's different
+          volumes_path = "/Volumes/workspace/repository/ios/App/Pods/Target Support Files/Pods-App"
+          if Dir.pwd != volumes_path && !volumes_path.empty?
+            begin
+              # Create directory structure if it doesn't exist
+              system("mkdir -p \"#{volumes_path}\"")
+              
+              # Create symlinks (overwrite existing)
+              system("ln -sf \"#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-input-files.xcfilelist\" \"#{volumes_path}/Pods-App-frameworks-#{config_name}-input-files.xcfilelist\"")
+              system("ln -sf \"#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-output-files.xcfilelist\" \"#{volumes_path}/Pods-App-frameworks-#{config_name}-output-files.xcfilelist\"")
+            rescue => e
+              puts "Warning: Could not create symlink: #{e.message}"
+            end
+          end
+        end
+      end
+      
+      # Special handling for PurchasesHybridCommon to ensure it builds properly
+      if target.name == 'PurchasesHybridCommon'
+        config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
       end
     end
   end

@@ -14,6 +14,45 @@ if [ -z ${FRAMEWORKS_FOLDER_PATH+x} ]; then
   exit 0
 fi
 
+# Try to locate the input/output file lists
+XCFILELIST_BASE_DIR="${SRCROOT}/Pods/Target Support Files/Pods-App"
+LOCAL_XCFILELIST_BASE_DIR="${PODS_ROOT}/Target Support Files/Pods-App"
+VOLUMES_XCFILELIST_BASE_DIR="/Volumes/workspace/repository/ios/App/Pods/Target Support Files/Pods-App"
+
+# Function to try multiple paths for xcfilelist
+try_xcfilelist_paths() {
+  local file_name=$1
+  local file_var_name=$2
+  
+  # Try different base dirs in order of preference
+  for base_dir in "$XCFILELIST_BASE_DIR" "$LOCAL_XCFILELIST_BASE_DIR" "$VOLUMES_XCFILELIST_BASE_DIR"; do
+    local file_path="${base_dir}/${file_name}"
+    if [ -f "$file_path" ]; then
+      eval "$file_var_name=\"$file_path\""
+      return 0
+    fi
+  done
+  
+  return 1
+}
+
+# Set up input and output file lists
+INPUT_FILE_LIST=""
+OUTPUT_FILE_LIST=""
+
+# Try to find the file lists
+if try_xcfilelist_paths "Pods-App-frameworks-${CONFIGURATION}-input-files.xcfilelist" "INPUT_FILE_LIST"; then
+  echo "Using input file list: $INPUT_FILE_LIST"
+else
+  echo "Warning: Could not find input file list, will use hardcoded frameworks list"
+fi
+
+if try_xcfilelist_paths "Pods-App-frameworks-${CONFIGURATION}-output-files.xcfilelist" "OUTPUT_FILE_LIST"; then
+  echo "Using output file list: $OUTPUT_FILE_LIST"
+else
+  echo "Warning: Could not find output file list, will use hardcoded frameworks list"
+fi
+
 echo "mkdir -p ${CONFIGURATION_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}"
 mkdir -p "${CONFIGURATION_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}"
 
