@@ -78,8 +78,11 @@ echo "Creating volume directory structure..."
 VOLUME_PATH="/Volumes/workspace/repository/ios/App/Pods/PurchasesHybridCommon/ios/PurchasesHybridCommon"
 mkdir -p "$VOLUME_PATH" 2>/dev/null || true
 
-# Try to copy the header file to the volume path
-cp "${SRCROOT}/Headers/Public/PurchasesHybridCommon/PurchasesHybridCommon.h" "$VOLUME_PATH/PurchasesHybridCommon.h" 2>/dev/null || true
+# Create the exact directory path where the header is being searched (with additional PurchasesHybridCommon directory)
+mkdir -p "$VOLUME_PATH/PurchasesHybridCommon" 2>/dev/null || true
+
+# Try to copy the header file to the specific volume path that's being looked for
+cp "${SRCROOT}/Headers/Public/PurchasesHybridCommon/PurchasesHybridCommon.h" "$VOLUME_PATH/PurchasesHybridCommon/PurchasesHybridCommon.h" 2>/dev/null || true
 cp "${SRCROOT}/Headers/Public/PurchasesHybridCommon/CommonFunctionality.swift" "$VOLUME_PATH/CommonFunctionality.swift" 2>/dev/null || true
 
 # 3. Create the framework file lists
