@@ -14,4 +14,4 @@ FOUNDATION_EXPORT double PurchasesHybridCommonVersionNumber;
 //! Project version string for PurchasesHybridCommon.
 FOUNDATION_EXPORT const unsigned char PurchasesHybridCommonVersionString[];
 
-// This is a stub header to allow compilation without PurchasesHybridCommon 
+// This is a stub header to allow compilation without PurchasesHybridCommon

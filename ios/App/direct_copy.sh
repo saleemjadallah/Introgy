@@ -1,3 +1,32 @@
+#!/bin/bash
+# Simple script to copy files directly to the volume path
+
+# Create the volume directory
+sudo mkdir -p "/Volumes/workspace/repository/ios/App/Pods/PurchasesHybridCommon/ios/PurchasesHybridCommon/PurchasesHybridCommon"
+
+# Create the PurchasesHybridCommon.h file directly
+sudo tee "/Volumes/workspace/repository/ios/App/Pods/PurchasesHybridCommon/ios/PurchasesHybridCommon/PurchasesHybridCommon.h" > /dev/null << 'EOF'
+//
+//  PurchasesHybridCommon.h
+//  PurchasesHybridCommon
+//
+//  Created for RevenueCat
+//
+
+#import <Foundation/Foundation.h>
+#import <RevenueCat/RevenueCat.h>
+
+//! Project version number for PurchasesHybridCommon.
+FOUNDATION_EXPORT double PurchasesHybridCommonVersionNumber;
+
+//! Project version string for PurchasesHybridCommon.
+FOUNDATION_EXPORT const unsigned char PurchasesHybridCommonVersionString[];
+
+// This is a stub header to allow compilation without PurchasesHybridCommon
+EOF
+
+# Create the CommonFunctionality.swift file directly
+sudo tee "/Volumes/workspace/repository/ios/App/Pods/PurchasesHybridCommon/ios/PurchasesHybridCommon/CommonFunctionality.swift" > /dev/null << 'EOF'
 //
 //  CommonFunctionality.swift
 //  PurchasesHybridCommon
@@ -35,3 +64,6 @@ import RevenueCat
         Purchases.configure(with: builder.build())
     }
 }
+EOF
+
+echo "Files created directly in the volume path." 

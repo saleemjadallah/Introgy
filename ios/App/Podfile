@@ -1,4 +1,6 @@
 require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
+require_relative 'capacitor-pods'
+require_relative './pods'
 
 platform :ios, '15.0'
 use_frameworks!
@@ -11,8 +13,8 @@ install! 'cocoapods'
 source 'https://cdn.cocoapods.org/'
 
 def capacitor_pods
-  pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
-  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
+  pod 'Capacitor', :path => '../../node_modules/@capacitor/app'
+  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/app'
   pod 'CapacitorApp', :path => '../../node_modules/@capacitor/app'
   pod 'CapacitorDevice', :path => '../../node_modules/@capacitor/device'
   pod 'CapacitorLocalNotifications', :path => '../../node_modules/@capacitor/local-notifications'
@@ -23,91 +25,118 @@ def capacitor_pods
   
   # Use RevenueCat directly instead of PurchasesHybridCommon
   pod 'RevenueCat', '5.19.0'
+  
+  # Use our local PurchasesHybridCommon podspec
+  pod 'PurchasesHybridCommon', :path => './'
 end
 
 target 'App' do
   capacitor_pods
   # Add your Pods here
-end
-
-post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-      config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
-      
-      # Disable build validation for all pods to prevent header errors
-      config.build_settings['VALIDATE_PRODUCT'] = 'NO'
-      
-      # Specifically for the Pods-App target, create framework file lists
-      if target.name == 'Pods-App'
-        # Get the list of frameworks to include
-        frameworks = [
-          'Capacitor',
-          'CapacitorApp',
-          'CapacitorCordova',
-          'CapacitorDevice',
-          'CapacitorLocalNotifications',
-          'CapacitorPreferences',
-          'CapacitorSplashScreen',
-          'CapacitorStatusBar',
-          'RevenueCat',
-          'RevenuecatPurchasesCapacitor'
-        ]
+  
+  post_install do |installer|
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+        # This setting is important for iOS 15.0 compatibility
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
         
-        # Create input list
-        input_list = ["${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks.sh"]
-        frameworks.each do |framework|
-          if framework == 'CapacitorCordova'
-            input_list << "${BUILT_PRODUCTS_DIR}/#{framework}/Cordova.framework"
-          else
-            input_list << "${BUILT_PRODUCTS_DIR}/#{framework}/#{framework}.framework"
-          end
+        # Set deployment target for all pods
+        config.build_settings['SWIFT_VERSION'] = '5.0'
+        
+        # Fix missing RevenueCat framework issue
+        config.build_settings['OTHER_LDFLAGS'] ||= ['$(inherited)']
+        unless config.build_settings['OTHER_LDFLAGS'].include? '-framework RevenueCat'
+          config.build_settings['OTHER_LDFLAGS'] << '-framework RevenueCat'
         end
         
-        # Create output list
-        output_list = []
-        frameworks.each do |framework|
-          if framework == 'CapacitorCordova'
-            output_list << "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cordova.framework"
-          else
-            output_list << "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/#{framework}.framework"
-          end
+        # Add preprocessor definitions for PurchasesHybridCommon
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'COCOAPODS=1', 'PURCHASES_HYBRID_COMMON_STUB=1']
+        
+        # Disable build validation for all pods to prevent header errors
+        config.build_settings['VALIDATE_PRODUCT'] = 'NO'
+        
+        # Special fix for PurchasesHybridCommon to handle missing header issue
+        if target.name == 'PurchasesHybridCommon'
+          config.build_settings['HEADER_SEARCH_PATHS'] ||= ["$(PODS_ROOT)/Headers/Public", "$(PODS_ROOT)/Headers/Public/PurchasesHybridCommon", "$(SRCROOT)/Headers"]
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'COCOAPODS=1', 'PURCHASES_HYBRID_COMMON_STUB=1']
+          config.build_settings['SWIFT_INCLUDE_PATHS'] ||= ["$(PODS_ROOT)/Headers/Public", "$(SRCROOT)/Headers"]
+          config.build_settings['SWIFT_ACTIVE_COMPILATION_CONDITIONS'] ||= ['$(inherited)', 'PURCHASES_HYBRID_COMMON_STUB']
+          config.build_settings['VALIDATE_PRODUCT'] = 'NO'
         end
         
-        # Create the xcfilelist files for both Debug and Release configurations
-        ['Debug', 'Release'].each do |config_name|
-          # Ensure the directory exists
-          FileUtils.mkdir_p("#{Dir.pwd}/Pods/Target Support Files/Pods-App")
+        # Specifically for the Pods-App target, create framework file lists
+        if target.name == 'Pods-App'
+          # Get the list of frameworks to include
+          frameworks = [
+            'Capacitor',
+            'CapacitorApp',
+            'CapacitorCordova',
+            'CapacitorDevice',
+            'CapacitorLocalNotifications',
+            'CapacitorPreferences',
+            'CapacitorSplashScreen',
+            'CapacitorStatusBar',
+            'RevenueCat',
+            'RevenuecatPurchasesCapacitor'
+          ]
           
-          # Write the input and output files
-          File.write("#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-input-files.xcfilelist", input_list.join("\n"))
-          File.write("#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-output-files.xcfilelist", output_list.join("\n"))
+          # Create input list
+          input_list = ["${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks.sh"]
+          frameworks.each do |framework|
+            if framework == 'CapacitorCordova'
+              input_list << "${BUILT_PRODUCTS_DIR}/#{framework}/Cordova.framework"
+            else
+              input_list << "${BUILT_PRODUCTS_DIR}/#{framework}/#{framework}.framework"
+            end
+          end
           
-          # Create a symlink in the Volumes path if it's different
-          volumes_path = "/Volumes/workspace/repository/ios/App/Pods/Target Support Files/Pods-App"
-          if Dir.pwd != volumes_path && !volumes_path.empty?
-            begin
-              # Create directory structure if it doesn't exist
-              system("mkdir -p \"#{volumes_path}\"")
-              
-              # Create symlinks (overwrite existing)
-              system("ln -sf \"#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-input-files.xcfilelist\" \"#{volumes_path}/Pods-App-frameworks-#{config_name}-input-files.xcfilelist\"")
-              system("ln -sf \"#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-output-files.xcfilelist\" \"#{volumes_path}/Pods-App-frameworks-#{config_name}-output-files.xcfilelist\"")
-            rescue => e
-              puts "Warning: Could not create symlink: #{e.message}"
+          # Create output list
+          output_list = []
+          frameworks.each do |framework|
+            if framework == 'CapacitorCordova'
+              output_list << "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cordova.framework"
+            else
+              output_list << "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/#{framework}.framework"
+            end
+          end
+          
+          # Create the xcfilelist files for both Debug and Release configurations
+          ['Debug', 'Release'].each do |config_name|
+            # Ensure the directory exists
+            FileUtils.mkdir_p("#{Dir.pwd}/Pods/Target Support Files/Pods-App")
+            
+            # Write the input and output files
+            File.write("#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-input-files.xcfilelist", input_list.join("\n"))
+            File.write("#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-output-files.xcfilelist", output_list.join("\n"))
+            
+            # Create a symlink in the Volumes path if it's different
+            volumes_path = "/Volumes/workspace/repository/ios/App/Pods/Target Support Files/Pods-App"
+            if Dir.pwd != volumes_path && !volumes_path.empty?
+              begin
+                # Create directory structure if it doesn't exist
+                system("mkdir -p \"#{volumes_path}\"")
+                
+                # Create symlinks (overwrite existing)
+                system("ln -sf \"#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-input-files.xcfilelist\" \"#{volumes_path}/Pods-App-frameworks-#{config_name}-input-files.xcfilelist\"")
+                system("ln -sf \"#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-output-files.xcfilelist\" \"#{volumes_path}/Pods-App-frameworks-#{config_name}-output-files.xcfilelist\"")
+              rescue => e
+                puts "Warning: Could not create symlink: #{e.message}"
+              end
             end
           end
         end
-      end
-      
-      # Stubbed PurchasesHybridCommon for RevenuecatPurchasesCapacitor
-      if target.name == 'RevenuecatPurchasesCapacitor'
-        config.build_settings['HEADER_SEARCH_PATHS'] ||= []
-        config.build_settings['HEADER_SEARCH_PATHS'] << "${PODS_ROOT}/Headers/Public"
-        config.build_settings['HEADER_SEARCH_PATHS'] << "${PODS_ROOT}/Headers/Public/PurchasesHybridCommon"
-        config.build_settings['OTHER_LDFLAGS'] ||= []
-        config.build_settings['OTHER_LDFLAGS'] << "-framework RevenueCat"
+        
+        # Stubbed PurchasesHybridCommon for RevenuecatPurchasesCapacitor
+        if target.name == 'RevenuecatPurchasesCapacitor'
+          config.build_settings['HEADER_SEARCH_PATHS'] ||= []
+          config.build_settings['HEADER_SEARCH_PATHS'] << "${PODS_ROOT}/Headers/Public"
+          config.build_settings['HEADER_SEARCH_PATHS'] << "${PODS_ROOT}/Headers/Public/PurchasesHybridCommon"
+          config.build_settings['HEADER_SEARCH_PATHS'] << "${SRCROOT}/Headers"
+          config.build_settings['OTHER_LDFLAGS'] ||= []
+          config.build_settings['OTHER_LDFLAGS'] << "-framework RevenueCat"
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'COCOAPODS=1', 'PURCHASES_HYBRID_COMMON_STUB=1']
+        end
       end
     end
   end

@@ -66,5 +66,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>GCC_PREPROCESSOR_DEFINITIONS</key>
+	<array>
+		<string>$(inherited)</string>
+		<string>COCOAPODS=1</string>
+		<string>PURCHASES_HYBRID_COMMON_STUB=1</string>
+	</array>
 </dict>
 </plist>
