@@ -4166,7 +4166,7 @@
 				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/PurchasesHybridCommon/PurchasesHybridCommon-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "Target Support Files/PurchasesHybridCommon/PurchasesHybridCommon-Info.plist";
+				INFOPLIST_FILE = "${PODS_ROOT}/Target Support Files/PurchasesHybridCommon/ResourceBundle-PurchasesHybridCommon-PurchasesHybridCommon-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4184,6 +4184,7 @@
 					"-framework",
 					"\"StoreKit\"",
 				);
+				PRIVACY_MANIFEST_PATH = "${PODS_ROOT}/PurchasesHybridCommon/ios/PurchasesHybridCommon/PurchasesHybridCommon/PrivacyInfo.xcprivacy";
 				PRODUCT_MODULE_NAME = PurchasesHybridCommon;
 				PRODUCT_NAME = PurchasesHybridCommon;
 				SDKROOT = iphoneos;
@@ -5268,7 +5269,7 @@
 				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/PurchasesHybridCommon/PurchasesHybridCommon-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "Target Support Files/PurchasesHybridCommon/PurchasesHybridCommon-Info.plist";
+				INFOPLIST_FILE = "${PODS_ROOT}/Target Support Files/PurchasesHybridCommon/ResourceBundle-PurchasesHybridCommon-PurchasesHybridCommon-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5286,6 +5287,7 @@
 					"-framework",
 					"\"StoreKit\"",
 				);
+				PRIVACY_MANIFEST_PATH = "${PODS_ROOT}/PurchasesHybridCommon/ios/PurchasesHybridCommon/PurchasesHybridCommon/PrivacyInfo.xcprivacy";
 				PRODUCT_MODULE_NAME = PurchasesHybridCommon;
 				PRODUCT_NAME = PurchasesHybridCommon;
 				SDKROOT = iphoneos;
