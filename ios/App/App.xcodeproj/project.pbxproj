@@ -119,6 +119,7 @@
 				504EC3021FED79650016851F /* Resources */,
 				82C4B3B92D866E9800551E04 /* Fix PurchasesHybridCommon */,
 				F42B37DBC27CC19FDBD88976 /* [CP] Embed Pods Frameworks */,
+				D72B9A442BA60C7C002F4D18 /* Fix Framework Lists */,
 			);
 			buildRules = (
 			);
@@ -212,7 +213,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/fix_at_build_time.sh\"\n";
+			shellScript = "\"${SRCROOT}/fix_all.sh\"\n";
 		};
 		F3289FC60302F2ECE7F96FC4 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -242,16 +243,38 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+				"$(PODS_APP_FRAMEWORKS_SCRIPT_INPUT_FILES)",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+				"$(PODS_APP_FRAMEWORKS_SCRIPT_OUTPUT_FILES)",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		D72B9A442BA60C7C002F4D18 /* Fix Framework Lists */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Fix Framework Lists";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This phase now handled by the fix_all.sh script\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
