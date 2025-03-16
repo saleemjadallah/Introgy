@@ -30,6 +30,27 @@ end
 post_install do |installer|
   assertDeploymentTarget(installer)
   
+  # Generate framework file lists
+  framework_dir = 'Pods/Target Support Files/Pods-App'
+  debug_input = "#{framework_dir}/Pods-App-frameworks-Debug-input-files.xcfilelist"
+  debug_output = "#{framework_dir}/Pods-App-frameworks-Debug-output-files.xcfilelist"
+  release_input = "#{framework_dir}/Pods-App-frameworks-Release-input-files.xcfilelist"
+  release_output = "#{framework_dir}/Pods-App-frameworks-Release-output-files.xcfilelist"
+  
+  # Create directory if it doesn't exist
+  FileUtils.mkdir_p(framework_dir)
+  
+  # Generate input files
+  input_frameworks = installer.pods_project.targets.map { |t| "${BUILT_PRODUCTS_DIR}/#{t.name}/#{t.name}.framework" }
+  input_content = ["${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks.sh"] + input_frameworks
+  File.write(debug_input, input_content.join("\n"))
+  File.write(release_input, input_content.join("\n"))
+  
+  # Generate output files
+  output_frameworks = installer.pods_project.targets.map { |t| "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/#{t.name}.framework" }
+  File.write(debug_output, output_frameworks.join("\n"))
+  File.write(release_output, output_frameworks.join("\n"))
+  
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       # Ensure proper linking for dynamic frameworks
@@ -63,6 +84,16 @@ post_install do |installer|
       if target.name == 'App' || target.name == 'Pods-App'
         config.build_settings['OTHER_LDFLAGS'] = '$(inherited) -framework "RevenueCat" -framework "RevenueCatUI"'
         config.build_settings['FRAMEWORK_SEARCH_PATHS'] = '$(inherited) "${PODS_ROOT}/RevenueCat" "${PODS_ROOT}/RevenueCatUI"'
+        
+        # Add framework file lists to build settings
+        if config.name == 'Debug'
+          config.build_settings['FRAMEWORK_INSTALL_INPUT_FILES'] = debug_input
+          config.build_settings['FRAMEWORK_INSTALL_OUTPUT_FILES'] = debug_output
+        else
+          config.build_settings['FRAMEWORK_INSTALL_INPUT_FILES'] = release_input
+          config.build_settings['FRAMEWORK_INSTALL_OUTPUT_FILES'] = release_output
+        end
+        
         # Specific settings for Pods-App target
         config.build_settings['GENERATE_MASTER_OBJECT_FILE'] = 'YES'
         config.build_settings['GENERATE_PKGINFO_FILE'] = 'YES'

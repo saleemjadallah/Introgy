@@ -3814,6 +3814,8 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				EXPANDED_CODE_SIGN_IDENTITY = "";
+				FRAMEWORK_INSTALL_INPUT_FILES = "Pods/Target Support Files/Pods-App/Pods-App-frameworks-Debug-input-files.xcfilelist";
+				FRAMEWORK_INSTALL_OUTPUT_FILES = "Pods/Target Support Files/Pods-App/Pods-App-frameworks-Debug-output-files.xcfilelist";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_ROOT}/RevenueCat\"",
@@ -4228,6 +4230,8 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				EXPANDED_CODE_SIGN_IDENTITY = "";
+				FRAMEWORK_INSTALL_INPUT_FILES = "Pods/Target Support Files/Pods-App/Pods-App-frameworks-Release-input-files.xcfilelist";
+				FRAMEWORK_INSTALL_OUTPUT_FILES = "Pods/Target Support Files/Pods-App/Pods-App-frameworks-Release-output-files.xcfilelist";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_ROOT}/RevenueCat\"",
