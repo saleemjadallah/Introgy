@@ -35,7 +35,7 @@ begin
     new_paths = [
       '$(PODS_ROOT)/Headers/Public',
       '$(PODS_ROOT)/Headers/Public/Capacitor',
-      '$(PODS_ROOT)/Headers/Public/CapacitorCordova'
+      # '$(PODS_ROOT)/Headers/Public/CapacitorCordova'
     ]
     
     # Add new paths if they don't already exist

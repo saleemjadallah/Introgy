@@ -1,17 +1,12 @@
-//
-//  PurchasesHybridCommon.h
-//  PurchasesHybridCommon
-//
-//  Created for RevenueCat
-//
+#ifndef PurchasesHybridCommon_h
+#define PurchasesHybridCommon_h
+
+// This is a stub header file for PurchasesHybridCommon
+// It's used to satisfy build requirements without the actual implementation
 
 #import <Foundation/Foundation.h>
-#import <RevenueCat/RevenueCat.h>
 
-//! Project version number for PurchasesHybridCommon.
-FOUNDATION_EXPORT double PurchasesHybridCommonVersionNumber;
+// Define any necessary types or interfaces that might be required
+// by RevenuecatPurchasesCapacitor or other dependent code
 
-//! Project version string for PurchasesHybridCommon.
-FOUNDATION_EXPORT const unsigned char PurchasesHybridCommonVersionString[];
-
-// This is a stub header to allow compilation without PurchasesHybridCommon
+#endif /* PurchasesHybridCommon_h */

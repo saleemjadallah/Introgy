@@ -22,30 +22,25 @@ PODS:
     - PurchasesHybridCommon (= 13.24.0)
 
 DEPENDENCIES:
-  - "Capacitor (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorApp (from `../../node_modules/@capacitor/app`)"
-  - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorDevice (from `../../node_modules/@capacitor/device`)"
   - "CapacitorLocalNotifications (from `../../node_modules/@capacitor/local-notifications`)"
   - "CapacitorPreferences (from `../../node_modules/@capacitor/preferences`)"
   - "CapacitorSplashScreen (from `../../node_modules/@capacitor/splash-screen`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
-  - PurchasesHybridCommon (= 13.24.0)
+  - PurchasesHybridCommon (from `./`)
   - RevenueCat (= 5.19.0)
   - "RevenuecatPurchasesCapacitor (from `../../node_modules/@revenuecat/purchases-capacitor`)"
 
 SPEC REPOS:
   trunk:
-    - PurchasesHybridCommon
+    - Capacitor
+    - CapacitorCordova
     - RevenueCat
 
 EXTERNAL SOURCES:
-  Capacitor:
-    :path: "../../node_modules/@capacitor/ios"
   CapacitorApp:
     :path: "../../node_modules/@capacitor/app"
-  CapacitorCordova:
-    :path: "../../node_modules/@capacitor/ios"
   CapacitorDevice:
     :path: "../../node_modules/@capacitor/device"
   CapacitorLocalNotifications:
@@ -56,22 +51,24 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/splash-screen"
   CapacitorStatusBar:
     :path: "../../node_modules/@capacitor/status-bar"
+  PurchasesHybridCommon:
+    :path: "./"
   RevenuecatPurchasesCapacitor:
     :path: "../../node_modules/@revenuecat/purchases-capacitor"
 
 SPEC CHECKSUMS:
-  Capacitor: bceb785fb78f5e81e4a9e37843bc1c24bd9c7194
+  Capacitor: acb91f61ae8b5747c0c3f0ccead96865f5c7cc98
   CapacitorApp: 9cb31064a6c6bb2b1438583733a7bf45557fc1da
-  CapacitorCordova: 866217f32c1d25b326c568a10ea3ed0c36b13e29
+  CapacitorCordova: 4fd56b242423e8e48a8cd391d7422475b5032994
   CapacitorDevice: 069faf433b3a99c3d5f0e500fbe634f60a8c6a84
   CapacitorLocalNotifications: c9577978cd598af5e2b5615548b8222b3b10d7e2
   CapacitorPreferences: 8e4bef1f937fc991a19d7ea99330c36a62edd24b
   CapacitorSplashScreen: 7e7a0a1113833032f196b3af6fa437baccacf5bc
   CapacitorStatusBar: a8c4c83ed2e973bdafb979e80e4b00d027832cb7
-  PurchasesHybridCommon: fa5e49745a67c5c3649607f6197ff6f5e8228740
+  PurchasesHybridCommon: b7812093b47606d778eb730238bc65105e10c4f7
   RevenueCat: 4be87c151dff652d2a5b7af46073db11f01ad93f
   RevenuecatPurchasesCapacitor: a3d1f606e31ad723e72018e6b5bdda76cd011d83
 
-PODFILE CHECKSUM: 93ca1dbf9beb668a5d7bb25bcef12290ee885314
+PODFILE CHECKSUM: a45486842301359e817c74455e0843f4285ad5d2
 
 COCOAPODS: 1.16.2

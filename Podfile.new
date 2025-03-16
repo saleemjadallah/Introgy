@@ -1,6 +1,4 @@
 require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
-# require_relative 'capacitor-pods'
-# require_relative './pods'
 
 platform :ios, '15.0'
 use_frameworks!
@@ -13,8 +11,9 @@ install! 'cocoapods'
 source 'https://cdn.cocoapods.org/'
 
 def capacitor_pods
+  pod 'Capacitor', :path => '../../node_modules/@capacitor/app'
+  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/app'
   pod 'CapacitorApp', :path => '../../node_modules/@capacitor/app'
-  # pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/app'
   pod 'CapacitorDevice', :path => '../../node_modules/@capacitor/device'
   pod 'CapacitorLocalNotifications', :path => '../../node_modules/@capacitor/local-notifications'
   pod 'CapacitorPreferences', :path => '../../node_modules/@capacitor/preferences'
@@ -70,6 +69,7 @@ target 'App' do
           frameworks = [
             'Capacitor',
             'CapacitorApp',
+            'CapacitorCordova',
             'CapacitorDevice',
             'CapacitorLocalNotifications',
             'CapacitorPreferences',
@@ -82,13 +82,21 @@ target 'App' do
           # Create input list
           input_list = ["${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks.sh"]
           frameworks.each do |framework|
-            input_list << "${BUILT_PRODUCTS_DIR}/#{framework}/#{framework}.framework"
+            if framework == 'CapacitorCordova'
+              input_list << "${BUILT_PRODUCTS_DIR}/#{framework}/Cordova.framework"
+            else
+              input_list << "${BUILT_PRODUCTS_DIR}/#{framework}/#{framework}.framework"
+            end
           end
           
           # Create output list
           output_list = []
           frameworks.each do |framework|
-            output_list << "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/#{framework}.framework"
+            if framework == 'CapacitorCordova'
+              output_list << "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cordova.framework"
+            else
+              output_list << "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/#{framework}.framework"
+            end
           end
           
           # Create the xcfilelist files for both Debug and Release configurations
@@ -130,4 +138,4 @@ target 'App' do
       end
     end
   end
-end
+end 
