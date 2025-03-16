@@ -1,12 +1,12 @@
 require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
 
-platform :ios, '14.0'
+platform :ios, '15.0'
 use_frameworks!
 
 # workaround to avoid Xcode caching of Pods that requires
 # Product -> Clean Build Folder after new Cordova plugins installed
 # Requires CocoaPods 1.6 or newer
-install! 'cocoapods', :disable_input_output_paths => true
+install! 'cocoapods'
 
 source 'https://cdn.cocoapods.org/'
 
@@ -35,8 +35,8 @@ post_install do |installer|
       # Ensure proper linking for dynamic frameworks
       config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
       
-      # Fix for Xcode 15 framework embedding
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+      # Update deployment target for all pods
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       
       # Enable framework code signing
       config.build_settings['EXPANDED_CODE_SIGN_IDENTITY'] = ""
@@ -45,17 +45,31 @@ post_install do |installer|
       
       # Fix arm64 architecture issues
       config.build_settings['ARCHS'] = '$(ARCHS_STANDARD)'
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = ''
       
       # Ignore framework import style warnings
       config.build_settings['OTHER_CFLAGS'] = '$(inherited) -Wno-quoted-include-in-framework-header'
       
-      # Enable dSYM file generation
+      # Enhanced dSYM generation settings
       config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf-with-dsym'
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['STRIP_INSTALLED_PRODUCT'] = 'NO'
+      config.build_settings['STRIP_STYLE'] = 'debugging'
+      config.build_settings['DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT'] = 'YES'
+      config.build_settings['DWARF_DSYM_FOLDER_PATH'] = '$(CONFIGURATION_BUILD_DIR)'
       
       # Fix framework embedding warning
-      if target.name == 'App'
+      if target.name == 'App' || target.name == 'Pods-App'
         config.build_settings['OTHER_LDFLAGS'] = '$(inherited) -framework "RevenueCat" -framework "RevenueCatUI"'
         config.build_settings['FRAMEWORK_SEARCH_PATHS'] = '$(inherited) "${PODS_ROOT}/RevenueCat" "${PODS_ROOT}/RevenueCatUI"'
+        # Specific settings for Pods-App target
+        config.build_settings['GENERATE_MASTER_OBJECT_FILE'] = 'YES'
+        config.build_settings['GENERATE_PKGINFO_FILE'] = 'YES'
+        
+        # Add modern build settings
+        config.build_settings['DEAD_CODE_STRIPPING'] = 'YES'
+        config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
       end
     end
     

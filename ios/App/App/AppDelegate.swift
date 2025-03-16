@@ -1,12 +1,61 @@
-
 import UIKit
 import Capacitor
 import RevenueCat
+import Foundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+
+    func testFoundation() {
+        // 1. String manipulation
+        let testString = "Hello, Foundation!"
+        print("1. String Tests:")
+        print("   - Original: \(testString)")
+        print("   - Uppercase: \(testString.uppercased())")
+        print("   - Contains 'Foundation': \(testString.contains("Foundation"))")
+        
+        // 2. Date handling
+        let now = Date()
+        let formatter = DateFormatter()
+        formatter.dateStyle = .full
+        formatter.timeStyle = .medium
+        print("\n2. Date Tests:")
+        print("   - Current date: \(formatter.string(from: now))")
+        
+        // 3. File management
+        let fileManager = FileManager.default
+        let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        print("\n3. File Management Tests:")
+        print("   - Documents directory: \(documentsPath.path)")
+        
+        // 4. JSON processing
+        let jsonData: [String: Any] = ["name": "Test User", "age": 30]
+        do {
+            let jsonString = try JSONSerialization.data(withJSONObject: jsonData)
+            print("\n4. JSON Tests:")
+            print("   - JSON data created successfully: \(String(data: jsonString, encoding: .utf8) ?? "failed")")
+        } catch {
+            print("   - JSON serialization failed: \(error)")
+        }
+        
+        // 5. URLSession test
+        print("\n5. URLSession Test:")
+        let url = URL(string: "https://api.github.com")!
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            if let error = error {
+                print("   - Network request failed: \(error)")
+                return
+            }
+            if let httpResponse = response as? HTTPURLResponse {
+                print("   - Network request succeeded with status code: \(httpResponse.statusCode)")
+            }
+        }
+        task.resume()
+        
+        print("\nFoundation framework test completed! Check console for results.")
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Initialize RevenueCat with proper configuration
@@ -16,8 +65,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let apiKey = "appl_wHXBFRFAOUUpWRqauPXyZEUElmq"
         
         // Configure with standard options
-        // Use simple initialization to avoid enum type issues
         Purchases.configure(withAPIKey: apiKey)
+        
+        // Run Foundation tests
+        testFoundation()
         
         return true
     }
