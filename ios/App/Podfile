@@ -28,115 +28,48 @@ target 'App' do
 end
 
 post_install do |installer|
-  assertDeploymentTarget(installer)
-  
-  # Generate framework file lists
-  framework_dir = 'Pods/Target Support Files/Pods-App'
-  debug_input = "#{framework_dir}/Pods-App-frameworks-Debug-input-files.xcfilelist"
-  debug_output = "#{framework_dir}/Pods-App-frameworks-Debug-output-files.xcfilelist"
-  release_input = "#{framework_dir}/Pods-App-frameworks-Release-input-files.xcfilelist"
-  release_output = "#{framework_dir}/Pods-App-frameworks-Release-output-files.xcfilelist"
-  
-  # Create directory if it doesn't exist
-  FileUtils.mkdir_p(framework_dir)
-  
-  # Generate input files
-  input_frameworks = installer.pods_project.targets.map { |t| "${BUILT_PRODUCTS_DIR}/#{t.name}/#{t.name}.framework" }
-  input_content = ["${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks.sh"] + input_frameworks
-  File.write(debug_input, input_content.join("\n"))
-  File.write(release_input, input_content.join("\n"))
-  
-  # Generate output files
-  output_frameworks = installer.pods_project.targets.map { |t| "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/#{t.name}.framework" }
-  File.write(debug_output, output_frameworks.join("\n"))
-  File.write(release_output, output_frameworks.join("\n"))
-  
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      # Ensure proper linking for dynamic frameworks
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
       
-      # Update deployment target for all pods
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-      
-      # Enable framework code signing
-      config.build_settings['EXPANDED_CODE_SIGN_IDENTITY'] = ""
-      config.build_settings['CODE_SIGNING_REQUIRED'] = "NO"
-      config.build_settings['CODE_SIGNING_ALLOWED'] = "NO"
-      
-      # Fix arm64 architecture issues
-      config.build_settings['ARCHS'] = '$(ARCHS_STANDARD)'
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = ''
-      
-      # Ignore framework import style warnings
-      config.build_settings['OTHER_CFLAGS'] = '$(inherited) -Wno-quoted-include-in-framework-header'
-      
-      # Enhanced dSYM generation settings
-      config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf-with-dsym'
-      config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
-      config.build_settings['ENABLE_BITCODE'] = 'NO'
-      config.build_settings['STRIP_INSTALLED_PRODUCT'] = 'NO'
-      config.build_settings['STRIP_STYLE'] = 'debugging'
-      config.build_settings['DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT'] = 'YES'
-      config.build_settings['DWARF_DSYM_FOLDER_PATH'] = '$(CONFIGURATION_BUILD_DIR)'
-      
-      # Fix framework embedding warning
-      if target.name == 'App' || target.name == 'Pods-App'
-        config.build_settings['OTHER_LDFLAGS'] = '$(inherited) -framework "RevenueCat" -framework "RevenueCatUI"'
-        config.build_settings['FRAMEWORK_SEARCH_PATHS'] = '$(inherited) "${PODS_ROOT}/RevenueCat" "${PODS_ROOT}/RevenueCatUI"'
+      if target.name == 'Pods-App'
+        # Generate framework file lists
+        input_list = []
+        output_list = []
         
-        # Add framework file lists to build settings
-        if config.name == 'Debug'
-          config.build_settings['FRAMEWORK_INSTALL_INPUT_FILES'] = debug_input
-          config.build_settings['FRAMEWORK_INSTALL_OUTPUT_FILES'] = debug_output
-        else
-          config.build_settings['FRAMEWORK_INSTALL_INPUT_FILES'] = release_input
-          config.build_settings['FRAMEWORK_INSTALL_OUTPUT_FILES'] = release_output
+        frameworks = [
+          'Capacitor',
+          'CapacitorApp',
+          'CapacitorCordova',
+          'CapacitorDevice',
+          'CapacitorLocalNotifications',
+          'CapacitorPreferences',
+          'CapacitorSplashScreen',
+          'CapacitorStatusBar',
+          'PurchasesHybridCommon',
+          'RevenueCat',
+          'RevenuecatPurchasesCapacitor'
+        ]
+        
+        # Add frameworks script
+        input_list << '${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks.sh'
+        
+        frameworks.each do |framework|
+          input_list << "${BUILT_PRODUCTS_DIR}/#{framework}/#{framework}.framework"
+          output_list << "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/#{framework}.framework"
         end
         
-        # Specific settings for Pods-App target
-        config.build_settings['GENERATE_MASTER_OBJECT_FILE'] = 'YES'
-        config.build_settings['GENERATE_PKGINFO_FILE'] = 'YES'
+        # Create the xcfilelist files
+        File.write("Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config.name}-input-files.xcfilelist", input_list.join("\n"))
+        File.write("Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config.name}-output-files.xcfilelist", output_list.join("\n"))
         
-        # Add modern build settings
-        config.build_settings['DEAD_CODE_STRIPPING'] = 'YES'
-        config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
-      end
-      
-      # Fix PurchasesHybridCommon privacy and resource bundle settings
-      if target.name == 'PurchasesHybridCommon'
-        config.build_settings['PRIVACY_MANIFEST_PATH'] = '${PODS_ROOT}/PurchasesHybridCommon/ios/PurchasesHybridCommon/PurchasesHybridCommon/PrivacyInfo.xcprivacy'
-        config.build_settings['INFOPLIST_FILE'] = '${PODS_ROOT}/Target Support Files/PurchasesHybridCommon/ResourceBundle-PurchasesHybridCommon-PurchasesHybridCommon-Info.plist'
-      end
-      
-      # Ensure framework file lists use correct paths
-      if target.name == 'Pods-App'
+        # Update build settings
         config.build_settings['FRAMEWORK_SEARCH_PATHS'] = ['$(inherited)', '"$(PODS_ROOT)/Target Support Files/Pods-App"']
         config.build_settings['PODS_ROOT'] = '$(SRCROOT)/Pods'
         config.build_settings['PODS_BUILD_DIR'] = '$(BUILD_DIR)'
         config.build_settings['PODS_CONFIGURATION_BUILD_DIR'] = '$(PODS_BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)'
         config.build_settings['PODS_XCFRAMEWORKS_BUILD_DIR'] = '$(PODS_CONFIGURATION_BUILD_DIR)/XCFrameworkIntermediates'
-      end
-    end
-    
-    # Fix RevenueCat specific settings
-    if target.name == 'RevenueCat'
-      target.build_configurations.each do |config|
-        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
-        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'RC_DISABLE_CUSTOM_ENTITLEMENTS_COMPUTATION=1'
-      end
-    end
-  end
-  
-  # Fix LIBRARY_SEARCH_PATHS for RevenueCat
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      # Ensure proper linking for dynamic frameworks
-      config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
-      
-      # Add StoreKit framework if missing
-      if !config.build_settings['OTHER_LDFLAGS']&.include?('-framework "StoreKit"')
-        config.build_settings['OTHER_LDFLAGS'] = "#{config.build_settings['OTHER_LDFLAGS']} -framework \"StoreKit\""
       end
     end
   end

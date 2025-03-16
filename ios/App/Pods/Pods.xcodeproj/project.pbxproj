@@ -3669,27 +3669,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 08D00309D0BDFD8755F8322A2EFA65DD /* CapacitorApp.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorApp/CapacitorApp-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorApp/CapacitorApp-Info.plist";
@@ -3701,21 +3692,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorApp/CapacitorApp.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = CapacitorApp;
 				PRODUCT_NAME = CapacitorApp;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -3729,27 +3709,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 93D25C4C80D75521489FE247BA1F5329 /* Capacitor.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/Capacitor/Capacitor-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/Capacitor/Capacitor-Info.plist";
@@ -3761,21 +3732,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/Capacitor/Capacitor.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = Capacitor;
 				PRODUCT_NAME = Capacitor;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -3791,37 +3751,22 @@
 			baseConfigurationReference = 09209143938B2386BB3906033655559D /* Pods-App.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
-				FRAMEWORK_INSTALL_INPUT_FILES = "Pods/Target Support Files/Pods-App/Pods-App-frameworks-Debug-input-files.xcfilelist";
-				FRAMEWORK_INSTALL_OUTPUT_FILES = "Pods/Target Support Files/Pods-App/Pods-App-frameworks-Debug-output-files.xcfilelist";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(PODS_ROOT)/Target Support Files/Pods-App\"",
 				);
-				GENERATE_MASTER_OBJECT_FILE = YES;
-				GENERATE_PKGINFO_FILE = YES;
 				INFOPLIST_FILE = "Target Support Files/Pods-App/Pods-App-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -3832,20 +3777,7 @@
 				);
 				MACH_O_TYPE = staticlib;
 				MODULEMAP_FILE = "Target Support Files/Pods-App/Pods-App.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-framework",
-					"\"RevenueCat\"",
-					"-framework",
-					"\"RevenueCatUI\"",
-					"-framework",
-					"\"StoreKit\"",
-				);
+				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PODS_BUILD_DIR = "$(BUILD_DIR)";
 				PODS_CONFIGURATION_BUILD_DIR = "$(PODS_BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
@@ -3855,8 +3787,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -3867,27 +3797,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EBBF067FF35CA64C69E34CEC662E6694 /* Capacitor.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/Capacitor/Capacitor-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/Capacitor/Capacitor-Info.plist";
@@ -3899,21 +3820,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/Capacitor/Capacitor.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = Capacitor;
 				PRODUCT_NAME = Capacitor;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -3927,27 +3837,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 60B0DDA85CF55188C4A32D0F43FAFF1E /* CapacitorCordova.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorCordova/CapacitorCordova-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorCordova/CapacitorCordova-Info.plist";
@@ -3959,21 +3860,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorCordova/CapacitorCordova.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = Cordova;
 				PRODUCT_NAME = Cordova;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.0;
@@ -3988,34 +3878,15 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E6714649533392D482FC9D2E77DDDC03 /* PurchasesHybridCommon.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PurchasesHybridCommon";
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
-				ENABLE_BITCODE = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				IBSC_MODULE = PurchasesHybridCommon;
 				INFOPLIST_FILE = "Target Support Files/PurchasesHybridCommon/ResourceBundle-PurchasesHybridCommon-PurchasesHybridCommon-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_NAME = PurchasesHybridCommon;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = bundle;
 			};
@@ -4025,31 +3896,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8D6A8BACBE3922B448370B7D1754F36E /* RevenueCat.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/RevenueCat/RevenueCat-prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"RC_DISABLE_CUSTOM_ENTITLEMENTS_COMPUTATION=1",
-				);
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/RevenueCat/RevenueCat-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -4060,21 +3918,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/RevenueCat/RevenueCat.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = RevenueCat;
 				PRODUCT_NAME = RevenueCat;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.7;
@@ -4088,27 +3935,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BE6B6B4174FBA573FD599EF582FDEC85 /* CapacitorLocalNotifications.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorLocalNotifications/CapacitorLocalNotifications-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorLocalNotifications/CapacitorLocalNotifications-Info.plist";
@@ -4120,21 +3958,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorLocalNotifications/CapacitorLocalNotifications.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = CapacitorLocalNotifications;
 				PRODUCT_NAME = CapacitorLocalNotifications;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -4148,29 +3975,20 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E6714649533392D482FC9D2E77DDDC03 /* PurchasesHybridCommon.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/PurchasesHybridCommon/PurchasesHybridCommon-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "${PODS_ROOT}/Target Support Files/PurchasesHybridCommon/ResourceBundle-PurchasesHybridCommon-PurchasesHybridCommon-Info.plist";
+				INFOPLIST_FILE = "Target Support Files/PurchasesHybridCommon/PurchasesHybridCommon-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4179,22 +3997,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/PurchasesHybridCommon/PurchasesHybridCommon.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
-				PRIVACY_MANIFEST_PATH = "${PODS_ROOT}/PurchasesHybridCommon/ios/PurchasesHybridCommon/PurchasesHybridCommon/PrivacyInfo.xcprivacy";
 				PRODUCT_MODULE_NAME = PurchasesHybridCommon;
 				PRODUCT_NAME = PurchasesHybridCommon;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.7;
@@ -4209,37 +4015,22 @@
 			baseConfigurationReference = 76836226476D35BC62A098CF501DF10B /* Pods-App.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
-				FRAMEWORK_INSTALL_INPUT_FILES = "Pods/Target Support Files/Pods-App/Pods-App-frameworks-Release-input-files.xcfilelist";
-				FRAMEWORK_INSTALL_OUTPUT_FILES = "Pods/Target Support Files/Pods-App/Pods-App-frameworks-Release-output-files.xcfilelist";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(PODS_ROOT)/Target Support Files/Pods-App\"",
 				);
-				GENERATE_MASTER_OBJECT_FILE = YES;
-				GENERATE_PKGINFO_FILE = YES;
 				INFOPLIST_FILE = "Target Support Files/Pods-App/Pods-App-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -4250,20 +4041,7 @@
 				);
 				MACH_O_TYPE = staticlib;
 				MODULEMAP_FILE = "Target Support Files/Pods-App/Pods-App.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-framework",
-					"\"RevenueCat\"",
-					"-framework",
-					"\"RevenueCatUI\"",
-					"-framework",
-					"\"StoreKit\"",
-				);
+				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PODS_BUILD_DIR = "$(BUILD_DIR)";
 				PODS_CONFIGURATION_BUILD_DIR = "$(PODS_BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
@@ -4273,8 +4051,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -4286,27 +4062,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 757E2FF8FD26A52FB37E123CEC74D744 /* CapacitorDevice.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorDevice/CapacitorDevice-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorDevice/CapacitorDevice-Info.plist";
@@ -4318,21 +4085,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorDevice/CapacitorDevice.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = CapacitorDevice;
 				PRODUCT_NAME = CapacitorDevice;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -4347,27 +4103,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5919119ACCFEB573D9816ED9DF13489B /* CapacitorPreferences.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorPreferences/CapacitorPreferences-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorPreferences/CapacitorPreferences-Info.plist";
@@ -4379,21 +4126,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorPreferences/CapacitorPreferences.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = CapacitorPreferences;
 				PRODUCT_NAME = CapacitorPreferences;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -4408,27 +4144,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9A1CD035858B7CA9D7AF4058049F6DD3 /* CapacitorSplashScreen.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorSplashScreen/CapacitorSplashScreen-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorSplashScreen/CapacitorSplashScreen-Info.plist";
@@ -4440,21 +4167,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorSplashScreen/CapacitorSplashScreen.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = CapacitorSplashScreen;
 				PRODUCT_NAME = CapacitorSplashScreen;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -4469,34 +4185,15 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3659708976D74DF25390DA55D47E1337 /* RevenueCat.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/RevenueCat";
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
-				ENABLE_BITCODE = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				IBSC_MODULE = RevenueCat;
 				INFOPLIST_FILE = "Target Support Files/RevenueCat/ResourceBundle-RevenueCat-RevenueCat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_NAME = RevenueCat;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = bundle;
 			};
@@ -4506,34 +4203,15 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A258A2D2A9321CCE3B4A46E9735E9CFE /* PurchasesHybridCommon.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PurchasesHybridCommon";
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
-				ENABLE_BITCODE = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				IBSC_MODULE = PurchasesHybridCommon;
 				INFOPLIST_FILE = "Target Support Files/PurchasesHybridCommon/ResourceBundle-PurchasesHybridCommon-PurchasesHybridCommon-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_NAME = PurchasesHybridCommon;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = bundle;
 			};
@@ -4671,27 +4349,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2650FC1CD79202165D6261EFC626DE00 /* CapacitorStatusBar.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorStatusBar/CapacitorStatusBar-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorStatusBar/CapacitorStatusBar-Info.plist";
@@ -4703,21 +4372,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorStatusBar/CapacitorStatusBar.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = CapacitorStatusBar;
 				PRODUCT_NAME = CapacitorStatusBar;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -4732,27 +4390,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 917509A2F625DA947062919E5EBF76F9 /* CapacitorCordova.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorCordova/CapacitorCordova-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorCordova/CapacitorCordova-Info.plist";
@@ -4764,21 +4413,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorCordova/CapacitorCordova.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = Cordova;
 				PRODUCT_NAME = Cordova;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.0;
@@ -4792,27 +4430,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = C6CEAF3D9C9A28DD6AD4A0D071D896CE /* CapacitorLocalNotifications.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorLocalNotifications/CapacitorLocalNotifications-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorLocalNotifications/CapacitorLocalNotifications-Info.plist";
@@ -4824,21 +4453,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorLocalNotifications/CapacitorLocalNotifications.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = CapacitorLocalNotifications;
 				PRODUCT_NAME = CapacitorLocalNotifications;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -4853,31 +4471,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3659708976D74DF25390DA55D47E1337 /* RevenueCat.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/RevenueCat/RevenueCat-prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"RC_DISABLE_CUSTOM_ENTITLEMENTS_COMPUTATION=1",
-				);
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/RevenueCat/RevenueCat-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -4888,21 +4493,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/RevenueCat/RevenueCat.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = RevenueCat;
 				PRODUCT_NAME = RevenueCat;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.7;
@@ -4917,27 +4511,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 447D39D2640F296571F27F9414132C2A /* CapacitorApp.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorApp/CapacitorApp-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorApp/CapacitorApp-Info.plist";
@@ -4949,21 +4534,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorApp/CapacitorApp.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = CapacitorApp;
 				PRODUCT_NAME = CapacitorApp;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -4978,34 +4552,15 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8D6A8BACBE3922B448370B7D1754F36E /* RevenueCat.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/RevenueCat";
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
-				ENABLE_BITCODE = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				IBSC_MODULE = RevenueCat;
 				INFOPLIST_FILE = "Target Support Files/RevenueCat/ResourceBundle-RevenueCat-RevenueCat-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_NAME = RevenueCat;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = bundle;
 			};
@@ -5015,27 +4570,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D88827286110CF8AF93616311D3ECD9A /* CapacitorPreferences.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorPreferences/CapacitorPreferences-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorPreferences/CapacitorPreferences-Info.plist";
@@ -5047,21 +4593,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorPreferences/CapacitorPreferences.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = CapacitorPreferences;
 				PRODUCT_NAME = CapacitorPreferences;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -5075,27 +4610,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3DA1947AA64DBCF3900EF12ECFABFF6B /* CapacitorSplashScreen.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorSplashScreen/CapacitorSplashScreen-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorSplashScreen/CapacitorSplashScreen-Info.plist";
@@ -5107,21 +4633,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorSplashScreen/CapacitorSplashScreen.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = CapacitorSplashScreen;
 				PRODUCT_NAME = CapacitorSplashScreen;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -5135,27 +4650,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BF536DFCB1970E7FF0F091B5BD648EE /* RevenuecatPurchasesCapacitor.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/RevenuecatPurchasesCapacitor/RevenuecatPurchasesCapacitor-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/RevenuecatPurchasesCapacitor/RevenuecatPurchasesCapacitor-Info.plist";
@@ -5167,21 +4673,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/RevenuecatPurchasesCapacitor/RevenuecatPurchasesCapacitor.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = RevenuecatPurchasesCapacitor;
 				PRODUCT_NAME = RevenuecatPurchasesCapacitor;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -5195,27 +4690,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DED5BB78AE0FE409EB22EE2320F86A6D /* CapacitorStatusBar.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorStatusBar/CapacitorStatusBar-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorStatusBar/CapacitorStatusBar-Info.plist";
@@ -5227,21 +4713,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorStatusBar/CapacitorStatusBar.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = CapacitorStatusBar;
 				PRODUCT_NAME = CapacitorStatusBar;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -5255,29 +4730,20 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A258A2D2A9321CCE3B4A46E9735E9CFE /* PurchasesHybridCommon.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/PurchasesHybridCommon/PurchasesHybridCommon-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "${PODS_ROOT}/Target Support Files/PurchasesHybridCommon/ResourceBundle-PurchasesHybridCommon-PurchasesHybridCommon-Info.plist";
+				INFOPLIST_FILE = "Target Support Files/PurchasesHybridCommon/PurchasesHybridCommon-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5286,22 +4752,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/PurchasesHybridCommon/PurchasesHybridCommon.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
-				PRIVACY_MANIFEST_PATH = "${PODS_ROOT}/PurchasesHybridCommon/ios/PurchasesHybridCommon/PurchasesHybridCommon/PrivacyInfo.xcprivacy";
 				PRODUCT_MODULE_NAME = PurchasesHybridCommon;
 				PRODUCT_NAME = PurchasesHybridCommon;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.7;
@@ -5316,27 +4770,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CD7F197598294C4E0BF9EB5229EE1C63 /* CapacitorDevice.debug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/CapacitorDevice/CapacitorDevice-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/CapacitorDevice/CapacitorDevice-Info.plist";
@@ -5348,21 +4793,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/CapacitorDevice/CapacitorDevice.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = CapacitorDevice;
 				PRODUCT_NAME = CapacitorDevice;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
@@ -5376,27 +4810,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F3C5B08DEA5517B5D53CB1886C22E8D7 /* RevenuecatPurchasesCapacitor.release.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				DWARF_DSYM_FOLDER_PATH = "$(CONFIGURATION_BUILD_DIR)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = NO;
 				ENABLE_MODULE_VERIFIER = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
-				EXPANDED_CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = "Target Support Files/RevenuecatPurchasesCapacitor/RevenuecatPurchasesCapacitor-prefix.pch";
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/RevenuecatPurchasesCapacitor/RevenuecatPurchasesCapacitor-Info.plist";
@@ -5408,21 +4833,10 @@
 					"@loader_path/Frameworks",
 				);
 				MODULEMAP_FILE = "Target Support Files/RevenuecatPurchasesCapacitor/RevenuecatPurchasesCapacitor.modulemap";
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-Wno-quoted-include-in-framework-header",
-				);
-				OTHER_LDFLAGS = (
-					"-framework",
-					"\"StoreKit\"",
-				);
 				PRODUCT_MODULE_NAME = RevenuecatPurchasesCapacitor;
 				PRODUCT_NAME = RevenuecatPurchasesCapacitor;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_VERSION = 5.1;
