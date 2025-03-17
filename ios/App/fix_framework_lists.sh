@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 echo "Creating framework file lists in both local and CI environments..."

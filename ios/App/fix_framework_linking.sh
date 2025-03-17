@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 echo "Fixing RevenueCat framework linking issues..."
