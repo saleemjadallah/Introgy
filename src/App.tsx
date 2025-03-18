@@ -1,7 +1,7 @@
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "@/components/Layout";
-import Home from "@/pages/Home";
+import Home from "@/pages/Index";  // Changed from @/pages/Home to @/pages/Index
 import SocialBattery from "@/pages/SocialBattery";
 import SocialNavigation from "@/pages/SocialNavigation";
 import ConnectionBuilder from "@/pages/ConnectionBuilder";
