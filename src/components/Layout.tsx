@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { Battery, Users, Brain, LineChart, Home, Bell, User } from "lucide-react";
@@ -6,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/profile/UserAvatar";
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
 import { Logo } from "@/components/ui/Logo";
+import { Footer } from "@/components/ui/Footer";
 
 const Layout = () => {
   const location = useLocation();
@@ -75,8 +77,9 @@ const Layout = () => {
           </div>
         </div>
 
-        <main className="flex-1 overflow-auto p-4 pb-16 md:pb-4">
+        <main className="flex-1 overflow-auto p-4 pb-16 md:pb-4 flex flex-col">
           <Outlet />
+          <Footer />
         </main>
       </div>
     </div>;

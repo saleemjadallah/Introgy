@@ -1,58 +1,48 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "@/components/Layout";
+import Home from "@/pages/Home";
+import SocialBattery from "@/pages/SocialBattery";
+import SocialNavigation from "@/pages/SocialNavigation";
+import ConnectionBuilder from "@/pages/ConnectionBuilder";
+import Wellbeing from "@/pages/Wellbeing";
+import Profile from "@/pages/Profile";
+import Auth from "@/pages/Auth";
+import FAQ from "@/pages/FAQ";
+import Terms from "@/pages/Terms";
+import Privacy from "@/pages/Privacy";
+import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/auth";
 import { PremiumProvider } from "@/contexts/premium";
-import Layout from "./components/Layout";
-import Index from "./pages/Index";
-import SocialBattery from "./pages/SocialBattery";
-import SocialNavigation from "./pages/SocialNavigation";
-import ConnectionBuilder from "./pages/ConnectionBuilder";
-import Wellbeing from "./pages/Wellbeing";
-import Profile from "./pages/Profile";
-import Auth from "./pages/Auth";
-import FAQ from "./pages/FAQ";
-import NotFound from "./pages/NotFound";
-import Onboarding from "./pages/Onboarding";
-import { AuthCallback } from "@/components/auth";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import CapacitorInit from "./components/capacitor/CapacitorInit";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+// Create a client
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            <PremiumProvider>
-              <CapacitorInit />
-              <Routes>
-                <Route element={<Layout />}>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/social-battery" element={<SocialBattery />} />
-                  <Route path="/social-navigation" element={<SocialNavigation />} />
-                  <Route path="/connection-builder" element={<ConnectionBuilder />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/wellbeing" element={<Wellbeing />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/auth/callback" element={<AuthCallback />} />
-                  <Route path="/onboarding" element={<Onboarding />} />
-                  <Route path="/payment-success" element={<PaymentSuccess />} />
-                </Route>
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </PremiumProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
+      <AuthProvider>
+        <PremiumProvider>
+          <Router>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="social-battery" element={<SocialBattery />} />
+                <Route path="social-navigation" element={<SocialNavigation />} />
+                <Route path="connection-builder" element={<ConnectionBuilder />} />
+                <Route path="wellbeing" element={<Wellbeing />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="faq" element={<FAQ />} />
+              </Route>
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+            </Routes>
+            <Toaster position="top-center" />
+          </Router>
+        </PremiumProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

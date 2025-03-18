@@ -1,3 +1,4 @@
+
 import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserAvatar } from "./UserAvatar";
@@ -10,7 +11,8 @@ import {
   Shield,
   Bell,
   BellOff,
-  DollarSign
+  DollarSign,
+  FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -18,6 +20,7 @@ import { useAuth } from "@/contexts/auth";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { getRecentlyEarnedBadges } from "@/data/badgesData";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ProfileDropdownProps {
   isOpen: boolean;
@@ -28,6 +31,7 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
   const { user, signOut, isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   
   const recentBadges = getRecentlyEarnedBadges(7);
   const hasNewBadges = recentBadges.length > 0;
@@ -90,6 +94,19 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
               <HelpCircle size={18} />
               <span>FAQ & Help</span>
             </Link>
+            
+            {isMobile && (
+              <>
+                <Link to="/terms" className="flex items-center gap-2 text-sm p-2 hover:bg-accent rounded-md">
+                  <FileText size={18} />
+                  <span>Terms & Conditions</span>
+                </Link>
+                <Link to="/privacy" className="flex items-center gap-2 text-sm p-2 hover:bg-accent rounded-md">
+                  <Shield size={18} />
+                  <span>Privacy Policy</span>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       ) : (
@@ -153,6 +170,19 @@ export const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
               <HelpCircle size={18} />
               <span>FAQ & Help</span>
             </Link>
+            
+            {isMobile && (
+              <>
+                <Link to="/terms" className="flex items-center gap-2 p-2 text-sm hover:bg-accent rounded-md">
+                  <FileText size={18} />
+                  <span>Terms & Conditions</span>
+                </Link>
+                <Link to="/privacy" className="flex items-center gap-2 p-2 text-sm hover:bg-accent rounded-md">
+                  <Shield size={18} />
+                  <span>Privacy Policy</span>
+                </Link>
+              </>
+            )}
             
             <button 
               className="flex items-center gap-2 p-2 text-sm hover:bg-accent rounded-md w-full text-left text-destructive"
