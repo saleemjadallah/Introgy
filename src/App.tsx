@@ -21,10 +21,11 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <PremiumProvider>
-          <Router>
+    // Place Router as the outermost wrapper so that useNavigate and other router hooks work in the providers
+    <Router>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <PremiumProvider>
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={<Layout />}>
@@ -40,10 +41,10 @@ function App() {
               <Route path="/privacy" element={<Privacy />} />
             </Routes>
             <Toaster position="top-center" />
-          </Router>
-        </PremiumProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+          </PremiumProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </Router>
   );
 }
 
