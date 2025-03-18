@@ -1,0 +1,3 @@
+// Xcode Cloud configuration
+PROJECT_PATH = ios/App/App.xcodeproj
+WORKSPACE_PATH = ios/App/App.xcworkspace

@@ -1,0 +1,45 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+!node_modules/@revenuecat
+!node_modules/@revenuecat/purchases-capacitor
+!node_modules/@revenuecat/purchases-capacitor/ios
+!node_modules/@capacitor
+!node_modules/@capacitor/ios
+!node_modules/@capacitor/ios/CapacitorCordova
+!node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova
+!node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/Classes
+!node_modules/@capacitor/ios/CapacitorCordova/CapacitorCordova/Classes/Public
+!node_modules/@capacitor/ios/Capacitor
+!node_modules/@capacitor/ios/Capacitor/Capacitor
+
+# Include RevenueCat files
+ios/App/Pods
+!ios/App/Pods/RevenueCat
+!ios/App/Pods/RevenueCat/Sources
+!ios/App/Pods/RevenueCat/Sources/PrivacyInfo.xcprivacy
+!ios/App/Pods/Target Support Files
+!ios/App/Pods/Target Support Files/RevenueCat
+!ios/App/Pods/Target Support Files/RevenueCat/ResourceBundle-RevenueCat-RevenueCat-Info.plist
+!revenuecat_sources
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 22% 95%;  /* Soft lavender-gray #F0F0F7 */
+    --foreground: 221 52% 15%;  /* Deep navy #121F36 */
+    --card: 0 0% 100%;  /* Pure white #FFFFFF */
+    --card-foreground: 221 52% 15%;  /* Deep navy #121F36 */
+    --popover: 0 0% 100%;  /* Pure white #FFFFFF */
+    --popover-foreground: 221 52% 15%;  /* Deep navy #121F36 */
+    --primary: 221 52% 15%;  /* Deep navy #121F36 */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 160 20% 93%;  /* Light sage-mint #E8F1EE */
+    --secondary-foreground: 221 52% 15%;  /* Deep navy #121F36 */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 214 15% 46%;  /* Slate blue #627286 */
+    --accent: 248 21% 45%;  /* Dusky purple #5D5A8C */
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 218 27% 88%;  /* Light periwinkle #D8DEE9 */
+    --input: 218 27% 88%;  /* Light periwinkle #D8DEE9 */
+    --ring: 221 52% 15%;  /* Deep navy #121F36 */
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-poppins;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+    color: #121F36;
+  }
+  
+  html {
+    @apply scroll-smooth;
+  }
+}
+
+/* Container gradient styles */
+.battery-container-gradient {
+  @apply bg-gradient-to-br from-[#E0F2F1] to-[#E8F5E9];
+}
+
+.navigation-container-gradient {
+  @apply bg-gradient-to-br from-[#E8EAF6] to-[#F3E5F5];
+}
+
+.connection-container-gradient {
+  @apply bg-gradient-to-br from-[#FFF3E0] to-[#FCEAE3];
+}
+
+.wellbeing-container-gradient {
+  @apply bg-gradient-to-br from-[#E1F5FE] to-[#E0F7FA];
+}
+
+.education-container-gradient {
+  @apply bg-gradient-to-br from-[#FFF8E1] to-[#FFFDE7];
+}
+
+/* Battery indicator gradient */
+.battery-indicator-gradient {
+  @apply bg-gradient-to-r from-[#7DAA92] to-[#A5D6A7];
+}
+
+/* Container styles */
+.container-secondary {
+  @apply bg-[#F5F8FC] border border-[#D8DEE9] rounded-lg;
+}
+
+.card {
+  @apply bg-card border-[#D8DEE9] shadow-sm;
+}
+
+/* Text styles */
+.text-primary {
+  @apply text-[#121F36] !important;
+}
+
+.text-secondary {
+  @apply text-[#627286] !important;
+}
+
+.text-accent {
+  @apply text-[#5D5A8C] !important;
+}
+
+/* Interactive element styles */
+.interactive-primary {
+  @apply bg-[#3E9D9D] text-white hover:bg-[#328383] !important;
+}
+
+.interactive-secondary {
+  @apply bg-[#7B7FC4] text-white hover:bg-[#6A6EB3] !important;
+}
+
+.interactive-success {
+  @apply bg-[#7DAA92] text-white hover:bg-[#6C9981] !important;
+}
+
+/* Battery level colors */
+.battery-level-high {
+  @apply bg-[#3E9D9D] !important;
+}
+
+.battery-level-medium {
+  @apply bg-[#F5B85E] !important;
+}
+
+.battery-level-low {
+  @apply bg-[#E57373] !important;
+}
+
+/* Footer navigation colors */
+.footer-nav-active {
+  @apply text-[#2A7D8B] !important;
+}
+
+.footer-nav-inactive {
+  @apply text-[#8A94A6] !important;
+}
+
+/* Icon colors for each section */
+.navigation-icon {
+  @apply text-[#7B7FC4];
+}
+
+.connection-icon {
+  @apply text-[#AD7A99];
+}
+
+.wellbeing-icon {
+  @apply text-[#4DB6AC];
+}
+
+.education-icon {
+  @apply text-[#FFA726] opacity-80;
+}
+
+/* Override headings and paragraphs explicitly */
+h1, h2, h3, h4, h5, h6 {
+  @apply text-[#121F36] !important;
+}
+
+p {
+  @apply text-[#627286] !important;
+}
+
+/* Add explicit overrides for components */
+.card-title {
+  @apply text-[#121F36] !important;
+}
+
+.card-description {
+  @apply text-[#627286] !important;
+}
+
+button, a {
+  @apply text-[#121F36];
+}
+
+.text-muted-foreground {
+  @apply text-[#627286] !important;
+}

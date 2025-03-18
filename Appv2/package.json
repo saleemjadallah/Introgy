@@ -1,0 +1,30 @@
+{
+  "name": "appv2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo \"Building web assets...\" && mkdir -p dist && cp -r public/* dist/",
+    "cap": "cap",
+    "cap:sync": "cap sync",
+    "cap:add:ios": "cap add ios",
+    "cap:open:ios": "cap open ios"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@capacitor/app": "^7.0.0",
+    "@capacitor/cli": "^7.1.0",
+    "@capacitor/core": "^7.1.0",
+    "@capacitor/device": "^7.0.0",
+    "@capacitor/ios": "^7.1.0",
+    "@capacitor/local-notifications": "^7.0.0",
+    "@capacitor/preferences": "^7.0.0",
+    "@capacitor/splash-screen": "^7.0.0",
+    "@capacitor/status-bar": "^7.0.0",
+    "@revenuecat/purchases-capacitor": "^10.2.0",
+    "@supabase/supabase-js": "^2.49.1"
+  }
+}
