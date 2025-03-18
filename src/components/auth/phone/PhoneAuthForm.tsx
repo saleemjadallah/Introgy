@@ -21,7 +21,10 @@ export const PhoneAuthForm = ({ mode }: { mode: "signin" | "signup" }) => {
     setPhone(formatPhoneNumber(e.target.value));
   };
 
-  const handlePhoneSubmit = async (e: React.FormEvent) => {
+  // Admin phone number that bypasses OTP verification
+const ADMIN_PHONE = '+971507493651';
+
+const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     
@@ -30,21 +33,37 @@ export const PhoneAuthForm = ({ mode }: { mode: "signin" | "signup" }) => {
       return;
     }
     
+    // Normalize the phone number for comparison
+    const normalizedPhone = phone.replace(/\s+/g, '');
+    const isAdminPhone = normalizedPhone === ADMIN_PHONE;
+    
     try {
-      // Wait for the OTP to be sent successfully
-      const success = await signInWithOTP(phone);
-      console.log("OTP send result:", success);
+      if (isAdminPhone) {
+        console.log("Admin phone detected, attempting direct sign-in");
+        // For admin phone, we'll try to sign in directly
+        // The actual sign-in happens in the authService.phoneOtpSignIn function
+      }
+      
+      // Wait for the OTP to be sent successfully or admin bypass
+      const success = await signInWithOTP(normalizedPhone);
+      console.log("Auth process result:", success);
       
       if (success) {
-        // Only change form state if OTP was sent successfully
+        // Only change form state if the process was successful
         setFormState("OTP_INPUT");
-        toast.success("Verification code sent to your phone");
+        
+        if (isAdminPhone) {
+          console.log("Admin phone detected, bypassing OTP notification");
+          // For admin, we don't show the toast about verification code
+        } else {
+          toast.success("Verification code sent to your phone");
+        }
       } else {
-        setError("Failed to send verification code. Please try again.");
+        setError("Failed to process authentication. Please try again.");
       }
-    } catch (error) {
-      console.error("Error sending OTP:", error);
-      setError("Failed to send verification code. Please try again.");
+    } catch (error: any) {
+      console.error("Authentication error:", error);
+      setError(error?.message || "Failed to process authentication. Please try again.");
     }
   };
 

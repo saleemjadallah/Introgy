@@ -1,0 +1,44 @@
+require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
+
+platform :ios, '14.0'
+use_frameworks!
+
+# workaround to avoid Xcode caching of Pods that requires
+# Product -> Clean Build Folder after new Cordova plugins installed
+# Requires CocoaPods 1.6 or newer
+install! 'cocoapods', :disable_input_output_paths => true
+
+# No pre-install hook needed when using Swift Package Manager for RevenueCat
+
+def capacitor_pods
+  pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
+  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
+  pod 'CapacitorApp', :path => '../../node_modules/@capacitor/app'
+  pod 'CapacitorDevice', :path => '../../node_modules/@capacitor/device'
+  pod 'CapacitorLocalNotifications', :path => '../../node_modules/@capacitor/local-notifications'
+  pod 'CapacitorPreferences', :path => '../../node_modules/@capacitor/preferences'
+  pod 'CapacitorSplashScreen', :path => '../../node_modules/@capacitor/splash-screen'
+  pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
+  pod 'RevenuecatPurchasesCapacitor', :path => '../../node_modules/@revenuecat/purchases-capacitor'
+end
+
+target 'App' do
+  capacitor_pods
+  # Do not add RevenueCat dependencies here - we're using Swift Package Manager instead
+end
+
+# Simple post-install hook for basic configurations
+post_install do |installer|
+  assertDeploymentTarget(installer)
+  
+  # Configure all pods properly
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      # Disable code signing for all pods
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+      
+      # Fix Xcode 15 warnings
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', '_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION']
+    end
+  end
+end

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Introgy App</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f5f5f5;
+    }
+    .container {
+      text-align: center;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      max-width: 80%;
+      width: 90%;
+    }
+    h1 {
+      color: #333;
+    }
+    p {
+      color: #666;
+      line-height: 1.6;
+    }
+    button {
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background-color: #3367d6;
+    }
+    .subscription-section {
+      margin-top: 20px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+    }
+    /* New styles for app UI */
+    .nav-menu {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .nav-button {
+      background-color: #f0f0f0;
+      color: #333;
+      border: none;
+      padding: 10px 20px;
+      margin: 0 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .nav-button:hover {
+      background-color: #e0e0e0;
+    }
+    .nav-button.active {
+      background-color: #4285f4;
+      color: white;
+    }
+    .tab-pane {
+      display: none;
+      padding: 20px;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      margin-top: 10px;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+    .feature-button {
+      background-color: #34a853;
+      margin: 10px;
+      width: 200px;
+    }
+    .premium-button {
+      background-color: #ea4335;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .feature-preview {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #eee;
+      border-radius: 8px;
+    }
+    .status-message {
+      margin-top: 15px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- App Loading Screen -->
+    <div id="loading-screen">
+      <h1>Welcome to Introgy</h1>
+      <p>Capacitor app with RevenueCat integration</p>
+      <p>App status: <span id="status">Loading...</span></p>
+    </div>
+    
+    <!-- Main App Content - Hidden until fully loaded -->
+    <div id="main-content" style="display: none;">
+      <h1>Introgy App</h1>
+      
+      <!-- Navigation Menu -->
+      <div class="nav-menu">
+        <button class="nav-button" onclick="switchTab('home')">Home</button>
+        <button class="nav-button" onclick="switchTab('features')">Features</button>
+        <button class="nav-button" onclick="switchTab('settings')">Settings</button>
+      </div>
+      
+      <!-- Tab Content -->
+      <div id="tab-content">
+        <!-- Home Tab -->
+        <div id="home-tab" class="tab-pane active">
+          <h2>Welcome to Introgy</h2>
+          <p>This is the main application dashboard.</p>
+          <div class="feature-preview">
+            <h3>Available Features</h3>
+            <button class="feature-button" onclick="window.accessPremiumFeature('analytics')">Analytics Dashboard</button>
+            <button class="feature-button" onclick="window.accessPremiumFeature('reports')">Generate Reports</button>
+          </div>
+        </div>
+        
+        <!-- Features Tab -->
+        <div id="features-tab" class="tab-pane">
+          <h2>Premium Features</h2>
+          <p>Explore our premium features:</p>
+          <ul>
+            <li>Advanced Analytics</li>
+            <li>Custom Reports</li>
+            <li>Data Export</li>
+            <li>API Access</li>
+          </ul>
+          <button class="premium-button" onclick="window.accessPremiumFeature('allFeatures')">Access All Features</button>
+        </div>
+        
+        <!-- Settings Tab -->
+        <div id="settings-tab" class="tab-pane">
+          <h2>Account Settings</h2>
+          <p>Manage your account and subscription:</p>
+          <button onclick="checkSubscriptionStatus().then(updateSubscriptionDisplay)">Check Subscription Status</button>
+          <p id="subscription-display">Subscription status will appear here</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Subscription section will be added dynamically when needed -->
+    <div id="subscription-container"></div>
+  </div>
+
+  <script type="module">
+    // Import RevenueCat module and Capacitor
+    import { 
+      initializeRevenueCat, 
+      getOfferings, 
+      purchasePackage, 
+      getCustomerInfo, 
+      checkSubscriptionStatus, 
+      restorePurchases, 
+      registerCustomerInfoListener,
+      showSubscriptionUI,
+      hideSubscriptionUI,
+      checkPremiumAccess
+    } from './revenuecat.js';
+    import { presentPaywall, dismissPaywall, checkEntitlements } from './paywall.js';
+    import { initAdminAuth, isAdminSignedIn } from './admin-auth.js';
+    import { initDeepLinks } from './deep-links.js';
+    import { Capacitor } from '@capacitor/core';
+    import { SplashScreen } from '@capacitor/splash-screen';
+    
+    // Import auth debug script (always load on native platforms)
+    if (window.location.hostname === 'localhost' || Capacitor.isNativePlatform()) {
+      // Load auth debug script immediately for better debugging
+      const authDebugScript = document.createElement('script');
+      authDebugScript.src = './auth-debug.js';
+      authDebugScript.onerror = (e) => console.error('Failed to load auth debug script:', e);
+      document.head.appendChild(authDebugScript);
+      console.log('Auth debug script added to document');
+      
+      // Load deep links debug script
+      const deepLinksDebugScript = document.createElement('script');
+      deepLinksDebugScript.src = './deep-links-debug.js';
+      deepLinksDebugScript.onerror = (e) => console.error('Failed to load deep links debug script:', e);
+      document.head.appendChild(deepLinksDebugScript);
+      console.log('Deep links debug script added to document');
+    }
+
+    // App initialization
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM content loaded');
+      document.getElementById('status').textContent = 'Waiting for device ready...';
+      
+      // Use the deviceready event for Capacitor
+      document.addEventListener('deviceready', onDeviceReady, false);
+      console.log('Added deviceready event listener');
+      
+      // If running in a browser, manually trigger onDeviceReady after a delay
+      if (Capacitor.getPlatform() === 'web') {
+        console.log('Running in web browser, will trigger onDeviceReady manually');
+        setTimeout(onDeviceReady, 1000);
+      } else {
+        console.log('Running on platform: ' + Capacitor.getPlatform());
+      }
+    });
+    
+    // Device ready handler
+    async function onDeviceReady() {
+      console.log('Device ready event triggered');
+      try {
+        document.getElementById('status').textContent = 'Initializing...';
+        
+        // Initialize Admin Authentication
+        console.log('Initializing admin authentication...');
+        const adminAuthInitialized = await initAdminAuth();
+        console.log('Admin authentication initialized:', adminAuthInitialized);
+        
+        // Initialize Deep Links
+        console.log('Initializing deep links...');
+        await initDeepLinks();
+        console.log('Deep links initialized');
+        
+        // Make supabase available globally for debugging
+        if (window.location.hostname === 'localhost' || Capacitor.isNativePlatform()) {
+          window.supabase = supabase;
+          console.log('Supabase made available globally for debugging');
+        }
+        
+        // Initialize RevenueCat
+        console.log('Attempting to initialize RevenueCat...');
+        const initialized = await initializeRevenueCat();
+        console.log('RevenueCat initialization result:', initialized);
+        if (initialized) {
+          const isAdmin = await isAdminSignedIn();
+          document.getElementById('status').textContent = isAdmin ? 'Ready - Admin Mode' : 'Ready - RevenueCat Initialized';
+          
+          // Check initial subscription status WITHOUT showing subscription UI
+          const statusResult = await checkSubscriptionStatus();
+          // Just store the result, don't update UI yet
+          window.hasActiveSubscription = statusResult && (statusResult.hasActiveSubscription || statusResult.hasPremium);
+          
+          // Register for real-time subscription updates
+          registerCustomerInfoListener((customerInfo) => {
+            console.log('Subscription status updated:', customerInfo);
+            updateSubscriptionStatus(customerInfo);
+          });
+          
+          // Now that everything is initialized, hide the splash screen and show the main app
+          if (Capacitor.isPluginAvailable('SplashScreen')) {
+            console.log('SplashScreen plugin is available, attempting to hide...');
+            try {
+              SplashScreen.hide();
+              console.log('Splash screen hidden successfully');
+            } catch (error) {
+              console.error('Error hiding splash screen:', error);
+            }
+          } else {
+            console.log('SplashScreen plugin is NOT available');
+          }
+          
+          // Show the main app content and hide the loading screen
+          setTimeout(() => {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            console.log('Main app content displayed');
+          }, 500);
+        } else {
+          document.getElementById('status').textContent = 'Error initializing RevenueCat';
+          // Hide splash screen even on error
+          if (Capacitor.isPluginAvailable('SplashScreen')) {
+            console.log('Hiding splash screen despite RevenueCat initialization error');
+            SplashScreen.hide();
+          }
+          
+          // Show the main app content even on error
+          setTimeout(() => {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            console.log('Main app content displayed despite RevenueCat error');
+          }, 500);
+        }
+      } catch (error) {
+        console.error('Initialization error:', error);
+        document.getElementById('status').textContent = 'Error: ' + error.message;
+        
+        // Hide splash screen even on initialization error
+        if (Capacitor.isPluginAvailable('SplashScreen')) {
+          console.log('Hiding splash screen despite initialization error');
+          SplashScreen.hide();
+        }
+        
+        // Show the main app content even on initialization error
+        setTimeout(() => {
+          document.getElementById('loading-screen').style.display = 'none';
+          document.getElementById('main-content').style.display = 'block';
+          console.log('Main app content displayed despite initialization error');
+        }, 500);
+      }
+      
+      // Define global function for premium access entry points
+      window.accessPremiumFeature = async function(featureName) {
+        console.log(`User attempting to access premium feature: ${featureName}`);
+        await checkPremiumAccess(() => {
+          console.log(`Access granted to premium feature: ${featureName}`);
+          // This will be called only if the user has a subscription
+          alert(`You have access to ${featureName}!`);
+          // You can place feature-specific code here
+        });
+      };
+      
+      // Tab switching functionality
+      window.switchTab = function(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-pane').forEach(tab => {
+          tab.classList.remove('active');
+        });
+        
+        // Show the selected tab
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        
+        // Update active button
+        document.querySelectorAll('.nav-button').forEach(button => {
+          button.classList.remove('active');
+        });
+        
+        // Find the button that was clicked and add the active class
+        event.target.classList.add('active');
+      };
+      
+      // Update subscription display
+      window.updateSubscriptionDisplay = function(status) {
+        const displayElement = document.getElementById('subscription-display');
+        if (status && (status.hasActiveSubscription || status.hasPremium)) {
+          const entitlements = status.entitlements ? Object.keys(status.entitlements).join(', ') : 'Single Purchase';
+          displayElement.textContent = `Active subscription! Entitlements: ${entitlements}`;
+          displayElement.style.color = 'green';
+        } else {
+          displayElement.textContent = 'No active subscription';
+          displayElement.style.color = 'red';
+        }
+      };
+    }
+    
+    // Handle purchase
+    async function handlePurchase(packageToPurchase) {
+      try {
+        document.getElementById('subscription-status').textContent = 'Processing purchase...';
+        const result = await purchasePackage(packageToPurchase);
+        
+        if (result.success) {
+          const statusResult = await checkSubscriptionStatus();
+          updateSubscriptionStatus(statusResult);
+        } else {
+          document.getElementById('subscription-status').textContent = 'Purchase failed: ' + result.error;
+        }
+      } catch (error) {
+        console.error('Purchase error:', error);
+        document.getElementById('subscription-status').textContent = 'Error during purchase';
+      }
+    }
+    
+    // Update subscription status - only update UI if element exists
+    function updateSubscriptionStatus(statusResult) {
+      // Always update the global variable
+      window.hasActiveSubscription = statusResult && (statusResult.hasActiveSubscription || statusResult.hasPremium);
+      
+      // Only update UI if the element exists (will only exist if subscription UI has been created)
+      const statusElement = document.getElementById('subscription-status');
+      if (statusElement) {
+        if (statusResult && (statusResult.hasActiveSubscription || statusResult.hasPremium)) {
+          const entitlements = statusResult.entitlements ? Object.keys(statusResult.entitlements).join(', ') : 'Single Purchase';
+          statusElement.textContent = `Active subscription! Entitlements: ${entitlements}`;
+          statusElement.style.color = 'green';
+        } else {
+          statusElement.textContent = 'No active subscription';
+          statusElement.style.color = 'red';
+        }
+      }
+    }
+  </script>
+</body>
+</html>

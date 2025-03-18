@@ -1,0 +1,34 @@
+{
+	"appId": "com.introgy.app",
+	"appName": "Introgy",
+	"webDir": "public",
+	"server": {
+		"androidScheme": "https",
+		"url": "https://introgy.ai",
+		"cleartext": true
+	},
+	"ios": {
+		"scheme": "introgy"
+	},
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 2000,
+			"backgroundColor": "#FFFFFF",
+			"showSpinner": true,
+			"spinnerColor": "#999999"
+		},
+		"LocalNotifications": {
+			"smallIcon": "ic_stat_icon_config_sample",
+			"iconColor": "#488AFF"
+		}
+	},
+	"packageClassList": [
+		"AppPlugin",
+		"DevicePlugin",
+		"LocalNotificationsPlugin",
+		"PreferencesPlugin",
+		"SplashScreenPlugin",
+		"StatusBarPlugin",
+		"PurchasesPlugin"
+	]
+}
