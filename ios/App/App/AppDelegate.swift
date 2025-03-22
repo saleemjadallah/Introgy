@@ -1,74 +1,46 @@
 import UIKit
 import Capacitor
+import GoogleSignIn
+import SwiftUI
 import RevenueCat
-import Foundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    func testFoundation() {
-        // 1. String manipulation
-        let testString = "Hello, Foundation!"
-        print("1. String Tests:")
-        print("   - Original: \(testString)")
-        print("   - Uppercase: \(testString.uppercased())")
-        print("   - Contains 'Foundation': \(testString.contains("Foundation"))")
-        
-        // 2. Date handling
-        let now = Date()
-        let formatter = DateFormatter()
-        formatter.dateStyle = .full
-        formatter.timeStyle = .medium
-        print("\n2. Date Tests:")
-        print("   - Current date: \(formatter.string(from: now))")
-        
-        // 3. File management
-        let fileManager = FileManager.default
-        let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        print("\n3. File Management Tests:")
-        print("   - Documents directory: \(documentsPath.path)")
-        
-        // 4. JSON processing
-        let jsonData: [String: Any] = ["name": "Test User", "age": 30]
-        do {
-            let jsonString = try JSONSerialization.data(withJSONObject: jsonData)
-            print("\n4. JSON Tests:")
-            print("   - JSON data created successfully: \(String(data: jsonString, encoding: .utf8) ?? "failed")")
-        } catch {
-            print("   - JSON serialization failed: \(error)")
-        }
-        
-        // 5. URLSession test
-        print("\n5. URLSession Test:")
-        let url = URL(string: "https://api.github.com")!
-        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
-            if let error = error {
-                print("   - Network request failed: \(error)")
-                return
-            }
-            if let httpResponse = response as? HTTPURLResponse {
-                print("   - Network request succeeded with status code: \(httpResponse.statusCode)")
-            }
-        }
-        task.resume()
-        
-        print("\nFoundation framework test completed! Check console for results.")
-    }
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Create window with standard Capacitor setup
+        window = UIWindow(frame: UIScreen.main.bounds)
+        
         // Initialize RevenueCat with proper configuration
         Purchases.logLevel = .debug
-        
         // Use the same API key that's in the capacitor.config.ts
         let apiKey = "appl_wHXBFRFAOUUpWRqauPXyZEUElmq"
-        
         // Configure with standard options
         Purchases.configure(withAPIKey: apiKey)
         
-        // Run Foundation tests
-        testFoundation()
+        // Configure Google Sign-In
+        let clientID = "308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com"
+        let config = GIDConfiguration(clientID: clientID)
+        GIDSignIn.sharedInstance.configuration = config
+        
+        // Attempt to restore the user's sign-in state
+        GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
+            if let user = user {
+                print("User is already signed in with Google: \(user.profile?.email ?? "Unknown")")
+            } else if let error = error {
+                print("Failed to restore Google Sign-In: \(error.localizedDescription)")
+            }
+        }
+        
+        // Initialize Capacitor web view - this will load your web content
+        let viewController = CAPBridgeViewController.init()
+        let navController = UINavigationController(rootViewController: viewController)
+        navController.navigationBar.isHidden = true
+        
+        window?.rootViewController = navController
+        window?.makeKeyAndVisible()
         
         return true
     }
@@ -96,9 +68,57 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        // Log the URL for debugging
+        print("📱 AppDelegate: Received URL: \(url.absoluteString)")
+        
+        // Handle Google Sign-In callbacks first
+        if GIDSignIn.sharedInstance.handle(url) {
+            print("📱 URL handled by Google Sign-In")
+            return true
+        }
+        
+        // Special handling for Supabase auth URLs with unusual formats
+        let urlString = url.absoluteString
+        if urlString.contains("access_token=") && urlString.contains("refresh_token=") {
+            print("📱 Detected Supabase auth callback URL")
+            
+            // Extract parameters from URL
+            if let accessToken = extractParameter(from: urlString, param: "access_token"),
+               let refreshToken = extractParameter(from: urlString, param: "refresh_token"),
+               let expiresIn = extractParameter(from: urlString, param: "expires_in") {
+                
+                print("📱 Successfully extracted auth tokens from URL")
+                
+                // Build a proper callback URL
+                let callbackUrl = "introgy://auth/callback?access_token=\(accessToken)&refresh_token=\(refreshToken)&expires_in=\(expiresIn)"
+                
+                if let properUrl = URL(string: callbackUrl) {
+                    // Let Capacitor handle this properly formatted URL
+                    return ApplicationDelegateProxy.shared.application(app, open: properUrl, options: options)
+                }
+            }
+        }
+        
+        // Then let Capacitor handle the rest
         // Called when the app was launched with a url. Feel free to add additional processing here,
         // but if you want the App API to support tracking app url opens, make sure to keep this call
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
+    }
+    
+    // Helper function to extract parameters from URLs
+    private func extractParameter(from urlString: String, param: String) -> String? {
+        guard let range = urlString.range(of: "\(param)=") else {
+            return nil
+        }
+        
+        let start = range.upperBound
+        let remaining = urlString[start...]
+        
+        if let end = remaining.range(of: "&")?.lowerBound {
+            return String(remaining[..<end])
+        } else {
+            return String(remaining)
+        }
     }
 
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {

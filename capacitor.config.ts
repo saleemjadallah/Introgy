@@ -6,9 +6,8 @@ const config: CapacitorConfig = {
   appName: 'Introgy',
   webDir: 'dist',
   server: {
-    url: process.env.NODE_ENV === 'development' 
-      ? 'https://4cb77e99-2411-4b1d-9e47-bac88f43f4af.lovableproject.com?forceHideBadge=true'
-      : 'https://introgy-app.netlify.app',
+    url: 'https://introgy.ai',
+    androidScheme: 'https',
     cleartext: true
   },
   plugins: {
@@ -28,8 +27,7 @@ const config: CapacitorConfig = {
     StatusBar: {
       style: "dark",
       backgroundColor: "#121212",
-      overlaysWebView: false,
-      animated: true
+      overlaysWebView: false
     },
     LocalNotifications: {
       smallIcon: "ic_stat_icon_config_sample",
@@ -45,17 +43,28 @@ const config: CapacitorConfig = {
     App: {
       appName: "Introgy",
       appVersion: "1.0.0"
+    },
+    GoogleAuth: {
+      scopes: [
+        'profile',
+        'email',
+        'openid'
+      ],
+      serverClientId: '308656966304-ouvq7u7q9sms8rujjtqpevaqr120vdge.apps.googleusercontent.com',
+      forceCodeForRefreshToken: true,
+      iosClientId: '308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com',
+      webClientId: '308656966304-ouvq7u7q9sms8rujjtqpevaqr120vdge.apps.googleusercontent.com',
+      androidClientId: '308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com',
+      clientId: '308656966304-ouvq7u7q9sms8rujjtqpevaqr120vdge.apps.googleusercontent.com'
     }
   },
   ios: {
     contentInset: "always",
-    allowsLinkPreview: false,
     scrollEnabled: true,
     scheme: "introgy",
     backgroundColor: "#121212"
   },
   android: {
-    allowsLinkPreview: false,
     backgroundColor: "#121212",
     overrideUserAgent: "Introgy Android App",
     captureInput: true,

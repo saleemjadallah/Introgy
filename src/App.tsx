@@ -8,13 +8,18 @@ import ConnectionBuilder from "@/pages/ConnectionBuilder";
 import Wellbeing from "@/pages/Wellbeing";
 import Profile from "@/pages/Profile";
 import Auth from "@/pages/Auth";
+import AuthTest from "@/pages/AuthTest";
+import AuthDebug from "@/pages/AuthDebug";
 import FAQ from "@/pages/FAQ";
 import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
+import { AuthCallback } from "@/components/auth/callback/AuthCallback";
+import { DebugCallback } from "@/components/auth/callback/DebugCallback";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/auth";
 import { PremiumProvider } from "@/contexts/premium";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import DeepLinkHandler from "@/components/DeepLinkHandler";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -26,8 +31,23 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <PremiumProvider>
+            <DeepLinkHandler />
             <Routes>
               <Route path="/auth" element={<Auth />} />
+              <Route path="/auth/test" element={<AuthTest />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/auth/google/callback" element={<AuthCallback />} />
+              <Route path="/web-callback-test.html" element={<AuthCallback />} />
+              <Route path="/callback" element={<AuthCallback />} />
+              <Route path="/api/auth/callback" element={<AuthCallback />} />
+              <Route path="/auth/v1/callback" element={<AuthCallback />} />
+              {/* Routes for handling redirects from introgy.ai domain */}
+              <Route path="/introgy.ai/auth/callback" element={<AuthCallback />} />
+              <Route path="/introgy.ai/auth/google/callback" element={<AuthCallback />} />
+              <Route path="/introgy.ai" element={<AuthCallback />} />
+              <Route path="/introgy.ai/*" element={<AuthCallback />} />
+              <Route path="/auth/debug" element={<AuthDebug />} />
+              <Route path="/auth/debug-callback" element={<DebugCallback />} />
               <Route path="/" element={<Layout />}>
                 <Route index element={<Home />} />
                 <Route path="social-battery" element={<SocialBattery />} />

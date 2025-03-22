@@ -1,5 +1,68 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
+
+// iOS-specific Google sign-in to avoid the 'site url is improperly formatted' error
+async function iOSGoogleSignIn() {
+  console.log("Using iOS-specific Google sign-in method");
+  
+  try {
+    // Check if we have the native plugin for Google Sign-In
+    const GoogleSignIn = window.Capacitor?.Plugins?.GoogleSignIn;
+    
+    if (GoogleSignIn) {
+      console.log("Native GoogleSignIn plugin detected, using native flow");
+      try {
+        // Try to use the native plugin first - this uses the Google SDK directly
+        const result = await GoogleSignIn.signIn();
+        console.log("Native Google sign-in successful:", result);
+        
+        // Mark that we're in the middle of authentication
+        localStorage.setItem('auth_in_progress', 'true');
+        localStorage.setItem('auth_started_at', Date.now().toString());
+        
+        return result;
+      } catch (nativeError) {
+        console.error("Native Google sign-in failed, falling back to web flow:", nativeError);
+        // Continue with web flow as fallback
+      }
+    } else {
+      console.log("Native GoogleSignIn plugin not detected, using web OAuth flow");
+    }
+    
+    // Use absolutely minimal options for iOS
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        skipBrowserRedirect: true, // Critical for iOS
+      }
+    });
+    
+    if (error) {
+      console.error("iOS Google OAuth error:", error);
+      throw error;
+    }
+    
+    if (!data?.url) {
+      console.error("No OAuth URL returned from Supabase for iOS");
+      throw new Error("Authentication failed: No OAuth URL returned");
+    }
+    
+    // Mark that we're in the middle of authentication
+    localStorage.setItem('auth_in_progress', 'true');
+    localStorage.setItem('auth_started_at', Date.now().toString());
+    
+    // Open in system browser without any custom URL schemes
+    console.log("Opening OAuth URL in iOS system browser:", data.url);
+    window.open(data.url, '_system');
+    
+    return null; // Auth will complete via deep link callback
+  } catch (error) {
+    console.error("iOS Google sign-in error:", error);
+    throw error;
+  }
+}
 
 export const emailSignIn = async (email: string, password: string) => {
   const response = await supabase.auth.signInWithPassword({ email, password: password || "" });
@@ -53,42 +116,24 @@ export const phoneSignUp = async (phone: string, password: string, displayName?:
   return response;
 };
 
-import { Capacitor } from '@capacitor/core';
+// Import the native Google Sign-In service
+import { nativeGoogleSignIn } from '@/services/nativeGoogleAuth';
 
-export const googleSignIn = async (redirectTo: string) => {
-  console.log("Starting Google sign in flow");
+export const googleSignIn = async (redirectTo?: string) => {
+  console.log("Starting Google sign in flow - SIMPLIFIED VERSION");
   
   // Check if we're running in a Capacitor app
   const isNative = Capacitor.isNativePlatform();
   const platform = Capacitor.getPlatform();
-  console.log("Current platform:", platform);
+  console.log("Current platform:", platform, "isNative:", isNative);
   
-  // For native apps, use the custom URL scheme
-  let finalRedirectUrl = redirectTo;
-  if (isNative) {
-    // Use the custom URL scheme for mobile apps
-    finalRedirectUrl = 'introgy://auth/callback';
-    console.log("Using native redirect URL:", finalRedirectUrl);
-  } else {
-    console.log("Using web redirect URL:", finalRedirectUrl);
-  }
+  // Store auth start information for debugging
+  localStorage.setItem('auth_start_time', new Date().toISOString());
+  localStorage.setItem('auth_in_progress', 'true');
+  localStorage.setItem('auth_started_at', Date.now().toString());
+  localStorage.setItem('auth_platform', platform);
   
   try {
-    // Configure the OAuth provider options
-    const oauthOptions = {
-      provider: 'google' as const,
-      options: {
-        redirectTo: finalRedirectUrl,
-        skipBrowserRedirect: false, // We'll handle the redirect manually for better control
-        queryParams: {
-          // Add a timestamp to prevent caching issues
-          '_t': Date.now().toString()
-        }
-      }
-    };
-    
-    console.log("OAuth options:", JSON.stringify(oauthOptions));
-    
     // First, check if we already have a session
     const { data: sessionData } = await supabase.auth.getSession();
     if (sessionData?.session) {
@@ -100,6 +145,32 @@ export const googleSignIn = async (redirectTo: string) => {
         return refreshData;
       }
     }
+    
+    // SUPER SIMPLIFIED APPROACH: Use minimal options and NO redirectTo
+    console.log("Using simplified OAuth flow for all platforms");
+    
+    const oauthOptions = {
+      provider: 'google' as const,
+      options: {
+        // On iOS we need to manage the redirect manually
+        skipBrowserRedirect: isNative,
+        // Keep basic scopes
+        scopes: 'email profile',
+        // CRITICAL: Do NOT specify a redirectTo at all - let Supabase handle it
+        // This avoids the "requested path is invalid" error
+        // redirectTo: undefined, <- DO NOT SET THIS
+        queryParams: {
+          // Request offline access to get refresh tokens
+          access_type: 'offline',
+          // Force account selection dialog
+          prompt: 'select_account',
+          // Add timestamp to prevent caching
+          '_t': Date.now().toString()
+        }
+      }
+    };
+    
+    console.log("OAuth options:", JSON.stringify(oauthOptions, null, 2));
     
     // Proceed with OAuth sign-in
     const { data, error } = await supabase.auth.signInWithOAuth(oauthOptions);
@@ -116,33 +187,88 @@ export const googleSignIn = async (redirectTo: string) => {
     
     console.log("OAuth URL from Supabase:", data.url);
 
-    // For native platforms, we need to open the URL manually in the system browser
+    // For native platforms, open the URL in the system browser
     if (isNative) {
-      console.log("Opening OAuth URL in system browser");
+      console.log("Opening OAuth URL in system browser", data.url);
       
-      // For iOS, we need to use the Capacitor Browser plugin or window.open with _system
-      if (platform === 'ios') {
-        // Use window.open with _system target to open in Safari
-        window.open(data.url, '_system');
+      // Mark that we're trying to open the browser - this will help with debugging
+      localStorage.setItem('browser_open_attempt', 'true');
+      localStorage.setItem('browser_open_time', new Date().toISOString());
+      localStorage.setItem('browser_open_url', data.url);
+      
+      // Show toast so user knows what's happening
+      toast.loading("Opening browser for authentication...");
+      
+      // Use Capacitor's App plugin to properly open the system browser
+      try {
+        console.log("Using Capacitor's App.openUrl to launch browser");
+        await App.openUrl({ url: data.url });
         
-        // For iOS, we need to manually save that we're in the middle of authentication
-        // This will help us recover if the deep link doesn't work properly
-        localStorage.setItem('auth_in_progress', 'true');
-        localStorage.setItem('auth_started_at', Date.now().toString());
-      } else {
-        // For Android, regular window.open should work
-        window.open(data.url);
+        // Mark success
+        localStorage.setItem('browser_open_method', 'capacitor_app_plugin');
+        toast.success("Browser opened");
+      } catch (browserError) {
+        console.error("Error opening system browser with App plugin:", browserError);
+        
+        // Try using Safari's URL scheme directly for iOS
+        if (platform === 'ios') {
+          try {
+            console.log("Attempting to open Safari directly using URL scheme");
+            
+            // Create a properly encoded safari:// URL
+            const encodedUrl = encodeURIComponent(data.url);
+            const safariUrl = `safari:${data.url}`;
+            
+            console.log("Opening Safari with URL:", safariUrl);
+            
+            // Try the direct Safari URL
+            await App.openUrl({ url: safariUrl });
+            
+            // Mark success
+            localStorage.setItem('browser_open_method', 'safari_url_scheme');
+            toast.success("Safari opened");
+          } catch (safariError) {
+            console.error("Failed to open Safari:", safariError);
+          }
+        }
+        
+        // Fall back to window.open as a second attempt
+        try {
+          console.log("Trying window.open as fallback");
+          
+          // Use a timeout to ensure the previous operation has completed
+          setTimeout(() => {
+            // Try to open in system browser
+            window.open(data.url, '_system');
+            
+            // Mark which method we used
+            localStorage.setItem('browser_open_method', 'window_open_system');
+          }, 500);
+        } catch (fallbackError) {
+          console.error("All browser opening methods failed:", fallbackError);
+          
+          // As a last resort, try to use location.href
+          console.log("Using location.href as last resort (may navigate away from app)");
+          
+          // Show a warning to the user
+          toast.error("Unable to open browser automatically. Please open manually.");
+          
+          // Set the location after a delay
+          setTimeout(() => {
+            window.location.href = data.url;
+            localStorage.setItem('browser_open_method', 'location_href');
+          }, 2000);
+        }
       }
-      
-      // Return early since we're handling the redirect manually
-      return data;
     }
 
-    // For web, let the default redirect happen
-    console.log("Google OAuth initiated successfully");
+    // Return data for handling by the caller
     return data;
   } catch (error) {
     console.error("Error during Google sign-in:", error);
+    // Clean up auth flags on error
+    localStorage.removeItem('auth_in_progress');
+    localStorage.removeItem('auth_started_at');
     throw error;
   }
 };

@@ -11,20 +11,115 @@ export const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Get the URL hash and log it for debugging
+        // Log the complete URL for debugging
+        const currentUrl = window.location.href;
+        console.log("Auth callback received at URL:", currentUrl);
+        toast.info("Processing authentication...");
+        
+        // Parse URL components for debugging
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const urlError = hashParams.get('error');
-        const urlErrorDescription = hashParams.get('error_description');
+        const queryParams = new URLSearchParams(window.location.search);
+        const pathname = window.location.pathname;
         
-        console.log("Auth callback URL:", window.location.href);
-        console.log("Hash params:", Object.fromEntries(hashParams.entries()));
+        // Log detailed information about the callback URL
+        console.log("Callback URL details:", {
+          url: currentUrl,
+          pathname,
+          hash: window.location.hash,
+          search: window.location.search,
+          origin: window.location.origin,
+          host: window.location.host,
+          hashParams: Object.fromEntries(hashParams.entries()),
+          queryParams: Object.fromEntries(queryParams.entries())
+        });
         
+        // Check for the specific error pattern with introgy.ai in the path
+        const hasIntrogyInPath = pathname.includes('introgy.ai');
+        const hasTokenInHash = hashParams.has('access_token') || hashParams.has('token');
+        
+        if (hasIntrogyInPath && hasTokenInHash) {
+          console.error("Detected invalid path with introgy.ai but contains valid tokens");
+          console.log("This indicates a Supabase URL construction issue - handling manually");
+          
+          // We can try to extract the tokens ourselves and manually handle the auth
+          try {
+            const accessToken = hashParams.get('access_token');
+            const refreshToken = hashParams.get('refresh_token');
+            const expiresIn = hashParams.get('expires_in');
+            const tokenType = hashParams.get('token_type') || 'bearer';
+            
+            if (accessToken) {
+              console.log("Found access token, attempting manual session creation");
+              localStorage.setItem('auth_token_extracted', 'true');
+              
+              // Store session with extracted token
+              const { data, error } = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken || '',
+              });
+              
+              if (error) {
+                throw error;
+              }
+              
+              if (data?.session) {
+                console.log("Successfully created session from extracted tokens");
+                toast.success("Signed in successfully");
+                navigate('/profile');
+                return;
+              }
+            }
+          } catch (extractError) {
+            console.error("Error handling extracted tokens:", extractError);
+          }
+        }
+        
+        // Store callback URL information for debugging
+        localStorage.setItem('last_callback_url', currentUrl);
+        localStorage.setItem('callback_time', new Date().toISOString());
+        
+        // Check for errors in both places
+        const urlError = hashParams.get('error') || queryParams.get('error');
+        const urlErrorDescription = 
+          hashParams.get('error_description') || 
+          queryParams.get('error_description') || 
+          hashParams.get('message') || 
+          queryParams.get('message');
+          
+        // Also look for the specific site URL formatting error
+        const isSiteUrlError = urlError === 'unexpected_failure' && 
+          (urlErrorDescription?.includes('site url') || 
+           urlErrorDescription?.includes('formatted'));
+           
+        if (isSiteUrlError) {
+          console.error('Site URL formatting error detected in callback');
+          localStorage.setItem('auth_error_type', 'site_url_formatting');
+        }
+        
+        // Handle any errors from the OAuth provider
         if (urlError) {
-          console.error("URL Error:", urlError, urlErrorDescription);
-          setError(urlErrorDescription || "Authentication failed");
-          toast.error(urlErrorDescription || "Authentication failed");
-          setTimeout(() => navigate('/auth'), 2000);
+          console.error("Auth Error:", urlError, urlErrorDescription);
+          
+          if (isSiteUrlError) {
+            // This is the site URL formatting error
+            setError("Authentication configuration error. Please try again later.");
+            toast.error("Authentication configuration error. Please try again later.");
+            
+            // Redirect to debug page for more detailed information
+            setTimeout(() => navigate('/auth/debug'), 2000);
+          } else {
+            // Other OAuth errors
+            setError(urlErrorDescription || "Authentication failed");
+            toast.error(urlErrorDescription || "Authentication failed");
+            setTimeout(() => navigate('/auth'), 2000);
+          }
           return;
+        }
+        
+        // Handle state parameter from OAuth flow if present
+        const state = hashParams.get('state') || queryParams.get('state');
+        if (state) {
+          console.log("Auth state parameter present:", state);
         }
 
         const { data, error } = await supabase.auth.getSession();
@@ -67,8 +162,28 @@ export const AuthCallback = () => {
         }
       } catch (error) {
         console.error('Error processing auth callback:', error);
-        setError("Authentication failed. Please try again.");
-        setTimeout(() => navigate('/auth'), 2000);
+        
+        // Check if this is the site URL formatting error
+        const errorStr = String(error);
+        if (errorStr.includes('site url is improperly formatted') || 
+            errorStr.includes('unexpected_failure')) {
+          console.error('Site URL formatting error in catch block:', error);
+          
+          // Store error details for debugging
+          localStorage.setItem('auth_error_details', errorStr);
+          localStorage.setItem('auth_error_time', new Date().toISOString());
+          
+          setError("Authentication configuration error. Please try again later.");
+          toast.error("Authentication configuration error. The team has been notified.");
+          
+          // Navigate to debug page for troubleshooting
+          setTimeout(() => navigate('/auth/debug'), 2000);
+        } else {
+          // Handle other errors
+          setError("Authentication failed. Please try again.");
+          toast.error("Authentication failed. Please try again.");
+          setTimeout(() => navigate('/auth'), 2000);
+        }
       }
     };
 
