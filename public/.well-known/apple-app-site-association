@@ -1,0 +1,16 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAM_ID.com.introgy.app",
+        "paths": [
+          "/auth/callback",
+          "/auth/google/callback",
+          "/auth/*",
+          "NOT /api/*"
+        ]
+      }
+    ]
+  }
+}

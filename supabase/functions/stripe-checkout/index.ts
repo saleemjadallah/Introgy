@@ -4,7 +4,7 @@ import Stripe from 'https://esm.sh/stripe@13.11.0';
 
 const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
 const stripe = new Stripe(stripeSecretKey);
-const appUrl = Deno.env.get('APP_URL') || 'http://localhost:5173';
+const appUrl = Deno.env.get('APP_URL') || 'https://introgy.ai';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

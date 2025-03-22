@@ -20,10 +20,41 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>dev.introgy</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>introgy</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>GCC_PREPROCESSOR_DEFINITIONS</key>
+	<array>
+		<string>$(inherited)</string>
+		<string>COCOAPODS=1</string>
+		<string>PURCHASES_HYBRID_COMMON_STUB=1</string>
+	</array>
+	<key>GIDClientID</key>
+	<string>308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>MinimumOSVersion</key>
@@ -34,13 +65,28 @@
 	<string>This app needs permission to save photos.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs photo library access for profile pictures.</string>
+	<key>RevenueCatApiKey</key>
+	<string>appl_kZAgCVDouEyJrUniScsiiNfrDYu</string>
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>2U9PT9HC89.skadnetwork</string>
+		</dict>
+	</array>
 	<key>SKStoreProductParameterITunesItemIdentifier</key>
 	<string>6743160910</string>
+	<key>StoreKit2Enabled</key>
+	<true/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>
 	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>Storyboard.storyboard</string>
 	<key>UIMainStoryboardFile</key>
@@ -66,11 +112,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<key>GCC_PREPROCESSOR_DEFINITIONS</key>
-	<array>
-		<string>$(inherited)</string>
-		<string>COCOAPODS=1</string>
-		<string>PURCHASES_HYBRID_COMMON_STUB=1</string>
-	</array>
 </dict>
 </plist>

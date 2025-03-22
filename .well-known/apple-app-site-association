@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "A644J99F8H.com.introgy.app",
+        "paths": ["*"]
+      }
+    ]
+  }
+}

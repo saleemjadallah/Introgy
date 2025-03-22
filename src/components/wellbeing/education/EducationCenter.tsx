@@ -51,16 +51,16 @@ const EducationCenter = () => {
             type="scroll" 
             orientation="horizontal"
           >
-            <TabsList className="min-w-max wellbeing-container-gradient">
-              <TabsTrigger value="glossary" className="whitespace-nowrap data-[state=active]:bg-white/60 hover:text-white">
+            <TabsList className="min-w-max wellbeing-container-gradient shadow-md border border-white/40">
+              <TabsTrigger value="glossary" className="whitespace-nowrap data-[state=active]:bg-white/60 data-[state=active]:text-blueteal hover:text-white">
                 <Book className="h-4 w-4 mr-2 text-blueteal" />
                 Psychology Glossary
               </TabsTrigger>
-              <TabsTrigger value="mythbusters" className="whitespace-nowrap data-[state=active]:bg-white/60 hover:text-white">
+              <TabsTrigger value="mythbusters" className="whitespace-nowrap data-[state=active]:bg-white/60 data-[state=active]:text-blueteal hover:text-white">
                 <AlertCircle className="h-4 w-4 mr-2 text-blueteal" />
                 Mythbusters
               </TabsTrigger>
-              <TabsTrigger value="famous" className="whitespace-nowrap data-[state=active]:bg-white/60 hover:text-white">
+              <TabsTrigger value="famous" className="whitespace-nowrap data-[state=active]:bg-white/60 data-[state=active]:text-blueteal hover:text-white">
                 <User className="h-4 w-4 mr-2 text-blueteal" />
                 Famous Introverts
               </TabsTrigger>
@@ -90,9 +90,9 @@ const EducationCenter = () => {
                 <span className={isMobile ? "sr-only" : ""}>Generate New</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-xl max-w-[90vw] w-full sm:max-w-md bg-white/95 backdrop-blur-sm border border-blueteal/20 shadow-lg">
+            <DialogContent className="rounded-xl max-w-[90vw] w-full sm:max-w-md bg-white/60 backdrop-blur-md border border-white/40 shadow-lg">
               <DialogHeader>
-                <DialogTitle className="text-center text-blueteal">Generate AI Content</DialogTitle>
+                <DialogTitle className="text-center text-blueteal font-medium">Generate AI Content</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">

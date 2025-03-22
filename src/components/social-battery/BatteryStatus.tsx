@@ -3,6 +3,8 @@ import { Battery } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { getBatteryStatusMessage, getBatteryColor } from "@/hooks/social-battery/batteryUtils";
+import { AnimatedProgress } from "@/components/animations/AnimatedProgress";
+import { motion } from "framer-motion";
 
 interface BatteryStatusProps {
   batteryLevel: number;
@@ -10,7 +12,15 @@ interface BatteryStatusProps {
 }
 
 export const BatteryStatus = ({ batteryLevel, onLevelChange }: BatteryStatusProps) => (
-  <Card className="battery-container-gradient">
+  <motion.div
+    initial={{ scale: 0.98, opacity: 0 }}
+    animate={{ scale: 1, opacity: 1 }}
+    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+    whileHover={{ scale: 1.01 }}
+    className="w-full"
+  >
+    <Card className="battery-container-gradient shadow-md hover:shadow-lg transition-shadow">
+  
     <CardHeader>
       <CardTitle className="flex items-center gap-2">
         <Battery className="h-5 w-5" />
@@ -24,12 +34,15 @@ export const BatteryStatus = ({ batteryLevel, onLevelChange }: BatteryStatusProp
           <span className="text-sm font-medium">Current Level</span>
           <span className="text-sm font-medium">{batteryLevel}%</span>
         </div>
-        <div className="h-4 w-full bg-white/50 rounded-full overflow-hidden">
-          <div 
-            className="h-full transition-all duration-500 battery-indicator-gradient"
-            style={{ width: `${batteryLevel}%` }}
-          />
-        </div>
+        <AnimatedProgress
+          value={batteryLevel}
+          className="my-1"
+          barClassName="battery-indicator-gradient"
+          showWaveEffect={true}
+          pulseOnChange={true}
+          celebrateOnMax={true}
+          height={16}
+        />
       </div>
 
       <div>
@@ -46,5 +59,6 @@ export const BatteryStatus = ({ batteryLevel, onLevelChange }: BatteryStatusProp
         />
       </div>
     </CardContent>
-  </Card>
+    </Card>
+  </motion.div>
 );

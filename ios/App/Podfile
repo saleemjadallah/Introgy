@@ -1,133 +1,85 @@
 require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
-# require_relative 'capacitor-pods'
-# require_relative './pods'
 
 platform :ios, '15.0'
 use_frameworks!
 
-# workaround to avoid Xcode caching of Pods that requires
-# Product -> Clean Build Folder after new Cordova plugins installed
-# Requires CocoaPods 1.6 or newer
-install! 'cocoapods'
+install! 'cocoapods', :deterministic_uuids => false
 
 source 'https://cdn.cocoapods.org/'
 
 def capacitor_pods
+  pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
+  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
   pod 'CapacitorApp', :path => '../../node_modules/@capacitor/app'
-  # pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/app'
   pod 'CapacitorDevice', :path => '../../node_modules/@capacitor/device'
   pod 'CapacitorLocalNotifications', :path => '../../node_modules/@capacitor/local-notifications'
   pod 'CapacitorPreferences', :path => '../../node_modules/@capacitor/preferences'
   pod 'CapacitorSplashScreen', :path => '../../node_modules/@capacitor/splash-screen'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
   pod 'RevenuecatPurchasesCapacitor', :path => '../../node_modules/@revenuecat/purchases-capacitor'
-  
-  # Use RevenueCat directly instead of PurchasesHybridCommon
-  pod 'RevenueCat', '5.19.0'
-  
-  # Use our local PurchasesHybridCommon podspec
-  pod 'PurchasesHybridCommon', :path => './'
 end
 
 target 'App' do
   capacitor_pods
-  # Add your Pods here
+  
+  # Use versions required by RevenuecatPurchasesCapacitor 10.2.0
+  pod 'RevenueCat', '5.19.0'
+  pod 'PurchasesHybridCommon', '13.24.0'
+
+  # Add Google Sign-In with the latest version
+  pod 'GoogleSignIn'
+  pod 'GoogleSignInSwiftSupport'
+
   
   post_install do |installer|
+    # Fix for RevenueCat bundle issue
     installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
-        # This setting is important for iOS 15.0 compatibility
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-        
-        # Set deployment target for all pods
-        config.build_settings['SWIFT_VERSION'] = '5.0'
-        
-        # Fix missing RevenueCat framework issue
-        config.build_settings['OTHER_LDFLAGS'] ||= ['$(inherited)']
-        unless config.build_settings['OTHER_LDFLAGS'].include? '-framework RevenueCat'
-          config.build_settings['OTHER_LDFLAGS'] << '-framework RevenueCat'
-        end
-        
-        # Add preprocessor definitions for PurchasesHybridCommon
-        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'COCOAPODS=1', 'PURCHASES_HYBRID_COMMON_STUB=1']
-        
-        # Disable build validation for all pods to prevent header errors
-        config.build_settings['VALIDATE_PRODUCT'] = 'NO'
-        
-        # Special fix for PurchasesHybridCommon to handle missing header issue
-        if target.name == 'PurchasesHybridCommon'
-          config.build_settings['HEADER_SEARCH_PATHS'] ||= ["$(PODS_ROOT)/Headers/Public", "$(PODS_ROOT)/Headers/Public/PurchasesHybridCommon", "$(SRCROOT)/Headers"]
-          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'COCOAPODS=1', 'PURCHASES_HYBRID_COMMON_STUB=1']
-          config.build_settings['SWIFT_INCLUDE_PATHS'] ||= ["$(PODS_ROOT)/Headers/Public", "$(SRCROOT)/Headers"]
-          config.build_settings['SWIFT_ACTIVE_COMPILATION_CONDITIONS'] ||= ['$(inherited)', 'PURCHASES_HYBRID_COMMON_STUB']
-          config.build_settings['VALIDATE_PRODUCT'] = 'NO'
-        end
-        
-        # Specifically for the Pods-App target, create framework file lists
-        if target.name == 'Pods-App'
-          # Get the list of frameworks to include
-          frameworks = [
-            'Capacitor',
-            'CapacitorApp',
-            'CapacitorDevice',
-            'CapacitorLocalNotifications',
-            'CapacitorPreferences',
-            'CapacitorSplashScreen',
-            'CapacitorStatusBar',
-            'RevenueCat',
-            'RevenuecatPurchasesCapacitor'
-          ]
-          
-          # Create input list
-          input_list = ["${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks.sh"]
-          frameworks.each do |framework|
-            input_list << "${BUILT_PRODUCTS_DIR}/#{framework}/#{framework}.framework"
+      # Add a script phase to create empty RevenueCat bundle
+      if target.name == 'App'
+        phase = target.new_shell_script_build_phase("Create Empty RevenueCat Bundle")
+        phase.shell_script = <<~SCRIPT
+          mkdir -p "${BUILT_PRODUCTS_DIR}/RevenueCat/RevenueCat.bundle"
+          touch "${BUILT_PRODUCTS_DIR}/RevenueCat/RevenueCat.bundle/RevenueCat"
+          mkdir -p "${CONFIGURATION_BUILD_DIR}/RevenueCat/RevenueCat.bundle"
+          touch "${CONFIGURATION_BUILD_DIR}/RevenueCat/RevenueCat.bundle/RevenueCat"
+        SCRIPT
+      end
+      
+      # Handle RevenueCat bundle target separately
+      if target.name == 'RevenueCat-RevenueCat'
+        # Remove problematic build phases
+        target.build_phases.each do |build_phase|
+          if build_phase.is_a?(Xcodeproj::Project::Object::PBXCopyFilesBuildPhase)
+            build_phase.remove_from_project
           end
-          
-          # Create output list
-          output_list = []
-          frameworks.each do |framework|
-            output_list << "${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/#{framework}.framework"
-          end
-          
-          # Create the xcfilelist files for both Debug and Release configurations
-          ['Debug', 'Release'].each do |config_name|
-            # Ensure the directory exists
-            FileUtils.mkdir_p("#{Dir.pwd}/Pods/Target Support Files/Pods-App")
-            
-            # Write the input and output files
-            File.write("#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-input-files.xcfilelist", input_list.join("\n"))
-            File.write("#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-output-files.xcfilelist", output_list.join("\n"))
-            
-            # Create a symlink in the Volumes path if it's different
-            volumes_path = "/Volumes/workspace/repository/ios/App/Pods/Target Support Files/Pods-App"
-            if Dir.pwd != volumes_path && !volumes_path.empty?
-              begin
-                # Create directory structure if it doesn't exist
-                system("mkdir -p \"#{volumes_path}\"")
-                
-                # Create symlinks (overwrite existing)
-                system("ln -sf \"#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-input-files.xcfilelist\" \"#{volumes_path}/Pods-App-frameworks-#{config_name}-input-files.xcfilelist\"")
-                system("ln -sf \"#{Dir.pwd}/Pods/Target Support Files/Pods-App/Pods-App-frameworks-#{config_name}-output-files.xcfilelist\" \"#{volumes_path}/Pods-App-frameworks-#{config_name}-output-files.xcfilelist\"")
-              rescue => e
-                puts "Warning: Could not create symlink: #{e.message}"
-              end
-            end
-          end
-        end
-        
-        # Stubbed PurchasesHybridCommon for RevenuecatPurchasesCapacitor
-        if target.name == 'RevenuecatPurchasesCapacitor'
-          config.build_settings['HEADER_SEARCH_PATHS'] ||= []
-          config.build_settings['HEADER_SEARCH_PATHS'] << "${PODS_ROOT}/Headers/Public"
-          config.build_settings['HEADER_SEARCH_PATHS'] << "${PODS_ROOT}/Headers/Public/PurchasesHybridCommon"
-          config.build_settings['HEADER_SEARCH_PATHS'] << "${SRCROOT}/Headers"
-          config.build_settings['OTHER_LDFLAGS'] ||= []
-          config.build_settings['OTHER_LDFLAGS'] << "-framework RevenueCat"
-          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'COCOAPODS=1', 'PURCHASES_HYBRID_COMMON_STUB=1']
         end
       end
+      
+      # Apply general configuration to all targets
+      target.build_configurations.each do |config|
+        # Basic configurations
+        config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+        config.build_settings['SWIFT_VERSION'] = '5.0'
+        
+        # For RevenueCat-specific targets
+        if ['RevenueCat', 'RevenueCat-RevenueCat'].include?(target.name)
+          config.build_settings['SKIP_INSTALL'] = 'YES'
+          config.build_settings['COPY_PHASE_STRIP'] = 'NO'
+          config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'NO'
+        end
+        
+        # For PurchasesHybridCommon
+        if target.name == 'PurchasesHybridCommon'
+          config.build_settings['HEADER_SEARCH_PATHS'] ||= ["$(PODS_ROOT)/Headers/Public", "$(PODS_ROOT)/Headers/Public/PurchasesHybridCommon"]
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'COCOAPODS=1']
+        end
+      end
+    end
+    
+    # Set minimum iOS version for all targets
+    installer.pods_project.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
     end
   end
 end

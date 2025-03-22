@@ -7,7 +7,7 @@ export interface AuthContextProps {
   isLoading: boolean;
   signIn: (credentials: { email?: string; phone?: string; password?: string }) => Promise<void>;
   signUp: (credentials: { email?: string; phone?: string; password?: string; displayName?: string }) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: () => Promise<any>; // Returns different data depending on platform
   signInWithOTP: (phone: string) => Promise<boolean>; // Returns boolean for success/failure
   verifyOTP: (phone: string, token: string) => Promise<void>;
   signOut: () => Promise<void>;

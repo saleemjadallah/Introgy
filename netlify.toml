@@ -13,6 +13,21 @@
   to = "/index.html"
   status = 200
 
+# Special redirect for Apple App Site Association file
+[[redirects]]
+  from = "/.well-known/apple-app-site-association"
+  to = "/.well-known/apple-app-site-association"
+  status = 200
+  force = true
+  headers = {Content-Type = "application/json"}
+
+# Headers to ensure proper content type for AASA file
+[[headers]]
+  for = "/.well-known/apple-app-site-association"
+  [headers.values]
+    Content-Type = "application/json"
+    Access-Control-Allow-Origin = "*"
+
 # Environment variables can be set here for development, or in the Netlify UI for production
 [build.environment]
   NODE_VERSION = "18"

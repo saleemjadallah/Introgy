@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Auth Callback Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1 {
+            color: #4285f4;
+        }
+        code {
+            background-color: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .success {
+            color: #0f9d58;
+        }
+        .error {
+            color: #db4437;
+        }
+    </style>
+</head>
+<body>
+    <h1>Google Auth Callback Test</h1>
+    <p>This page helps debug Google OAuth authentication issues by displaying information about the callback parameters.</p>
+    
+    <h2>URL Parameters</h2>
+    <div id="urlInfo">Analyzing URL...</div>
+    
+    <h2>Hash Parameters</h2>
+    <div id="hashParams">Analyzing hash parameters...</div>
+    
+    <h2>Query Parameters</h2>
+    <div id="queryParams">Analyzing query parameters...</div>
+    
+    <h2>Manual Redirect</h2>
+    <p>After reviewing the parameters, you can:</p>
+    <button id="continueBtn">Continue to App</button>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Parse and display URL info
+            const urlElement = document.getElementById('urlInfo');
+            urlElement.innerHTML = `
+                <pre>Full URL: ${window.location.href}</pre>
+                <p>Protocol: <code>${window.location.protocol}</code></p>
+                <p>Host: <code>${window.location.host}</code></p>
+                <p>Path: <code>${window.location.pathname}</code></p>
+            `;
+            
+            // Parse and display hash parameters
+            const hashElement = document.getElementById('hashParams');
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            let hashHtml = '<p>Hash parameters found:</p><pre>';
+            
+            if (hashParams.toString()) {
+                for (const [key, value] of hashParams.entries()) {
+                    hashHtml += `${key}: ${value}\n`;
+                }
+                hashHtml += '</pre>';
+                
+                // Check for access token
+                if (hashParams.has('access_token')) {
+                    hashHtml += '<p class="success">✓ Access token found in hash parameters</p>';
+                } else {
+                    hashHtml += '<p class="error">✗ No access token found in hash parameters</p>';
+                }
+            } else {
+                hashHtml = '<p>No hash parameters found</p>';
+            }
+            hashElement.innerHTML = hashHtml;
+            
+            // Parse and display query parameters
+            const queryElement = document.getElementById('queryParams');
+            const queryParams = new URLSearchParams(window.location.search);
+            let queryHtml = '<p>Query parameters found:</p><pre>';
+            
+            if (queryParams.toString()) {
+                for (const [key, value] of queryParams.entries()) {
+                    queryHtml += `${key}: ${value}\n`;
+                }
+                queryHtml += '</pre>';
+                
+                // Check for code parameter
+                if (queryParams.has('code')) {
+                    queryHtml += '<p class="success">✓ Authorization code found in query parameters</p>';
+                } else if (queryParams.has('error')) {
+                    queryHtml += `<p class="error">✗ Error found: ${queryParams.get('error')}</p>`;
+                    if (queryParams.has('error_description')) {
+                        queryHtml += `<p class="error">Error description: ${queryParams.get('error_description')}</p>`;
+                    }
+                } else {
+                    queryHtml += '<p class="error">✗ No authorization code found in query parameters</p>';
+                }
+            } else {
+                queryHtml = '<p>No query parameters found</p>';
+            }
+            queryElement.innerHTML = queryHtml;
+            
+            // Set up redirect button
+            const continueBtn = document.getElementById('continueBtn');
+            continueBtn.addEventListener('click', function() {
+                // Redirect to the main app with the parameters
+                window.location.href = '/auth/callback' + window.location.search + window.location.hash;
+            });
+        });
+    </script>
+</body>
+</html>

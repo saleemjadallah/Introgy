@@ -35,9 +35,12 @@
   }
 
   body {
-    @apply bg-background text-foreground font-poppins;
+    @apply text-foreground font-poppins;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
     color: #121F36;
+    background: linear-gradient(to bottom, #F0F0F7, #E8F1EE);
+    min-height: 100vh;
+    background-attachment: fixed;
   }
   
   html {
@@ -46,24 +49,29 @@
 }
 
 /* Container gradient styles */
+.app-background-gradient {
+  background: linear-gradient(to bottom, #F0F0F7, #E8F1EE);
+  background-attachment: fixed;
+}
+
 .battery-container-gradient {
-  @apply bg-gradient-to-br from-[#E0F2F1] to-[#E8F5E9];
+  @apply bg-gradient-to-br from-[#E0F2F1] to-[#E8F5E9] backdrop-blur-md bg-white/30;
 }
 
 .navigation-container-gradient {
-  @apply bg-gradient-to-br from-[#E8EAF6] to-[#F3E5F5];
+  @apply bg-gradient-to-br from-[#E8EAF6] to-[#F3E5F5] backdrop-blur-md bg-white/30;
 }
 
 .connection-container-gradient {
-  @apply bg-gradient-to-br from-[#FFF3E0] to-[#FCEAE3];
+  @apply bg-gradient-to-br from-[#FFF3E0] to-[#FCEAE3] backdrop-blur-md bg-white/30;
 }
 
 .wellbeing-container-gradient {
-  @apply bg-gradient-to-br from-[#E1F5FE] to-[#E0F7FA];
+  @apply bg-gradient-to-br from-[#E1F5FE] to-[#E0F7FA] backdrop-blur-md bg-white/30;
 }
 
 .education-container-gradient {
-  @apply bg-gradient-to-br from-[#FFF8E1] to-[#FFFDE7];
+  @apply bg-gradient-to-br from-[#FFF8E1] to-[#FFFDE7] backdrop-blur-md bg-white/30;
 }
 
 /* Battery indicator gradient */
