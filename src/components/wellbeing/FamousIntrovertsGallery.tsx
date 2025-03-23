@@ -40,7 +40,7 @@ const FamousIntrovertsGallery = () => {
   };
 
   return (
-    <div className="space-y-4 font-poppins">
+    <div className="space-y-4 font-poppins w-full overflow-x-hidden">
       <div className="text-sm text-muted-foreground mb-4">
         Explore this gallery of notable introverts who have made significant contributions across various fields.
         Their stories demonstrate how introvert traits can be powerful strengths when understood and embraced.
@@ -62,7 +62,7 @@ const FamousIntrovertsGallery = () => {
           <Filter className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium">Filter by field:</span>
         </div>
-        <TabsList className="flex flex-wrap h-auto mb-4">
+        <TabsList className="flex flex-wrap h-auto mb-4 w-full max-w-full overflow-x-auto">
           <TabsTrigger value="all" className="mb-1">All Fields</TabsTrigger>
           {categories.map(category => (
             <TabsTrigger key={category} value={category} className="mb-1">
@@ -77,7 +77,7 @@ const FamousIntrovertsGallery = () => {
               {filteredIntroverts.map((person) => (
                 <Card 
                   key={person.id}
-                  className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                  className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-full"
                   onClick={() => handleCardClick(person)}
                 >
                   <div className="aspect-[3/2] relative overflow-hidden">

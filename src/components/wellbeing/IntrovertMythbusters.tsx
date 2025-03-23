@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -46,7 +47,7 @@ const IntrovertMythbusters = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full overflow-x-hidden">
       <div className="text-sm text-muted-foreground mb-4">
         Many misconceptions about introverts persist in our society, affecting how introverts are 
         perceived and sometimes how they perceive themselves. Explore these common myths and 
@@ -69,7 +70,7 @@ const IntrovertMythbusters = () => {
           type="scroll" 
           orientation="vertical"
         >
-          <div className="space-y-2">
+          <div className="space-y-2 pr-2">
             {filteredMyths.map((myth) => (
               <MythItem
                 key={myth.id}

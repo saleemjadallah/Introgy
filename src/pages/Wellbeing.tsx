@@ -1,3 +1,4 @@
+
 import { LineChart, BookOpen, Users, Battery, Book, ChevronDown, AlertCircle, User, MessageSquare, MountainSnow } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -25,7 +26,7 @@ const Wellbeing = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-6 w-full max-w-full">
+    <div className="space-y-6 w-full max-w-full overflow-x-hidden">
       <div className="space-y-1">
         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Wellbeing Center</h2>
         <p className="text-sm sm:text-base text-muted-foreground">AI-powered resources to support your introvert wellbeing</p>
@@ -33,7 +34,7 @@ const Wellbeing = () => {
 
       <div className="w-full">
         <ScrollArea 
-          className="w-full" 
+          className="w-full max-w-[calc(100vw-2rem)]" 
           type="scroll" 
           orientation="horizontal"
         >
@@ -101,7 +102,7 @@ const Wellbeing = () => {
       )}
 
       {activeSection === 'overview' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6 w-full max-w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6 w-full">
           <Card className="w-full wellbeing-container-gradient overflow-hidden shadow-lg border border-white/40">
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
@@ -172,11 +173,17 @@ const Wellbeing = () => {
           </Card>
         </div>
       ) : activeSection === 'education' ? (
-        <EducationCenter />
+        <div className="w-full overflow-x-hidden">
+          <EducationCenter />
+        </div>
       ) : activeSection === 'wisdom' ? (
-        <CommunityWisdom />
+        <div className="w-full overflow-x-hidden">
+          <CommunityWisdom />
+        </div>
       ) : (
-        <MindfulnessExercises />
+        <div className="w-full overflow-x-hidden">
+          <MindfulnessExercises />
+        </div>
       )}
     </div>
   );
