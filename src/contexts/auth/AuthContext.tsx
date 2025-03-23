@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,7 +29,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log("Checking for native Google Sign-In state");
           const googleState = await checkGoogleSignInState();
           
-          // Fixed TypeScript error by properly checking for idToken existence
           if (googleState.isSignedIn && 'idToken' in googleState && googleState.idToken) {
             console.log("Found active Google Sign-In state, signing in with Supabase");
             try {
@@ -67,7 +65,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       cleanupGoogleListener = setupGoogleSignInListener(async (googleUser) => {
         console.log("Google Sign-In restored, signing in with Supabase");
         
-        // Also add an idToken check here for type safety
         if (googleUser && 'idToken' in googleUser && googleUser.idToken) {
           try {
             const { data, error } = await supabase.auth.signInWithIdToken({
@@ -113,13 +110,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  const signIn = async ({ email, phone, password }: { email?: string; phone?: string; password?: string; }) => {
+  const signIn = async ({ phone, password }: { phone: string; password?: string; }) => {
     try {
       setIsLoading(true);
       
-      if (email) {
-        await authService.emailSignIn(email, password || "");
-      } else if (phone && password) {
+      if (phone && password) {
         await authService.phoneSignIn(phone, password);
       }
       
@@ -132,14 +127,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async ({ email, phone, password, displayName }: { email?: string; phone?: string; password?: string; displayName?: string; }) => {
+  const signUp = async ({ phone, password, displayName }: { phone: string; password?: string; displayName?: string; }) => {
     try {
       setIsLoading(true);
 
       let response;
-      if (email) {
-        response = await authService.emailSignUp(email, password || "", displayName);
-      } else if (phone && password) {
+      if (phone && password) {
         response = await authService.phoneSignUp(phone, password, displayName);
       }
 
@@ -162,7 +155,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log("Starting Google sign in flow");
       console.log("Current URL:", window.location.origin);
       
-      // Store debug info
       localStorage.setItem('auth_environment', window.location.hostname);
       localStorage.setItem('auth_is_native', String(Capacitor.isNativePlatform()));
       localStorage.setItem('auth_origin', window.location.origin);

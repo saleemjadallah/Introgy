@@ -14,37 +14,11 @@ interface GoogleAuthPluginInterface {
   disconnect(): Promise<{ success: boolean }>;
 }
 
-export const emailSignIn = async (email: string, password: string) => {
-  const response = await supabase.auth.signInWithPassword({ email, password: password || "" });
-  if (response?.error) {
-    throw response.error;
-  }
-  return response;
-};
-
 export const phoneSignIn = async (phone: string, password: string) => {
   const response = await supabase.auth.signInWithPassword({ phone, password });
   if (response?.error) {
     throw response.error;
   }
-  return response;
-};
-
-export const emailSignUp = async (email: string, password: string, displayName?: string) => {
-  const response = await supabase.auth.signUp({
-    email,
-    password: password || "",
-    options: {
-      data: {
-        display_name: displayName
-      }
-    }
-  });
-  
-  if (response?.error) {
-    throw response.error;
-  }
-  
   return response;
 };
 
