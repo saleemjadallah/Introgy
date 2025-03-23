@@ -14,32 +14,6 @@ interface GoogleAuthPluginInterface {
   disconnect(): Promise<{ success: boolean }>;
 }
 
-export const phoneSignIn = async (phone: string, password: string) => {
-  const response = await supabase.auth.signInWithPassword({ phone, password });
-  if (response?.error) {
-    throw response.error;
-  }
-  return response;
-};
-
-export const phoneSignUp = async (phone: string, password: string, displayName?: string) => {
-  const response = await supabase.auth.signUp({
-    phone,
-    password,
-    options: {
-      data: {
-        display_name: displayName
-      }
-    }
-  });
-  
-  if (response?.error) {
-    throw response.error;
-  }
-  
-  return response;
-};
-
 // Admin phone number that bypasses OTP verification
 const ADMIN_PHONE = '+971507493651';
 const ADMIN_PASSWORD = 'admin123'; // Simple password for admin account

@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,32 +9,21 @@ import { useAuth } from '@/contexts/auth';
 import { Link } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { GoogleIcon } from '@/components/icons';
+import { Logo } from '@/components/ui/Logo';
 
 const Auth = () => {
-  const { signIn, signUp, signInWithGoogle, signInWithOTP, isLoading } = useAuth();
+  const { signInWithOTP, signInWithGoogle, isLoading } = useAuth();
   const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [activeTab, setActiveTab] = useState('signin');
   
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (phone && !password) {
+      if (phone) {
         await signInWithOTP(phone);
-      } else {
-        await signIn({ phone, password });
       }
     } catch (error) {
       console.error('Error signing in:', error);
-    }
-  };
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await signUp({ phone, password, displayName });
-    } catch (error) {
-      console.error('Error signing up:', error);
     }
   };
 
@@ -50,13 +39,21 @@ const Auth = () => {
   return (
     <div className="container mx-auto max-w-md py-12">
       <Card className="overflow-hidden">
-        <CardHeader className="bg-primary text-white">
-          <CardTitle className="text-xl">Welcome to Introgy</CardTitle>
-          <CardDescription className="text-primary-foreground">
-            Sign in to your account or create a new one
-          </CardDescription>
+        <CardHeader className="bg-white border-b">
+          <div className="flex flex-col items-center space-y-4">
+            <Logo />
+            <CardTitle className="text-xl text-gray-900">Welcome to Introgy</CardTitle>
+            <p className="text-primary text-center font-medium">
+              {activeTab === 'signin' 
+                ? 'Sign in to your account' 
+                : 'Create a new account'}
+            </p>
+          </div>
         </CardHeader>
-        <Tabs defaultValue="signin">
+        <Tabs 
+          defaultValue="signin" 
+          onValueChange={setActiveTab}
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -75,35 +72,13 @@ const Auth = () => {
                     onChange={(e) => setPhone(e.target.value)}
                     required
                   />
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Button
-                      type="button"
-                      variant="link"
-                      className="px-0 font-normal text-xs"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (phone) {
-                          signInWithOTP(phone);
-                        }
-                      }}
-                    >
-                      Sign in with OTP instead
-                    </Button>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                  <p className="text-xs text-muted-foreground">
+                    We'll send a verification code to this number
+                  </p>
                 </div>
                 
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Signing in...' : 'Sign In'}
+                  {isLoading ? 'Sending code...' : 'Send verification code'}
                 </Button>
               </form>
               
@@ -133,17 +108,7 @@ const Auth = () => {
             </TabsContent>
             
             <TabsContent value="signup" className="space-y-4">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="displayName">Name</Label>
-                  <Input
-                    id="displayName"
-                    placeholder="John Doe"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                  />
-                </div>
-                
+              <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signupPhone">Phone Number</Label>
                   <Input
@@ -154,21 +119,13 @@ const Auth = () => {
                     onChange={(e) => setPhone(e.target.value)}
                     required
                   />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="signupPassword">Password</Label>
-                  <Input
-                    id="signupPassword"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <p className="text-xs text-muted-foreground">
+                    We'll send a verification code to this number
+                  </p>
                 </div>
                 
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Creating Account...' : 'Sign Up'}
+                  {isLoading ? 'Sending code...' : 'Send verification code'}
                 </Button>
               </form>
               

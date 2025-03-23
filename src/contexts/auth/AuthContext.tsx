@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -110,40 +111,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  const signIn = async ({ phone, password }: { phone: string; password?: string; }) => {
+  const signInWithOTP = async (phone: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      
-      if (phone && password) {
-        await authService.phoneSignIn(phone, password);
-      }
-      
-      navigate('/profile');
+      return await authService.phoneOtpSignIn(phone);
     } catch (error: any) {
-      toast.error(error.message || 'Failed to sign in');
-      console.error('Sign in error:', error);
+      console.error('OTP error details:', error);
+      toast.error(error.message || 'Failed to send verification code');
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const signUp = async ({ phone, password, displayName }: { phone: string; password?: string; displayName?: string; }) => {
+  const verifyOTP = async (phone: string, token: string) => {
     try {
       setIsLoading(true);
-
-      let response;
-      if (phone && password) {
-        response = await authService.phoneSignUp(phone, password, displayName);
-      }
-
-      toast.success('Account created! Please verify your account.');
-      
-      if (response?.data?.session) {
-        navigate('/onboarding');
-      }
+      await authService.verifyPhoneOtp(phone, token);
+      navigate('/profile');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create account');
-      console.error('Sign up error:', error);
+      toast.error(error.message || 'Invalid verification code');
+      console.error('OTP verification error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      setIsLoading(true);
+      await authService.signOut();
+      navigate('/');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to sign out');
+      console.error('Sign out error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -222,52 +224,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signInWithOTP = async (phone: string): Promise<boolean> => {
-    try {
-      setIsLoading(true);
-      return await authService.phoneOtpSignIn(phone);
-    } catch (error: any) {
-      console.error('OTP error details:', error);
-      toast.error(error.message || 'Failed to send verification code');
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const verifyOTP = async (phone: string, token: string) => {
-    try {
-      setIsLoading(true);
-      await authService.verifyPhoneOtp(phone, token);
-      navigate('/profile');
-    } catch (error: any) {
-      toast.error(error.message || 'Invalid verification code');
-      console.error('OTP verification error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signOut = async () => {
-    try {
-      setIsLoading(true);
-      await authService.signOut();
-      navigate('/');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to sign out');
-      console.error('Sign out error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const value = {
     session,
     user,
     isLoading,
-    signIn,
-    signUp,
     signInWithGoogle,
     signInWithOTP,
     verifyOTP,
