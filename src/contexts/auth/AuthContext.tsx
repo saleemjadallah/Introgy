@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +7,7 @@ import { AuthContextProps } from "./types";
 import * as authService from "./authService";
 import useGoogleAuth from "@/hooks/useGoogleAuth";
 import { Capacitor } from "@capacitor/core";
-import { checkGoogleSignInState, setupGoogleSignInListener } from "@/services/nativeGoogleAuth";
+import { checkGoogleSignInState, setupGoogleSignInListener } from "@/services/googleAuthService";
 
 export const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
@@ -166,7 +165,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      setIsLoading(true); // Set loading state to prevent multiple clicks
+      setIsLoading(true);
       console.log("Starting Google sign in flow");
       console.log("Current URL:", window.location.origin);
       

@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { PhoneAuthForm } from "@/components/auth"; 
 import { useAuth } from "@/contexts/auth"; 
 import { ArrowLeft } from "lucide-react";
@@ -10,6 +9,7 @@ import { toast } from "sonner";
 import { AnimatedButton } from "@/components/animations/AnimatedButton";
 import { AnimatedCard } from "@/components/animations/AnimatedCard";
 import { motion } from "framer-motion";
+import { Capacitor } from "@capacitor/core";
 
 const Auth = () => {
   const [mode, setMode] = useState<"signin" | "signup">("signin");

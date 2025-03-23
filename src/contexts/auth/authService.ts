@@ -1,7 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { nativeGoogleSignIn } from "@/services/nativeGoogleAuth";
-import { Capacitor, registerPlugin } from "@capacitor/core";
+import { googleSignIn } from "@/services/googleAuthService";
 
 // Register the GoogleAuth plugin
 interface GoogleAuthPlugin {
@@ -232,22 +231,10 @@ export const signOut = async () => {
 
 export const googleSignIn = async () => {
   try {
-    // Store auth info for debugging
-    localStorage.setItem('auth_start_time', new Date().toISOString());
-    localStorage.setItem('auth_started_at', Date.now().toString());
-    localStorage.setItem('google_auth_initiated', 'true');
-    localStorage.setItem('google_auth_timestamp', Date.now().toString());
-    
-    const platform = Capacitor.getPlatform();
-    localStorage.setItem('auth_platform', platform);
-    console.log(`Starting Google Sign-In process on ${platform} platform`);
-    
-    // Use browser-based flow for all platforms
-    console.log('🌐 Using browser-based OAuth flow for all platforms');
-    return await nativeGoogleSignIn();
+    // Use the refactored googleAuthService implementation
+    return await googleSignIn();
   } catch (error) {
     console.error("Error during Google sign-in:", error);
-    localStorage.setItem('google_auth_error', JSON.stringify(error));
     toast.error('Sign-in failed');
     throw error;
   }
