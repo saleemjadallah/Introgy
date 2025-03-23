@@ -10,6 +10,8 @@ import { Link } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { GoogleIcon } from '@/components/icons';
 import { Logo } from '@/components/ui/Logo';
+import { ArrowLeft } from 'lucide-react';
+import { navigateToProfile } from '@/utils/navigation';
 
 const Auth = () => {
   const { signInWithOTP, signInWithGoogle, isLoading } = useAuth();
@@ -37,7 +39,17 @@ const Auth = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-md py-12">
+    <div className="container mx-auto max-w-md py-12 relative">
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        className="absolute left-0 top-0 flex items-center gap-1 text-primary"
+        onClick={() => navigateToProfile()}
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Return to App
+      </Button>
+      
       <Card className="overflow-hidden">
         <CardHeader className="bg-white border-b">
           <div className="flex flex-col items-center space-y-4">
