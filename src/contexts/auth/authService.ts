@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Capacitor } from "@capacitor/core";
-import { GoogleAuth } from "@/services/googleAuthService";
+import { googleSignIn as originalGoogleSignIn } from "@/services/googleAuthService";
 
 // Type definition for GoogleAuth plugin
 interface GoogleAuthPluginInterface {
@@ -228,9 +228,7 @@ export const signOut = async () => {
   return true;
 };
 
-// Import and re-export the googleSignIn function from googleAuthService
-import { googleSignIn as originalGoogleSignIn } from "@/services/googleAuthService";
-
+// Re-export the googleSignIn function from googleAuthService
 export const googleSignIn = async () => {
   try {
     return await originalGoogleSignIn();

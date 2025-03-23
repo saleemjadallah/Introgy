@@ -170,7 +170,7 @@ const browserBasedGoogleSignIn = async () => {
       throw authResponse.error;
     }
     
-    if (!authResponse.data.url) {
+    if (!authResponse.data?.url) {
       console.error("No OAuth URL returned from Supabase");
       throw new Error("Failed to get authentication URL");
     }
