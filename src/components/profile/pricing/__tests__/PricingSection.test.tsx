@@ -1,3 +1,4 @@
+
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { vi } from "vitest";
@@ -44,8 +45,6 @@ describe("PricingSection Component", () => {
       session: null,
       isLoading: false,
       isAuthenticated: true,
-      signIn: vi.fn(),
-      signUp: vi.fn(),
       signInWithGoogle: vi.fn(),
       signInWithOTP: vi.fn(),
       verifyOTP: vi.fn(),
