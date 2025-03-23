@@ -1,3 +1,4 @@
+
 import UIKit
 import Capacitor
 import GoogleSignIn
@@ -126,6 +127,7 @@ enum Handlers {}
         // Create response dictionary
         let response: [String: String] = [
             "idToken": idToken,
+            "accessToken": result.user.accessToken.tokenString,
             "userId": userId,
             "email": email,
             "name": name,
@@ -162,4 +164,3 @@ enum Handlers {}
         }
     }
 }
-

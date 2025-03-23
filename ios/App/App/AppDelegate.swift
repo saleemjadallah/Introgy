@@ -25,12 +25,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let config = GIDConfiguration(clientID: clientID)
         GIDSignIn.sharedInstance.configuration = config
         
+        // Log configuration for debugging
+        print("📱 Configured Google Sign-In with client ID: \(clientID)")
+        
         // Attempt to restore the user's sign-in state
         GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
             if let user = user {
-                print("User is already signed in with Google: \(user.profile?.email ?? "Unknown")")
+                print("📱 User is already signed in with Google: \(user.profile?.email ?? "Unknown")")
             } else if let error = error {
-                print("Failed to restore Google Sign-In: \(error.localizedDescription)")
+                print("📱 Failed to restore Google Sign-In: \(error.localizedDescription)")
+            } else {
+                print("📱 No previous Google Sign-In session found")
             }
         }
         
@@ -71,7 +76,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Log the URL for debugging
         print("📱 AppDelegate: Received URL: \(url.absoluteString)")
         
-        // Handle Google Sign-In callbacks first
+        // Handle Google Sign-In callbacks first - this is the critical part for Google authentication
         if GIDSignIn.sharedInstance.handle(url) {
             print("📱 URL handled by Google Sign-In")
             return true
@@ -100,8 +105,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         // Then let Capacitor handle the rest
-        // Called when the app was launched with a url. Feel free to add additional processing here,
-        // but if you want the App API to support tracking app url opens, make sure to keep this call
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
     }
     
@@ -127,5 +130,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // tracking app url opens, make sure to keep this call
         return ApplicationDelegateProxy.shared.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
-
 }

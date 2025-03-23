@@ -143,12 +143,14 @@ const browserBasedGoogleSignIn = async () => {
     
     // Supabase callback URL for OAuth redirects
     const callbackUrl = getRedirectUrl();
-    const supabaseCallbackUrl = callbackUrl || 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
-    const redirectTo = supabaseCallbackUrl;
+    console.log("Using redirect URL:", callbackUrl);
+    
+    // Use callbackUrl but fall back to Supabase default if empty
+    const redirectTo = callbackUrl || 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
     
     // Store the platform and environment info for debugging
     localStorage.setItem('auth_redirect_url', redirectTo);
-    localStorage.setItem('supabase_callback_url', supabaseCallbackUrl);
+    localStorage.setItem('auth_callback_url', callbackUrl || '');
     localStorage.setItem('auth_timestamp', new Date().toISOString());
     
     // Generate OAuth URL from Supabase Auth with enhanced options
@@ -188,8 +190,12 @@ const browserBasedGoogleSignIn = async () => {
     if (typeof window !== 'undefined' && !Capacitor.isNativePlatform()) {
       console.log('Using window.location.href for web platform');
       
-      // Directly navigating to the URL
-      window.location.href = authResponse.data.url;
+      // Add small delay to ensure localStorage is written
+      setTimeout(() => {
+        // Directly navigating to the URL
+        window.location.href = authResponse.data.url;
+      }, 50);
+      
       return { url: authResponse.data.url }; // Return the URL for reference
     } 
     // For Android, use system browser fallback
@@ -223,23 +229,33 @@ function getRedirectUrl() {
   const protocol = window.location.protocol;
   const port = window.location.port ? `:${window.location.port}` : '';
   
+  console.log(`Determining redirect URL for hostname: ${hostname}`);
+  
   // For development environments
   if (hostname === 'localhost' || hostname.includes('127.0.0.1')) {
-    return `${protocol}//${hostname}${port}/auth`;
+    const redirectUrl = `${protocol}//${hostname}${port}/auth`;
+    console.log(`Using local development redirect URL: ${redirectUrl}`);
+    return redirectUrl;
   }
   
   // For production/preview environments
   if (hostname.includes('lovableproject.com')) {
-    return `${protocol}//${hostname}/auth`;
+    const redirectUrl = `${protocol}//${hostname}/auth`;
+    console.log(`Using preview environment redirect URL: ${redirectUrl}`);
+    return redirectUrl;
   }
   
   // For deployed app
   if (hostname === 'introgy.ai' || hostname.includes('introgy')) {
-    return `${protocol}//${hostname}/auth`;
+    const redirectUrl = `${protocol}//${hostname}/auth`;
+    console.log(`Using production app redirect URL: ${redirectUrl}`);
+    return redirectUrl;
   }
   
   // Fallback to current origin
-  return `${protocol}//${hostname}${port}/auth`;
+  const fallbackUrl = `${protocol}//${hostname}${port}/auth`;
+  console.log(`Using fallback redirect URL: ${fallbackUrl}`);
+  return fallbackUrl;
 }
 
 // Function to handle native sign-in with ID token
@@ -268,6 +284,9 @@ export const signInWithGoogleIdToken = async (idToken: string, accessToken?: str
 
 // Helper to listen for app URLs (for deep linking)
 export const listenForDeepLinks = () => {
+  // Log that we're setting up the deeplink listener
+  console.log('Setting up deeplink listener');
+  
   App.addListener('appUrlOpen', async ({ url }) => {
     console.log('App opened with URL:', url);
     
