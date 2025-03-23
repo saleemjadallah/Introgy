@@ -30,7 +30,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log("Checking for native Google Sign-In state");
           const googleState = await checkGoogleSignInState();
           
-          if (googleState.isSignedIn && googleState.idToken) {
+          // Fixed TypeScript error by properly checking for idToken existence
+          if (googleState.isSignedIn && 'idToken' in googleState && googleState.idToken) {
             console.log("Found active Google Sign-In state, signing in with Supabase");
             try {
               const { data, error } = await supabase.auth.signInWithIdToken({
@@ -66,7 +67,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       cleanupGoogleListener = setupGoogleSignInListener(async (googleUser) => {
         console.log("Google Sign-In restored, signing in with Supabase");
         
-        if (googleUser.idToken) {
+        // Also add an idToken check here for type safety
+        if (googleUser && 'idToken' in googleUser && googleUser.idToken) {
           try {
             const { data, error } = await supabase.auth.signInWithIdToken({
               provider: 'google',

@@ -21,6 +21,8 @@ export interface GoogleAuthUser {
   userId?: string;
 }
 
+export type GoogleSignInResult = { isSignedIn: boolean } | (GoogleAuthUser & { isSignedIn: boolean });
+
 export interface GoogleAuthPlugin {
   signIn(): Promise<GoogleAuthUser>;
   signInWithSupabase(): Promise<GoogleAuthUser>;
@@ -58,13 +60,14 @@ export const initGoogleAuthPlugin = (): boolean => {
  * Checks the current Google Sign-In state
  * @returns Object containing sign-in state and user info if signed in
  */
-export const checkGoogleSignInState = async () => {
+export const checkGoogleSignInState = async (): Promise<GoogleSignInResult> => {
   try {
     if (!GoogleAuth) {
       initGoogleAuthPlugin();
     }
     
     if (!GoogleAuth) {
+      console.log("GoogleAuth plugin still not available after initialization attempt");
       return { isSignedIn: false };
     }
     
@@ -72,8 +75,14 @@ export const checkGoogleSignInState = async () => {
     
     if (isSignedIn) {
       // Get current user details
-      const userData = await GoogleAuth.getCurrentUser();
-      return { isSignedIn, ...userData };
+      try {
+        const userData = await GoogleAuth.getCurrentUser();
+        console.log("Retrieved current Google user data:", userData);
+        return { ...userData, isSignedIn };
+      } catch (userError) {
+        console.error("Error getting current Google user:", userError);
+        return { isSignedIn };
+      }
     }
     
     return { isSignedIn };
