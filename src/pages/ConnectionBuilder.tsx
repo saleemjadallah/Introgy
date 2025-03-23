@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Brain, MessageCircle, Heart, Shield, Sparkle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -64,7 +65,7 @@ const ConnectionBuilder = () => {
   
   const renderFeatureCards = () => {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-x-hidden">
         <Card className="shadow-sm connection-container-gradient">
           <CardHeader className="p-4 sm:p-6">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
@@ -171,7 +172,7 @@ const ConnectionBuilder = () => {
   };
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div className="space-y-1">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Connection Builder</h2>

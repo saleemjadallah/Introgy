@@ -24,7 +24,7 @@ const Boundaries = () => {
   };
 
   return (
-    <Card className="navigation-container-gradient w-full max-w-md mx-auto">
+    <Card className="navigation-container-gradient w-full max-w-md mx-auto overflow-hidden">
       <CardHeader className="space-y-1 px-4 sm:px-6">
         <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
           <Bell className="h-5 w-5 text-periwinkle" />
@@ -35,26 +35,26 @@ const Boundaries = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 px-4 sm:px-6">
-        <div className="flex gap-2">
+        <div className="flex gap-2 max-w-[calc(100vw-3rem)] sm:max-w-none">
           <Input 
             placeholder="Add a boundary reminder..." 
             value={newBoundary}
             onChange={(e) => setNewBoundary(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAddBoundary()}
-            className="flex-1"
+            className="flex-1 min-w-0"
           />
           <Button onClick={handleAddBoundary} size="icon" className="shrink-0">
             <Plus className="h-4 w-4" />
           </Button>
         </div>
         
-        <div className="space-y-2">
+        <div className="space-y-2 overflow-x-hidden">
           {boundaries.map((boundary, index) => (
             <div 
               key={index} 
               className="flex items-center justify-between p-3 bg-muted rounded-md text-sm sm:text-base"
             >
-              <span className="mr-2 break-words flex-1">{boundary}</span>
+              <span className="mr-2 break-words flex-1 overflow-hidden">{boundary}</span>
               <Button 
                 variant="ghost" 
                 size="icon" 

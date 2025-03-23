@@ -11,7 +11,7 @@ const BoundaryManager = () => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="space-y-6 w-full max-w-4xl mx-auto px-4 sm:px-6">
+    <div className="space-y-6 w-full max-w-4xl mx-auto px-4 sm:px-6 overflow-x-hidden">
       <div>
         <h2 className="text-xl sm:text-2xl font-bold">Boundary Manager</h2>
         <p className="text-sm text-muted-foreground mt-1">
@@ -44,15 +44,15 @@ const BoundaryManager = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="templates" className="space-y-4">
+        <TabsContent value="templates" className="space-y-4 max-w-[calc(100vw-2rem)]">
           <BoundaryTemplates />
         </TabsContent>
 
-        <TabsContent value="limits" className="space-y-4">
+        <TabsContent value="limits" className="space-y-4 max-w-[calc(100vw-2rem)]">
           <SocialLimits />
         </TabsContent>
 
-        <TabsContent value="communication" className="space-y-4">
+        <TabsContent value="communication" className="space-y-4 max-w-[calc(100vw-2rem)]">
           <CommunicationGuide />
         </TabsContent>
       </Tabs>

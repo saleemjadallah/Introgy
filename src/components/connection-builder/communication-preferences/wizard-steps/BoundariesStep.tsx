@@ -1,3 +1,4 @@
+
 import { Boundaries } from '@/types/communication-preferences';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
@@ -59,7 +60,7 @@ const BoundariesStep = ({ boundaries, onChange }: BoundariesStepProps) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-medium">Group Size Preferences</h3>
@@ -70,8 +71,8 @@ const BoundariesStep = ({ boundaries, onChange }: BoundariesStepProps) => {
         
         <div className="space-y-5">
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="min-group">Minimum comfortable group size</Label>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <Label htmlFor="min-group" className="flex-shrink-0">Minimum comfortable group size</Label>
               <span className="text-sm font-medium">
                 {boundaries.groupSizePreference.min === 1 ? '1 person (one-on-one)' : `${boundaries.groupSizePreference.min} people`}
               </span>
@@ -87,8 +88,8 @@ const BoundariesStep = ({ boundaries, onChange }: BoundariesStepProps) => {
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="ideal-group">Ideal group size</Label>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <Label htmlFor="ideal-group" className="flex-shrink-0">Ideal group size</Label>
               <span className="text-sm font-medium">
                 {boundaries.groupSizePreference.ideal === 1 ? '1 person (one-on-one)' : `${boundaries.groupSizePreference.ideal} people`}
               </span>
@@ -104,8 +105,8 @@ const BoundariesStep = ({ boundaries, onChange }: BoundariesStepProps) => {
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="max-group">Maximum comfortable group size</Label>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <Label htmlFor="max-group" className="flex-shrink-0">Maximum comfortable group size</Label>
               <span className="text-sm font-medium">
                 {boundaries.groupSizePreference.max} people
               </span>
@@ -132,8 +133,8 @@ const BoundariesStep = ({ boundaries, onChange }: BoundariesStepProps) => {
         
         <div className="space-y-5">
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="ideal-duration">Ideal interaction duration</Label>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <Label htmlFor="ideal-duration" className="flex-shrink-0">Ideal interaction duration</Label>
               <span className="text-sm font-medium">
                 {formatDuration(boundaries.durationLimits.idealDuration)}
               </span>
@@ -149,8 +150,8 @@ const BoundariesStep = ({ boundaries, onChange }: BoundariesStepProps) => {
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="max-duration">Maximum comfortable duration</Label>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <Label htmlFor="max-duration" className="flex-shrink-0">Maximum comfortable duration</Label>
               <span className="text-sm font-medium">
                 {formatDuration(boundaries.durationLimits.maxDuration)}
               </span>
@@ -166,8 +167,8 @@ const BoundariesStep = ({ boundaries, onChange }: BoundariesStepProps) => {
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="break-frequency">Preferred break frequency</Label>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <Label htmlFor="break-frequency" className="flex-shrink-0">Preferred break frequency</Label>
               <span className="text-sm font-medium">
                 Every {formatDuration(boundaries.durationLimits.breakFrequency)}
               </span>
@@ -194,8 +195,8 @@ const BoundariesStep = ({ boundaries, onChange }: BoundariesStepProps) => {
         
         <div className="space-y-5">
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="preferred-notice">Preferred advance notice</Label>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <Label htmlFor="preferred-notice" className="flex-shrink-0">Preferred advance notice</Label>
               <span className="text-sm font-medium">
                 {formatDays(boundaries.advanceNotice.preferred)}
               </span>
@@ -211,8 +212,8 @@ const BoundariesStep = ({ boundaries, onChange }: BoundariesStepProps) => {
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="minimum-notice">Minimum acceptable notice</Label>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <Label htmlFor="minimum-notice" className="flex-shrink-0">Minimum acceptable notice</Label>
               <span className="text-sm font-medium">
                 {formatDays(boundaries.advanceNotice.minimum)}
               </span>
