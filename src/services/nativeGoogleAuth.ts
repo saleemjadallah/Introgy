@@ -1,239 +1,157 @@
+import { supabase } from "@/integrations/supabase/client";
+import { Browser } from '@capacitor/browser';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { App } from '@capacitor/app';
-import { supabase } from '@/integrations/supabase/client';
 
-// Define the interface for the Google Sign-In Plugin
-interface GoogleSignInPlugin {
-  signIn(): Promise<GoogleSignInResult>;
-  checkSignInState(): Promise<GoogleSignInState>;
+// Register the GoogleAuth plugin
+interface GoogleAuthPlugin {
+  signIn(): Promise<any>;
+  signInWithSupabase(): Promise<{ idToken: string; accessToken: string }>;
+  signOut(): Promise<{ success: boolean }>;
   refresh(): Promise<{ idToken: string; accessToken: string }>;
-  addListener(
-    eventName: 'signInRestored',
-    listenerFunc: (state: { user: GoogleSignInResult }) => void
-  ): Promise<PluginListenerHandle>;
-  removeAllListeners(): Promise<void>;
+  isSignedIn(): Promise<{ isSignedIn: boolean }>;
+  getCurrentUser(): Promise<any>;
+  disconnect(): Promise<{ success: boolean }>;
 }
 
-interface PluginListenerHandle {
-  remove: () => Promise<void>;
-}
+const GoogleAuth = registerPlugin<GoogleAuthPlugin>('GoogleAuth');
 
-// Define the result interface
-interface GoogleSignInResult {
-  idToken: string;
-  accessToken: string;
-  displayName?: string;
-  email?: string;
-  givenName?: string;
-  familyName?: string;
-  photoUrl?: string;
-  photoUrlLarge?: string;
-  // We don't actually use nonce in our implementation
-}
-
-// Define the sign-in state interface
-interface GoogleSignInState {
-  isSignedIn: boolean;
-  idToken?: string;
-  accessToken?: string;
-  displayName?: string;
-  email?: string;
-  givenName?: string;
-  familyName?: string;
-  photoUrl?: string;
-}
-
-// Register the plugin with Capacitor - CRITICAL: Make sure this matches the native plugin name
-const GoogleSignIn = registerPlugin<GoogleSignInPlugin>('GoogleSignIn', {
-  web: {
-    // We'll fallback to the web implementation if not on iOS
-    signIn: async () => {
-      console.log("Using web fallback for GoogleSignIn plugin");
-      // For web, use the existing web-based OAuth flow
-      // Use the callback path that matches what's configured in the Supabase dashboard
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          // Don't specify a custom redirectTo - let Supabase handle it
-          // redirectTo: window.location.origin + '/auth/callback',
-          scopes: 'email profile',
-          queryParams: {
-            // Add access_type to ensure refresh tokens are provided
-            access_type: 'offline',
-            // Force prompt to ensure user can select account
-            prompt: 'select_account'
-          }
-        }
-      });
-      
-      if (error) {
-        throw error;
-      }
-      
-      // For web, we'll get a redirect so just return an empty result
-      return {} as GoogleSignInResult;
-    }
-  }
-});
-
-/**
- * Uses the native Google Sign-In SDK on iOS, but falls back to web-based OAuth for other platforms
- */
-export async function nativeGoogleSignIn() {
+// Use appropriate Google Sign-In method based on platform
+export const nativeGoogleSignIn = async () => {
   try {
+    // Get current platform
     const platform = Capacitor.getPlatform();
-    console.log(`Platform detected: ${platform}, Running native: ${Capacitor.isNativePlatform()}`);
+    console.log(`Attempting Google sign-in on platform: ${platform}`);
     
-    // Check if Capacitor plugins are available
-    if (!window.Capacitor || !window.Capacitor.Plugins) {
-      console.error('Capacitor plugins not available');
-      throw new Error('Capacitor environment not properly initialized');
+    // CRITICAL: For iOS, always use the native implementation
+    if (platform === 'ios') {
+      console.log('🔍 iOS platform detected, using fully native implementation');
+      console.log('This function should not be called directly on iOS - authService.googleSignIn() handles iOS natively');
+      
+      // Store debugging information
+      localStorage.setItem('auth_platform', platform);
+      localStorage.setItem('auth_timestamp', new Date().toISOString());
+      localStorage.setItem('google_auth_native_attempt', 'true');
+      
+      // Return true to indicate we're handling this elsewhere (in authService.googleSignIn)
+      return true;
     }
     
-    // Check if the GoogleSignIn plugin is available
-    const pluginNames = Object.keys(window.Capacitor.Plugins);
-    console.log('Available Capacitor plugins:', pluginNames.join(', '));
+    // For non-iOS platforms, use browser-based OAuth flow
+    console.log("Starting OAuth flow for Google sign-in on non-iOS platform");
     
-    // Check specifically for the GoogleSignIn plugin
-    if (!pluginNames.includes('GoogleSignIn')) {
-      console.warn('GoogleSignIn plugin not found in registered plugins!');
-    }
+    // Always use the Supabase callback URL for OAuth redirects
+    const supabaseCallbackUrl = 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
+    const redirectTo = supabaseCallbackUrl;
     
-    // Mark that we're starting an auth process
-    localStorage.setItem('auth_in_progress', 'true');
-    localStorage.setItem('auth_started_at', Date.now().toString());
+    // Store the platform and environment info for debugging
+    localStorage.setItem('auth_platform', platform);
+    localStorage.setItem('auth_redirect_url', redirectTo);
+    localStorage.setItem('supabase_callback_url', supabaseCallbackUrl);
+    localStorage.setItem('auth_timestamp', new Date().toISOString());
     
-    // *** SIMPLIFIED APPROACH: Always use Supabase's OAuth flow ***
-    // This is more reliable and handles token exchange on the server side
-    console.log('Using Supabase OAuth flow for Google authentication');
-    
+    // Generate OAuth URL from Supabase Auth with enhanced options
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // Important: On iOS, don't skip the browser redirect
-        skipBrowserRedirect: false,
+        redirectTo,
         scopes: 'email profile',
         queryParams: {
-          // Request offline access to get refresh tokens
-          access_type: 'offline',
-          // Force account selection dialog
-          prompt: 'select_account'
+          access_type: 'offline', // Enable refresh tokens
+          prompt: 'select_account', // Always show account selection
+          include_granted_scopes: 'true', // Include previously granted scopes
+          state: `platform=${platform}`, // Include platform in state for better tracking
         }
       }
     });
     
     if (error) {
-      console.error('Error initiating OAuth flow:', error);
+      console.error("Error starting Google OAuth flow:", error);
       throw error;
     }
     
-    if (!data?.url) {
-      console.error('No OAuth URL returned from Supabase');
-      throw new Error('Failed to get authentication URL');
+    if (!data.url) {
+      console.error("No OAuth URL returned from Supabase");
+      throw new Error("Failed to get authentication URL");
     }
     
-    console.log('Opening OAuth URL:', data.url);
+    console.log(`Received OAuth URL from Supabase: ${data.url}`);
+    localStorage.setItem('oauth_url', data.url);
     
-    // For native platforms, use Capacitor's App plugin to open URLs
-    if (Capacitor.isNativePlatform()) {
-      console.log("Using App.openUrl to open system browser");
-      try {
-        // This is the proper, recommended way to open URLs with Capacitor
-        await App.openUrl({ url: data.url });
-        console.log("Successfully opened URL with App.openUrl");
-      } catch (err) {
-        console.error("Error opening URL with App.openUrl:", err);
-        
-        // Fallback to window.open as a backup
-        console.log("Falling back to window.open");
-        window.open(data.url, '_system');
-      }
-    } else {
-      // On web, let the redirect happen naturally
-      console.log("Web platform detected, using location.href");
+    // Store the provider for later reference
+    localStorage.setItem('auth_provider', 'google');
+    localStorage.setItem('google_auth_platform', platform);
+    localStorage.setItem('auth_attempt_time', new Date().toISOString());
+    
+    // For web, use window.location directly
+    if (typeof window !== 'undefined' && !Capacitor.isNativePlatform()) {
+      console.log('Using window.location.href for web platform');
       window.location.href = data.url;
+      return true; // Return early since the page will reload
+    } 
+    // For Android, use Capacitor Browser plugin
+    else {
+      console.log('Using Capacitor Browser plugin for Android platform');
+      try {
+        await Browser.open({
+          url: data.url,
+          windowName: '_blank',
+          presentationStyle: 'fullscreen'
+        });
+        console.log('Browser.open call completed successfully');
+      } catch (browserError) {
+        console.error('Browser plugin error:', browserError);
+        
+        // Fallback to window.open if Browser plugin fails
+        console.log('Trying window.open as fallback');
+        window.open(data.url, '_blank');
+      }
     }
     
-    // Return data for handling by the caller
-    return data;
+    // Return true to indicate success in starting the flow
+    // The actual auth result will be handled by a callback
+    return true;
   } catch (error) {
-    console.error('Google Sign-In error:', error);
-    // Clean up auth progress flags on error
-    localStorage.removeItem('auth_in_progress');
-    localStorage.removeItem('auth_started_at');
+    console.error("Google sign-in error:", error);
+    localStorage.removeItem('auth_provider');
     throw error;
   }
-}
+};
 
-/**
- * Checks if the user is already signed in with Google
- * This uses the native GoogleSignIn plugin's checkSignInState method
- */
-export async function checkGoogleSignInState(): Promise<GoogleSignInState> {
+// Function to handle native sign-in with ID token
+// This would be called from the native side in iOS
+export const signInWithGoogleIdToken = async (idToken: string, accessToken?: string) => {
   try {
-    // Only supported on iOS for now
-    if (Capacitor.getPlatform() === 'ios') {
-      console.log('Checking Google Sign-In state');
-      const state = await GoogleSignIn.checkSignInState();
-      console.log('Google Sign-In state:', state);
-      return state;
+    console.log("Signing in with Google ID token");
+    
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: 'google',
+      token: idToken,
+      access_token: accessToken
+    });
+    
+    if (error) {
+      console.error("Error signing in with ID token:", error);
+      throw error;
     }
     
-    // For other platforms, check with Supabase
-    const { data } = await supabase.auth.getSession();
-    if (data?.session) {
-      const provider = data.session.user.app_metadata?.provider;
-      if (provider === 'google') {
-        console.log('Found active Google session in Supabase');
-        return {
-          isSignedIn: true,
-          email: data.session.user.email || undefined,
-          displayName: data.session.user.user_metadata?.full_name,
-        };
-      }
-    }
-    
-    return { isSignedIn: false };
+    console.log("Successfully signed in with Google ID token");
+    return data;
   } catch (error) {
-    console.error('Error checking Google Sign-In state:', error);
-    return { isSignedIn: false };
+    console.error("ID token sign-in error:", error);
+    throw error;
   }
-}
+};
 
-/**
- * Sets up a listener for Google Sign-In state restoration
- * This is useful for automatically signing in users when the app starts
- */
-export function setupGoogleSignInListener(callback: (user: GoogleSignInResult) => void): () => void {
-  if (Capacitor.getPlatform() !== 'ios') {
-    return () => {}; // No-op for non-iOS platforms
-  }
-  
-  let listener: PluginListenerHandle | null = null;
-  
-  const setup = async () => {
-    try {
-      listener = await GoogleSignIn.addListener('signInRestored', (event) => {
-        console.log('Google Sign-In restored event received:', event);
-        if (event.user) {
-          callback(event.user);
-        }
-      });
-    } catch (error) {
-      console.error('Error setting up Google Sign-In listener:', error);
+// Helper to listen for app URLs (for deep linking)
+export const listenForDeepLinks = () => {
+  App.addListener('appUrlOpen', async ({ url }) => {
+    console.log('App opened with URL:', url);
+    
+    // Handle the authentication callback
+    if (url.includes('auth/callback')) {
+      console.log('Processing auth callback from deep link');
+      // The AuthCallback component will handle the rest
     }
-  };
-  
-  setup();
-  
-  // Return cleanup function
-  return () => {
-    if (listener) {
-      listener.remove().catch(error => {
-        console.error('Error removing Google Sign-In listener:', error);
-      });
-    }
-  };
-}
-
-export default nativeGoogleSignIn;
+  });
+};

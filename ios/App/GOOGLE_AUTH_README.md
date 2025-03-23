@@ -1,114 +1,96 @@
-# Google Authentication Implementation Guide
+# Google Authentication Implementation for iOS
 
-This document explains how Google Sign-In is implemented in the Introgy app and provides troubleshooting information for common issues.
+This document explains how the Google Authentication has been implemented in the iOS version of the app.
 
-## Implementation Overview
+## Overview
 
-The app uses a hybrid approach to Google authentication:
+The app uses a hybrid approach for Google authentication:
+- **iOS**: Uses native Google Sign-In SDK directly via a custom Capacitor plugin
+- **Web/Android**: Uses browser-based OAuth flow via Supabase
 
-1. On iOS, it uses the native Google Sign-In SDK through a custom Capacitor plugin
-2. On web, it uses Supabase OAuth flow
+## Configuration
 
-### Key Components
+The Google Sign-In configuration uses:
+- Client ID: `308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com`
+- URL Scheme: `com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2`
+- Bundle ID: `ai.introgy.app`
 
-- **Native iOS Implementation**:
-  - `GoogleSignInHandler.swift`: Core handler for Google Sign-In operations
-  - `GoogleSignInPlugin.swift`: Capacitor plugin exposing native functionality to JavaScript
-  - `GoogleSignInViewController.swift`: UI for the sign-in flow
-  - `AppDelegate.swift`: Handles URL callbacks and restores sign-in state
+## Key Files
 
-- **JavaScript Implementation**:
-  - `nativeGoogleAuth.ts`: Service that manages Google authentication
-  - `useGoogleAuth.ts`: React hook for integrating with the auth context
+1. **Native Plugin Implementation**:
+   - `/ios/App/App/GoogleAuthPlugin.swift` - Main plugin implementation
+   - `/ios/App/App/GoogleAuthPlugin.m` - Plugin registration
+   - `/ios/App/App/GoogleSignInViewController.swift` - UI for sign-in
+   - `/ios/App/App/GoogleSignOutViewController.swift` - UI for sign-out
 
-- **Configuration**:
-  - `capacitor.config.ts`: Contains client IDs and scopes
-  - `Info.plist`: URL schemes and GIDClientID
-  - `client_308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com.plist`: Credentials file
+2. **JavaScript Integration**:
+   - `/src/services/nativeGoogleAuth.ts` - Platform detection and routing
+   - `/src/contexts/auth/authService.ts` - Authentication service
+   - `/src/hooks/useGoogleAuth.ts` - React hook
 
-## Client IDs
+3. **Configuration**:
+   - `/ios/App/App/Info.plist` - URL schemes and permissions
+   - `/capacitor.config.ts` - Capacitor plugin settings
+   - `/ios/App/App/client_308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com.plist` - Google credentials
 
-The app uses two different client IDs:
+## Testing Instructions
 
-1. **iOS Client ID**: `308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com`
-2. **Web Client ID**: `308656966304-ouvq7u7q9sms8rujjtqpevaqr120vdge.apps.googleusercontent.com`
+To test the Google Sign-In implementation:
 
-## Authentication Flow
+1. **Verify Configuration**:
+   ```bash
+   cd ios/App/App
+   ./ensure_google_credentials.sh
+   ```
+   This script checks all configuration files and ensures they are set up correctly.
 
-1. User taps "Sign in with Google" in the app
-2. On iOS:
-   - Native Google Sign-In UI is presented
-   - User authenticates with Google
-   - App receives ID token and access token
-   - Tokens are exchanged with Supabase
+2. **Build and Run**:
+   - Build and run the app on a real iOS device (not simulator)
+   - Navigate to the sign-in screen
+   - Tap the Google Sign-In button
+   - The native Google Sign-In UI should appear (not a browser window)
+   - After signing in, verify that you are successfully authenticated
 
-3. On web:
-   - Supabase OAuth flow is used
-   - User is redirected to Google for authentication
-   - Redirected back to app with tokens
-   - Supabase handles the token exchange
+3. **Debug Mode**:
+   - The implementation includes extensive debug logs
+   - Look for log messages with the 📱 emoji prefix
+   - Check for any authentication-related errors
 
-## Common Issues and Solutions
+## Troubleshooting
 
-### 1. Google Sign-In Not Working on iOS
+If Google Sign-In doesn't work:
 
-**Symptoms**: Tapping the Google sign-in button does nothing or shows an error.
+1. **Check URL Schemes**:
+   - Ensure the URL scheme is correctly registered in `Info.plist`
+   - The URL scheme should be: `com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2`
 
-**Possible Causes and Solutions**:
+2. **Check Plugin Registration**:
+   - Verify that `plugin.m` includes the `GoogleAuthPlugin` registration
 
-- **Missing Credentials File**: Ensure `client_308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com.plist` exists in the project and is included in the build.
-  
-- **URL Scheme Issue**: Verify URL schemes in Info.plist include `com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2`
+3. **Check Credentials**:
+   - Run `ensure_google_credentials.sh` to verify all credentials
+   - Ensure the Google credentials plist file exists and has correct values
 
-- **Plugin Registration Issue**: Check that both plugins are registered properly:
-  - `GoogleAuthPlugin` should be registered as "GoogleAuth"
-  - `GoogleSignInPlugin` should be registered as "GoogleSignIn"
+4. **Check URL Handling**:
+   - In `AppDelegate.swift`, verify that the Google Sign-In URL handling is working
+   - Check logs for any URL-related errors
 
-- **SDK Initialization**: Verify Google Sign-In is initialized in AppDelegate with the correct client ID
+## Implementation Notes
 
-### 2. "Requested Path is Invalid" Error
+- The implementation separates the authentication flow between iOS and web/Android
+- On iOS, it uses the native Google Sign-In SDK through a custom Capacitor plugin
+- The native implementation provides better security and user experience on iOS
+- After Google authentication, tokens are passed to Supabase for session management
 
-**Symptoms**: Authentication starts but fails with "requested path is invalid" error.
+## Security Considerations
 
-**Solution**:
-- Do not specify custom redirect URLs in the Supabase call
-- Let Supabase use its default redirect URLs
+- ID tokens and access tokens are passed securely through the native plugin
+- No tokens are stored in local storage, only in memory during the authentication process
+- URL schemes are protected against hijacking by proper bundle ID verification
 
-### 3. Authentication Not Persisting
+## Future Improvements
 
-**Symptoms**: User needs to sign in again every time they open the app.
-
-**Solution**:
-- Ensure `restorePreviousSignIn` is called in AppDelegate
-- Verify that the `GoogleSignInPlugin` adds an observer for restoration events
-
-## Testing
-
-To test the Google Sign-In flow:
-
-1. Run the app on an iOS device or simulator
-2. Tap "Sign in with Google"
-3. Complete the authentication flow
-4. Verify that the user stays signed in when reopening the app
-
-## Debugging
-
-For debugging authentication issues:
-
-1. Check the Xcode console for detailed logs
-2. Look for events with the "📱" prefix for native Google Sign-In logs
-3. Use the iOS App Authentication debug page to see detailed token information
-
-## Build Notes
-
-To ensure Google Sign-In works properly in production builds:
-
-1. Run `ensure_google_credentials.sh` during the build process
-2. Make sure the Google credentials plist file is included in the Xcode project
-3. Verify that the URL schemes are properly configured
-
-## References
-
-- [Google Sign-In for iOS Documentation](https://developers.google.com/identity/sign-in/ios/start)
-- [Supabase OAuth Documentation](https://supabase.com/docs/guides/auth/social-login/auth-google)
-- [Capacitor Deep Linking Guide](https://capacitorjs.com/docs/apis/app#handling-deep-links)
+- Add more detailed error reporting to the UI
+- Enhance token refresh handling
+- Improve sign-out experience
+- Add additional sign-in methods
