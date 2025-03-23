@@ -15,11 +15,8 @@ const GoogleIcon = ({ className }: { className?: string }) => {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
-      <path d="M15.5 8.5L14 12l-2 1-2-1-1.5-3.5" />
-      <path d="M7 17l2.5-5" />
-      <path d="M14.5 12l2.5 5" />
-      <path d="M9.5 8.5L12 10l2.5-1.5" />
+      <circle cx="12" cy="12" r="10" />
+      <path d="M8 12 L12 16 L17 7" />
     </svg>
   );
 };

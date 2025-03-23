@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/auth';
 import { Link } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
-import GoogleIcon from '@/components/icons/GoogleIcon';
+import { GoogleIcon } from '@/components/icons';
 
 const Auth = () => {
   const { signIn, signUp, signInWithGoogle, signInWithOTP, isLoading } = useAuth();
