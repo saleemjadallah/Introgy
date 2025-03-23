@@ -43,7 +43,9 @@ const AIProfileWizard = ({
   
   const handlePhrasesGenerated = (phrasesData: any) => {
     setPhrases(phrasesData);
-    setShowPhrasesDialog(true);
+    if (phrasesData) {
+      setShowPhrasesDialog(true);
+    }
   };
   
   const handleApplyEnhancements = (updatedProfile: Partial<CommunicationProfile>) => {

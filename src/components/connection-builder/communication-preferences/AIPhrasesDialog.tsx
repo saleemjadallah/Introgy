@@ -15,7 +15,7 @@ interface AIPhrasesDialogProps {
     exitStrategies: string[];
     followUps: string[];
     explanation: string;
-  };
+  } | null;
 }
 
 const AIPhrasesDialog = ({
@@ -26,6 +26,22 @@ const AIPhrasesDialog = ({
   const { toast } = useToast();
   const [copiedPhrases, setCopiedPhrases] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('introductions');
+  
+  // Add null check to handle cases where phrases is null
+  if (!phrases) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>AI-Generated Communication Phrases</DialogTitle>
+            <DialogDescription>
+              No phrases have been generated yet. Please generate some phrases first.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    );
+  }
   
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
