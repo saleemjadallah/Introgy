@@ -15,31 +15,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Initialize RevenueCat with proper configuration
         Purchases.logLevel = .debug
-        // Use the same API key that's in the capacitor.config.ts
         let apiKey = "appl_wHXBFRFAOUUpWRqauPXyZEUElmq"
-        // Configure with standard options
         Purchases.configure(withAPIKey: apiKey)
         
-        // Configure Google Sign-In
-        let clientID = "308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com"
-        let config = GIDConfiguration(clientID: clientID)
-        GIDSignIn.sharedInstance.configuration = config
+        // Configure Google Sign-In using our service
+        GoogleAuthService.shared.configure()
         
-        // Log configuration for debugging
-        print("📱 Configured Google Sign-In with client ID: \(clientID)")
+        // Run verification to help with debugging
+        GoogleAuthVerifier.verifySetup()
         
-        // Attempt to restore the user's sign-in state
-        GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
-            if let user = user {
-                print("📱 User is already signed in with Google: \(user.profile?.email ?? "Unknown")")
-            } else if let error = error {
-                print("📱 Failed to restore Google Sign-In: \(error.localizedDescription)")
-            } else {
-                print("📱 No previous Google Sign-In session found")
-            }
-        }
-        
-        // Initialize Capacitor web view - this will load your web content
+        // Initialize Capacitor web view
         let viewController = CAPBridgeViewController.init()
         let navController = UINavigationController(rootViewController: viewController)
         navController.navigationBar.isHidden = true
@@ -77,7 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("📱 AppDelegate: Received URL: \(url.absoluteString)")
         
         // Handle Google Sign-In callbacks first - this is the critical part for Google authentication
-        if GIDSignIn.sharedInstance.handle(url) {
+        if GoogleAuthService.shared.handleURL(url) {
             print("📱 URL handled by Google Sign-In")
             return true
         }
@@ -108,7 +93,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
     }
     
-    // Helper function to extract parameters from URLs
     private func extractParameter(from urlString: String, param: String) -> String? {
         guard let range = urlString.range(of: "\(param)=") else {
             return nil

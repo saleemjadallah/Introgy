@@ -6,25 +6,42 @@ import { toast } from "sonner";
 
 // Constants
 const IOS_PLATFORM = 'ios';
+const PLUGIN_NAME = 'GoogleAuth';
 
-// Register the GoogleAuth plugin
+// Types
+export interface GoogleAuthUser {
+  idToken: string;
+  accessToken: string;
+  email?: string;
+  displayName?: string;
+  givenName?: string;
+  familyName?: string;
+  photoUrl?: string;
+  photoUrlLarge?: string;
+  userId?: string;
+}
+
 export interface GoogleAuthPlugin {
-  signIn(): Promise<any>;
-  signInWithSupabase(): Promise<{ idToken: string; accessToken: string }>;
+  signIn(): Promise<GoogleAuthUser>;
+  signInWithSupabase(): Promise<GoogleAuthUser>;
   signOut(): Promise<{ success: boolean }>;
-  refresh(): Promise<{ idToken: string; accessToken: string }>;
+  refresh(): Promise<Pick<GoogleAuthUser, 'idToken' | 'accessToken'>>;
   isSignedIn(): Promise<{ isSignedIn: boolean }>;
-  getCurrentUser(): Promise<any>;
+  getCurrentUser(): Promise<GoogleAuthUser & { isSignedIn: boolean }>;
   disconnect(): Promise<{ success: boolean }>;
 }
 
+// Plugin instance
 export let GoogleAuth: GoogleAuthPlugin | null = null;
 
-// Initialize the plugin if available
-export const initGoogleAuthPlugin = () => {
+/**
+ * Initializes the Google Auth plugin if available
+ * @returns Boolean indicating if plugin was successfully initialized
+ */
+export const initGoogleAuthPlugin = (): boolean => {
   try {
-    if (Capacitor.isPluginAvailable('GoogleAuth')) {
-      GoogleAuth = (Capacitor as any).Plugins.GoogleAuth;
+    if (Capacitor.isPluginAvailable(PLUGIN_NAME)) {
+      GoogleAuth = (Capacitor as any).Plugins[PLUGIN_NAME];
       console.log("GoogleAuth plugin initialized");
       return true;
     } else {
@@ -37,7 +54,10 @@ export const initGoogleAuthPlugin = () => {
   }
 };
 
-// Check Google Sign-In state (for iOS mainly)
+/**
+ * Checks the current Google Sign-In state
+ * @returns Object containing sign-in state and user info if signed in
+ */
 export const checkGoogleSignInState = async () => {
   try {
     if (!GoogleAuth) {
@@ -63,22 +83,26 @@ export const checkGoogleSignInState = async () => {
   }
 };
 
-// Set up listener for Google Sign-In restoration events (iOS only)
-export const setupGoogleSignInListener = (callback: (userData: any) => void) => {
+/**
+ * Sets up a listener for Google Sign-In restoration events (iOS only)
+ * @param callback Function to call when sign-in is restored
+ * @returns Function to remove the listener
+ */
+export const setupGoogleSignInListener = (callback: (userData: GoogleAuthUser) => void) => {
   if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== IOS_PLATFORM || !GoogleAuth) {
     return () => {}; // No-op cleanup function
   }
   
-  // For iOS, we would set up a listener for sign-in restoration
+  // For iOS, set up a listener for sign-in restoration
   const eventName = "signInRestored";
-  const handler = (event: any) => {
+  const handler = (event: { user: GoogleAuthUser }) => {
     if (event.user) {
       callback(event.user);
     }
   };
   
   // Add listener
-  const removeListener = (Capacitor as any).Plugins.GoogleAuth.addListener(eventName, handler);
+  const removeListener = (Capacitor as any).Plugins[PLUGIN_NAME].addListener(eventName, handler);
   
   // Return cleanup function
   return () => {
@@ -86,17 +110,16 @@ export const setupGoogleSignInListener = (callback: (userData: any) => void) => 
   };
 };
 
-// Sign in with Google
+/**
+ * Main function to sign in with Google
+ * Uses native flow on iOS, browser-based flow elsewhere
+ */
 export const googleSignIn = async () => {
   try {
     // Store auth info for debugging
-    localStorage.setItem('auth_start_time', new Date().toISOString());
-    localStorage.setItem('auth_started_at', Date.now().toString());
-    localStorage.setItem('google_auth_initiated', 'true');
-    localStorage.setItem('google_auth_timestamp', Date.now().toString());
+    storeAuthDebugInfo();
     
     const platform = Capacitor.getPlatform();
-    localStorage.setItem('auth_platform', platform);
     console.log(`Starting Google Sign-In process on ${platform} platform`);
     
     // If on iOS, use native Google Sign-In
@@ -134,36 +157,45 @@ export const googleSignIn = async () => {
   }
 };
 
-// Browser-based Google sign-in flow
+/**
+ * Store debug information for Google Auth
+ */
+const storeAuthDebugInfo = () => {
+  localStorage.setItem('auth_start_time', new Date().toISOString());
+  localStorage.setItem('auth_started_at', Date.now().toString());
+  localStorage.setItem('google_auth_initiated', 'true');
+  localStorage.setItem('google_auth_timestamp', Date.now().toString());
+  localStorage.setItem('auth_platform', Capacitor.getPlatform());
+};
+
+/**
+ * Browser-based Google sign-in flow
+ */
 const browserBasedGoogleSignIn = async () => {
   try {
     // Get current platform
     const platform = Capacitor.getPlatform();
     console.log(`Setting up browser-based Google sign-in on platform: ${platform}`);
     
-    // Supabase callback URL for OAuth redirects
-    const callbackUrl = getRedirectUrl();
-    console.log("Using redirect URL:", callbackUrl);
+    // Determine proper redirect URL
+    const redirectTo = getRedirectUrl();
+    console.log("Using redirect URL:", redirectTo);
     
-    // Use callbackUrl but fall back to Supabase default if empty
-    const redirectTo = callbackUrl || 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
-    
-    // Store the platform and environment info for debugging
+    // Store debug info
     localStorage.setItem('auth_redirect_url', redirectTo);
-    localStorage.setItem('auth_callback_url', callbackUrl || '');
     localStorage.setItem('auth_timestamp', new Date().toISOString());
     
-    // Generate OAuth URL from Supabase Auth with enhanced options
+    // Generate OAuth URL from Supabase Auth
     const authResponse = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo,
         scopes: 'email profile',
         queryParams: {
-          access_type: 'offline', // Enable refresh tokens
-          prompt: 'select_account', // Always show account selection
-          include_granted_scopes: 'true', // Include previously granted scopes
-          state: `platform=${platform}`, // Include platform in state for better tracking
+          access_type: 'offline',
+          prompt: 'select_account',
+          include_granted_scopes: 'true',
+          state: `platform=${platform}`,
         }
       }
     });
@@ -181,41 +213,14 @@ const browserBasedGoogleSignIn = async () => {
     console.log(`Received OAuth URL from Supabase: ${authResponse.data.url}`);
     localStorage.setItem('oauth_url', authResponse.data.url);
     
-    // Store the provider for later reference
+    // Store auth provider info
     localStorage.setItem('auth_provider', 'google');
     localStorage.setItem('google_auth_platform', platform);
-    localStorage.setItem('auth_attempt_time', new Date().toISOString());
     
-    // For web, use window.location directly
-    if (typeof window !== 'undefined' && !Capacitor.isNativePlatform()) {
-      console.log('Using window.location.href for web platform');
-      
-      // Add small delay to ensure localStorage is written
-      setTimeout(() => {
-        // Directly navigating to the URL
-        window.location.href = authResponse.data.url;
-      }, 50);
-      
-      return { url: authResponse.data.url }; // Return the URL for reference
-    } 
-    // For Android, use system browser fallback
-    else {
-      console.log('Using system browser for mobile platform');
-      try {
-        // Try using system browser via window.open
-        window.open(authResponse.data.url, '_blank');
-        console.log('Window.open call completed successfully');
-      } catch (browserError) {
-        console.error('Browser opening error:', browserError);
-        
-        // Ultimate fallback to window.location
-        console.log('Falling back to window.location');
-        window.location.href = authResponse.data.url;
-      }
-      
-      return { url: authResponse.data.url }; // Return the URL for reference
-    }
+    // Handle navigation to the OAuth URL
+    handleOAuthNavigation(authResponse.data.url);
     
+    return { url: authResponse.data.url };
   } catch (error) {
     console.error("Google sign-in error:", error);
     localStorage.removeItem('auth_provider');
@@ -223,42 +228,65 @@ const browserBasedGoogleSignIn = async () => {
   }
 };
 
-// Function to get the proper redirect URL based on environment
-function getRedirectUrl() {
+/**
+ * Handle navigation to the OAuth URL based on platform
+ */
+const handleOAuthNavigation = (url: string) => {
+  // For web, use window.location directly
+  if (!Capacitor.isNativePlatform()) {
+    console.log('Using window.location.href for web platform');
+    
+    // Add small delay to ensure localStorage is written
+    setTimeout(() => {
+      window.location.href = url;
+    }, 50);
+    return;
+  } 
+  
+  // For mobile platforms, try system browser
+  console.log('Using system browser for mobile platform');
+  try {
+    window.open(url, '_blank');
+    console.log('Window.open call completed successfully');
+  } catch (browserError) {
+    console.error('Browser opening error:', browserError);
+    
+    // Ultimate fallback to window.location
+    console.log('Falling back to window.location');
+    window.location.href = url;
+  }
+};
+
+/**
+ * Function to get the proper redirect URL based on environment
+ */
+export function getRedirectUrl(): string {
   const hostname = window.location.hostname;
   const protocol = window.location.protocol;
   const port = window.location.port ? `:${window.location.port}` : '';
   
   console.log(`Determining redirect URL for hostname: ${hostname}`);
   
-  // For development environments
+  // Use the full URL including protocol, not just the domain
   if (hostname === 'localhost' || hostname.includes('127.0.0.1')) {
-    const redirectUrl = `${protocol}//${hostname}${port}/auth`;
-    console.log(`Using local development redirect URL: ${redirectUrl}`);
-    return redirectUrl;
+    return `${protocol}//${hostname}${port}/auth`;
   }
   
-  // For production/preview environments
   if (hostname.includes('lovableproject.com')) {
-    const redirectUrl = `${protocol}//${hostname}/auth`;
-    console.log(`Using preview environment redirect URL: ${redirectUrl}`);
-    return redirectUrl;
+    return `${protocol}//${hostname}/auth`;
   }
   
-  // For deployed app
-  if (hostname === 'introgy.ai' || hostname.includes('introgy')) {
-    const redirectUrl = `${protocol}//${hostname}/auth`;
-    console.log(`Using production app redirect URL: ${redirectUrl}`);
-    return redirectUrl;
+  if (hostname.includes('introgy')) {
+    return `${protocol}//${hostname}/auth`;
   }
   
-  // Fallback to current origin
-  const fallbackUrl = `${protocol}//${hostname}${port}/auth`;
-  console.log(`Using fallback redirect URL: ${fallbackUrl}`);
-  return fallbackUrl;
+  // Fallback to current origin with auth path
+  return `${protocol}//${hostname}${port}/auth`;
 }
 
-// Function to handle native sign-in with ID token
+/**
+ * Function to handle native sign-in with ID token
+ */
 export const signInWithGoogleIdToken = async (idToken: string, accessToken?: string) => {
   try {
     console.log("Signing in with Google ID token");
@@ -282,9 +310,10 @@ export const signInWithGoogleIdToken = async (idToken: string, accessToken?: str
   }
 };
 
-// Helper to listen for app URLs (for deep linking)
+/**
+ * Helper to listen for app URLs (for deep linking)
+ */
 export const listenForDeepLinks = () => {
-  // Log that we're setting up the deeplink listener
   console.log('Setting up deeplink listener');
   
   App.addListener('appUrlOpen', async ({ url }) => {
@@ -297,3 +326,6 @@ export const listenForDeepLinks = () => {
     }
   });
 };
+
+// Initialize the plugin on module load
+initGoogleAuthPlugin();
