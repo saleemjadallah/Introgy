@@ -1,14 +1,13 @@
+
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useAuth } from '@/contexts/auth';
 import { listenForDeepLinks, initGoogleAuthPlugin } from '@/services/googleAuthService';
 
 export default function useGoogleAuth() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { isLoading } = useAuth();
 
   // Initialize Google Auth plugin on component mount
   useEffect(() => {
@@ -65,10 +64,8 @@ export default function useGoogleAuth() {
       }
     };
     
-    if (!isLoading) {
-      handleAuthCallback();
-    }
-  }, [searchParams, navigate, isLoading]);
+    handleAuthCallback();
+  }, [searchParams, navigate]);
   
   // Check for OAuth timeout - this cleans up if redirect failed
   useEffect(() => {

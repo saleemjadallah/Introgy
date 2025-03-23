@@ -1,4 +1,5 @@
-import { Capacitor, registerPlugin } from "@capacitor/core";
+
+import { Capacitor } from "@capacitor/core";
 import { App } from '@capacitor/app';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -150,7 +151,7 @@ const browserBasedGoogleSignIn = async () => {
     localStorage.setItem('auth_timestamp', new Date().toISOString());
     
     // Generate OAuth URL from Supabase Auth with enhanced options
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const authResponse = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo,
@@ -164,18 +165,18 @@ const browserBasedGoogleSignIn = async () => {
       }
     });
     
-    if (error) {
-      console.error("Error starting Google OAuth flow:", error);
-      throw error;
+    if (authResponse.error) {
+      console.error("Error starting Google OAuth flow:", authResponse.error);
+      throw authResponse.error;
     }
     
-    if (!data.url) {
+    if (!authResponse.data.url) {
       console.error("No OAuth URL returned from Supabase");
       throw new Error("Failed to get authentication URL");
     }
     
-    console.log(`Received OAuth URL from Supabase: ${data.url}`);
-    localStorage.setItem('oauth_url', data.url);
+    console.log(`Received OAuth URL from Supabase: ${authResponse.data.url}`);
+    localStorage.setItem('oauth_url', authResponse.data.url);
     
     // Store the provider for later reference
     localStorage.setItem('auth_provider', 'google');
@@ -185,25 +186,25 @@ const browserBasedGoogleSignIn = async () => {
     // For web, use window.location directly
     if (typeof window !== 'undefined' && !Capacitor.isNativePlatform()) {
       console.log('Using window.location.href for web platform');
-      window.location.href = data.url;
-      return { url: data.url }; // Return the URL for reference
+      window.location.href = authResponse.data.url;
+      return { url: authResponse.data.url }; // Return the URL for reference
     } 
     // For Android, use system browser fallback
     else {
       console.log('Using system browser for mobile platform');
       try {
         // Try using system browser via window.open
-        window.open(data.url, '_blank');
+        window.open(authResponse.data.url, '_blank');
         console.log('Window.open call completed successfully');
       } catch (browserError) {
         console.error('Browser opening error:', browserError);
         
         // Ultimate fallback to window.location
         console.log('Falling back to window.location');
-        window.location.href = data.url;
+        window.location.href = authResponse.data.url;
       }
       
-      return { url: data.url }; // Return the URL for reference
+      return { url: authResponse.data.url }; // Return the URL for reference
     }
     
   } catch (error) {
@@ -218,19 +219,19 @@ export const signInWithGoogleIdToken = async (idToken: string, accessToken?: str
   try {
     console.log("Signing in with Google ID token");
     
-    const { data, error } = await supabase.auth.signInWithIdToken({
+    const signInResponse = await supabase.auth.signInWithIdToken({
       provider: 'google',
       token: idToken,
       access_token: accessToken
     });
     
-    if (error) {
-      console.error("Error signing in with ID token:", error);
-      throw error;
+    if (signInResponse.error) {
+      console.error("Error signing in with ID token:", signInResponse.error);
+      throw signInResponse.error;
     }
     
     console.log("Successfully signed in with Google ID token");
-    return data;
+    return signInResponse.data;
   } catch (error) {
     console.error("ID token sign-in error:", error);
     throw error;

@@ -20,9 +20,17 @@ import { AuthProvider } from "@/contexts/auth";
 import { PremiumProvider } from "@/contexts/premium";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DeepLinkHandler from "@/components/DeepLinkHandler";
+import useGoogleAuth from "@/hooks/useGoogleAuth";
 
 // Create a client
 const queryClient = new QueryClient();
+
+// Custom GoogleAuthProvider to prevent circular dependency
+const GoogleAuthProvider = ({ children }: { children: React.ReactNode }) => {
+  // This hook will set up deep link listeners and handle auth callbacks
+  useGoogleAuth();
+  return <>{children}</>;
+};
 
 function App() {
   return (
@@ -30,38 +38,40 @@ function App() {
     <Router>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <PremiumProvider>
-            <DeepLinkHandler />
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/auth/test" element={<AuthTest />} />
-              <Route path="/auth/callback" element={<AuthCallback />} />
-              <Route path="/auth/google/callback" element={<AuthCallback />} />
-              <Route path="/web-callback-test.html" element={<AuthCallback />} />
-              <Route path="/callback" element={<AuthCallback />} />
-              <Route path="/api/auth/callback" element={<AuthCallback />} />
-              <Route path="/auth/v1/callback" element={<AuthCallback />} />
-              {/* Routes for handling redirects from introgy.ai domain */}
-              <Route path="/introgy.ai/auth/callback" element={<AuthCallback />} />
-              <Route path="/introgy.ai/auth/google/callback" element={<AuthCallback />} />
-              <Route path="/introgy.ai" element={<AuthCallback />} />
-              <Route path="/introgy.ai/*" element={<AuthCallback />} />
-              <Route path="/auth/debug" element={<AuthDebug />} />
-              <Route path="/auth/debug-callback" element={<DebugCallback />} />
-              <Route path="/" element={<Layout />}>
-                <Route index element={<Home />} />
-                <Route path="social-battery" element={<SocialBattery />} />
-                <Route path="social-navigation" element={<SocialNavigation />} />
-                <Route path="connection-builder" element={<ConnectionBuilder />} />
-                <Route path="wellbeing" element={<Wellbeing />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="faq" element={<FAQ />} />
-              </Route>
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
-            </Routes>
-            <Toaster position="top-center" />
-          </PremiumProvider>
+          <GoogleAuthProvider>
+            <PremiumProvider>
+              <DeepLinkHandler />
+              <Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/auth/test" element={<AuthTest />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/auth/google/callback" element={<AuthCallback />} />
+                <Route path="/web-callback-test.html" element={<AuthCallback />} />
+                <Route path="/callback" element={<AuthCallback />} />
+                <Route path="/api/auth/callback" element={<AuthCallback />} />
+                <Route path="/auth/v1/callback" element={<AuthCallback />} />
+                {/* Routes for handling redirects from introgy.ai domain */}
+                <Route path="/introgy.ai/auth/callback" element={<AuthCallback />} />
+                <Route path="/introgy.ai/auth/google/callback" element={<AuthCallback />} />
+                <Route path="/introgy.ai" element={<AuthCallback />} />
+                <Route path="/introgy.ai/*" element={<AuthCallback />} />
+                <Route path="/auth/debug" element={<AuthDebug />} />
+                <Route path="/auth/debug-callback" element={<DebugCallback />} />
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Home />} />
+                  <Route path="social-battery" element={<SocialBattery />} />
+                  <Route path="social-navigation" element={<SocialNavigation />} />
+                  <Route path="connection-builder" element={<ConnectionBuilder />} />
+                  <Route path="wellbeing" element={<Wellbeing />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="faq" element={<FAQ />} />
+                </Route>
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+              </Routes>
+              <Toaster position="top-center" />
+            </PremiumProvider>
+          </GoogleAuthProvider>
         </AuthProvider>
       </QueryClientProvider>
     </Router>

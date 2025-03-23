@@ -5,7 +5,6 @@ import { Session, AuthChangeEvent, User } from "@supabase/supabase-js";
 import { toast } from "sonner";
 import { AuthContextProps } from "./types";
 import * as authService from "./authService";
-import useGoogleAuth from "@/hooks/useGoogleAuth";
 import { Capacitor } from "@capacitor/core";
 import { checkGoogleSignInState, setupGoogleSignInListener } from "@/services/googleAuthService";
 
@@ -16,8 +15,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  
-  useGoogleAuth();
 
   useEffect(() => {
     const setInitialSession = async () => {

@@ -1,10 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { initGoogleAuthPlugin, googleSignIn as initiateGoogleSignIn } from "@/services/googleAuthService";
 import { Capacitor } from "@capacitor/core";
+import { GoogleAuth } from "@/services/googleAuthService";
 
-// Register the GoogleAuth plugin
-interface GoogleAuthPlugin {
+// Type definition for GoogleAuth plugin
+interface GoogleAuthPluginInterface {
   signIn(): Promise<any>;
   signInWithSupabase(): Promise<{ idToken: string; accessToken: string }>;
   signOut(): Promise<{ success: boolean }>;
@@ -13,10 +13,6 @@ interface GoogleAuthPlugin {
   getCurrentUser(): Promise<any>;
   disconnect(): Promise<{ success: boolean }>;
 }
-
-// Use the Capacitor registerPlugin properly
-const { registerPlugin } = Capacitor;
-export const GoogleAuth = registerPlugin<GoogleAuthPlugin>('GoogleAuth');
 
 export const emailSignIn = async (email: string, password: string) => {
   const response = await supabase.auth.signInWithPassword({ email, password: password || "" });
@@ -232,12 +228,14 @@ export const signOut = async () => {
   return true;
 };
 
+// Import and re-export the googleSignIn function from googleAuthService
+import { googleSignIn as originalGoogleSignIn } from "@/services/googleAuthService";
+
 export const googleSignIn = async () => {
   try {
-    // Use the imported function from googleAuthService
-    return await initiateGoogleSignIn();
+    return await originalGoogleSignIn();
   } catch (error) {
-    console.error("Error during Google sign-in:", error);
+    console.error("Error during Google sign-in from authService:", error);
     toast.error('Sign-in failed');
     throw error;
   }
