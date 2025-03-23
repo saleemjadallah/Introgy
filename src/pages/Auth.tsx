@@ -51,8 +51,8 @@ const Auth = () => {
       console.log(`Device info - Platform: ${platform}, Native: ${isNative}`);
       
       // Check for available plugins
-      if (window.Capacitor && window.Capacitor.Plugins) {
-        console.log("Available plugins:", Object.keys(window.Capacitor.Plugins));
+      if (Capacitor.Plugins) {
+        console.log("Available plugins:", Object.keys(Capacitor.Plugins));
       }
       
       // Set a timeout to detect if the redirect isn't happening

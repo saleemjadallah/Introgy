@@ -1,8 +1,6 @@
-
-import { Capacitor } from "@capacitor/core";
-import { Browser } from '@capacitor/browser';
-import { supabase } from "@/integrations/supabase/client";
+import { Capacitor, registerPlugin } from "@capacitor/core";
 import { App } from '@capacitor/app';
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 // Constants
@@ -113,14 +111,10 @@ export const googleSignIn = async () => {
         }
         
         // Sign in with Supabase using the token
-        const { data, error } = await signInWithGoogleIdToken(idToken, accessToken);
-        
-        if (error) {
-          throw error;
-        }
+        const result = await signInWithGoogleIdToken(idToken, accessToken);
         
         console.log('Successfully signed in with Google on iOS');
-        return data;
+        return result;
       } catch (error) {
         console.error('Error with native iOS Google sign-in:', error);
         toast.error('Sign-in failed');
@@ -192,30 +186,26 @@ const browserBasedGoogleSignIn = async () => {
     if (typeof window !== 'undefined' && !Capacitor.isNativePlatform()) {
       console.log('Using window.location.href for web platform');
       window.location.href = data.url;
-      return true; // Return early since the page will reload
+      return { url: data.url }; // Return the URL for reference
     } 
-    // For Android, use Capacitor Browser plugin
+    // For Android, use system browser fallback
     else {
-      console.log('Using Capacitor Browser plugin for Android platform');
+      console.log('Using system browser for mobile platform');
       try {
-        await Browser.open({
-          url: data.url,
-          windowName: '_blank',
-          presentationStyle: 'fullscreen'
-        });
-        console.log('Browser.open call completed successfully');
-      } catch (browserError) {
-        console.error('Browser plugin error:', browserError);
-        
-        // Fallback to window.open if Browser plugin fails
-        console.log('Trying window.open as fallback');
+        // Try using system browser via window.open
         window.open(data.url, '_blank');
+        console.log('Window.open call completed successfully');
+      } catch (browserError) {
+        console.error('Browser opening error:', browserError);
+        
+        // Ultimate fallback to window.location
+        console.log('Falling back to window.location');
+        window.location.href = data.url;
       }
+      
+      return { url: data.url }; // Return the URL for reference
     }
     
-    // Return true to indicate success in starting the flow
-    // The actual auth result will be handled by a callback
-    return true;
   } catch (error) {
     console.error("Google sign-in error:", error);
     localStorage.removeItem('auth_provider');
