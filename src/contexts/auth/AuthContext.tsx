@@ -160,8 +160,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log("Starting Google sign in flow");
       console.log("Current URL:", window.location.origin);
       
+      // Store debug info
       localStorage.setItem('auth_environment', window.location.hostname);
       localStorage.setItem('auth_is_native', String(Capacitor.isNativePlatform()));
+      localStorage.setItem('auth_origin', window.location.origin);
+      localStorage.setItem('auth_pathname', window.location.pathname);
       
       localStorage.setItem('google_auth_initiated', 'true');
       localStorage.setItem('google_auth_timestamp', Date.now().toString());

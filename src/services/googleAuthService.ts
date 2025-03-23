@@ -141,8 +141,9 @@ const browserBasedGoogleSignIn = async () => {
     const platform = Capacitor.getPlatform();
     console.log(`Setting up browser-based Google sign-in on platform: ${platform}`);
     
-    // Always use the Supabase callback URL for OAuth redirects
-    const supabaseCallbackUrl = 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
+    // Supabase callback URL for OAuth redirects
+    const callbackUrl = getRedirectUrl();
+    const supabaseCallbackUrl = callbackUrl || 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
     const redirectTo = supabaseCallbackUrl;
     
     // Store the platform and environment info for debugging
@@ -186,6 +187,8 @@ const browserBasedGoogleSignIn = async () => {
     // For web, use window.location directly
     if (typeof window !== 'undefined' && !Capacitor.isNativePlatform()) {
       console.log('Using window.location.href for web platform');
+      
+      // Directly navigating to the URL
       window.location.href = authResponse.data.url;
       return { url: authResponse.data.url }; // Return the URL for reference
     } 
@@ -213,6 +216,31 @@ const browserBasedGoogleSignIn = async () => {
     throw error;
   }
 };
+
+// Function to get the proper redirect URL based on environment
+function getRedirectUrl() {
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
+  const port = window.location.port ? `:${window.location.port}` : '';
+  
+  // For development environments
+  if (hostname === 'localhost' || hostname.includes('127.0.0.1')) {
+    return `${protocol}//${hostname}${port}/auth`;
+  }
+  
+  // For production/preview environments
+  if (hostname.includes('lovableproject.com')) {
+    return `${protocol}//${hostname}/auth`;
+  }
+  
+  // For deployed app
+  if (hostname === 'introgy.ai' || hostname.includes('introgy')) {
+    return `${protocol}//${hostname}/auth`;
+  }
+  
+  // Fallback to current origin
+  return `${protocol}//${hostname}${port}/auth`;
+}
 
 // Function to handle native sign-in with ID token
 export const signInWithGoogleIdToken = async (idToken: string, accessToken?: string) => {
