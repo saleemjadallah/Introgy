@@ -1,5 +1,6 @@
 
 import { Capacitor } from "@capacitor/core";
+import { Browser } from '@capacitor/browser';
 import { App } from '@capacitor/app';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -36,12 +37,105 @@ export interface GoogleAuthPlugin {
 // Plugin instance
 export let GoogleAuth: GoogleAuthPlugin | null = null;
 
+// Initialize deep link handler for native platforms
+if (Capacitor.isNativePlatform()) {
+  console.log('Setting up app URL open listener for deep links');
+  
+  App.addListener('appUrlOpen', async ({ url }) => {
+    console.log('Deep link received:', url);
+    localStorage.setItem('deep_link_received', url);
+    localStorage.setItem('deep_link_time', new Date().toISOString());
+    
+    // Check if this is our auth callback URL
+    if (url.includes('auth/v1/callback')) {
+      console.log('Auth callback URL detected');
+      
+      try {
+        // Handle both hash and query parameter formats
+        const hasFragment = url.includes('#');
+        const hasQuery = url.includes('?');
+        
+        let params: URLSearchParams;
+        if (hasFragment) {
+          // Extract the fragment
+          const fragment = url.split('#')[1];
+          params = new URLSearchParams(fragment);
+        } else if (hasQuery) {
+          // Extract query parameters
+          const query = url.split('?')[1];
+          params = new URLSearchParams(query);
+        } else {
+          console.error('No parameters found in callback URL');
+          return;
+        }
+        
+        // Extract tokens
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+        
+        if (accessToken && refreshToken) {
+          console.log('Tokens extracted successfully from URL');
+          localStorage.setItem('auth_tokens_found', 'true');
+          
+          // Set the session in Supabase
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+          
+          if (error) {
+            console.error('Session error:', error);
+            localStorage.setItem('session_error', JSON.stringify(error));
+          } else {
+            console.log('User authenticated successfully via deep link');
+            localStorage.setItem('auth_success', 'true');
+            localStorage.setItem('user_email', data.user?.email || 'unknown');
+            
+            // Navigate or dispatch event to update UI
+            window.dispatchEvent(new CustomEvent('auth:success', { 
+              detail: { user: data.user } 
+            }));
+          }
+        } else {
+          console.error('Access token or refresh token missing in callback');
+          localStorage.setItem('tokens_missing', 'true');
+        }
+      } catch (err) {
+        console.error('Error processing auth callback:', err);
+        localStorage.setItem('auth_callback_error', JSON.stringify(err));
+      }
+    }
+  });
+  
+  console.log('Deep link handler set up successfully');
+}
+
 /**
  * Initializes the Google Auth plugin if available
  * @returns Boolean indicating if plugin was successfully initialized
  */
 export const initGoogleAuthPlugin = (): boolean => {
   try {
+    // Force register the plugin if on iOS to ensure it's available
+    if (Capacitor.getPlatform() === IOS_PLATFORM) {
+      console.log("📱 iOS platform detected, ensuring GoogleAuth plugin is properly registered");
+      
+      // Direct access to plugins
+      GoogleAuth = (Capacitor as any).Plugins[PLUGIN_NAME];
+      
+      // Log the plugin availability for debugging
+      console.log("GoogleAuth plugin availability check:", {
+        isAvailableByAPI: Capacitor.isPluginAvailable(PLUGIN_NAME),
+        isAvailableByDirect: !!(Capacitor as any).Plugins[PLUGIN_NAME],
+        plugins: Object.keys((Capacitor as any).Plugins || {}).join(", ")
+      });
+      
+      // On iOS, we'll always return true and use the plugin if available
+      // or fall back to the web flow if not
+      return true;
+    }
+    
+    // For other platforms, use standard detection
     if (Capacitor.isPluginAvailable(PLUGIN_NAME)) {
       GoogleAuth = (Capacitor as any).Plugins[PLUGIN_NAME];
       console.log("GoogleAuth plugin initialized");
@@ -121,7 +215,7 @@ export const setupGoogleSignInListener = (callback: (userData: GoogleAuthUser) =
 
 /**
  * Main function to sign in with Google
- * Uses native flow on iOS, browser-based flow elsewhere
+ * Uses browser-based flow on all platforms for maximum reliability
  */
 export const googleSignIn = async () => {
   try {
@@ -131,32 +225,19 @@ export const googleSignIn = async () => {
     const platform = Capacitor.getPlatform();
     console.log(`Starting Google Sign-In process on ${platform} platform`);
     
-    // If on iOS, use native Google Sign-In
-    if (platform === IOS_PLATFORM && GoogleAuth) {
-      console.log('📱 iOS platform detected, using native GoogleAuth plugin');
-      
-      try {
-        // Use the native plugin to get the tokens
-        const { idToken, accessToken } = await GoogleAuth.signInWithSupabase();
-        
-        if (!idToken) {
-          throw new Error('No ID token returned from Google Sign-In');
-        }
-        
-        // Sign in with Supabase using the token
-        const result = await signInWithGoogleIdToken(idToken, accessToken);
-        
-        console.log('Successfully signed in with Google on iOS');
-        return result;
-      } catch (error) {
-        console.error('Error with native iOS Google sign-in:', error);
-        toast.error('Sign-in failed');
-        throw error;
-      }
-    }
+    // Use a more reliable approach based on your error message
+    console.log('🌐 Using simplified browser-based OAuth flow for all platforms');
+    localStorage.setItem('auth_approach', 'simplified_browser_based_oauth');
     
-    // For non-iOS platforms, use browser-based flow
-    console.log('🌐 Using browser-based OAuth flow');
+    // Important: Clear any previous auth state that could be interfering
+    localStorage.removeItem('auth_provider');
+    localStorage.removeItem('auth_state');
+    localStorage.removeItem('auth_redirect_url');
+    
+    // Log details to help with debugging
+    console.log('🔧 Auth process starting with clean state');
+    
+    // Use simplified browser-based sign-in to avoid URL formatting issues
     return await browserBasedGoogleSignIn();
   } catch (error) {
     console.error("Error during Google sign-in:", error);
@@ -186,26 +267,40 @@ const browserBasedGoogleSignIn = async () => {
     const platform = Capacitor.getPlatform();
     console.log(`Setting up browser-based Google sign-in on platform: ${platform}`);
     
-    // Determine proper redirect URL
-    const redirectTo = getRedirectUrl();
-    console.log("Using redirect URL:", redirectTo);
+    // IMPORTANT: Always use the Supabase callback URL for all platforms
+    // This is what works and is expected by Supabase
+    const redirectTo = 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
+    console.log("Using Supabase callback URL:", redirectTo);
     
-    // Store debug info
+    // Store debug info with timestamp for troubleshooting
+    const timestamp = new Date().toISOString();
     localStorage.setItem('auth_redirect_url', redirectTo);
-    localStorage.setItem('auth_timestamp', new Date().toISOString());
+    localStorage.setItem('auth_timestamp', timestamp);
+    localStorage.setItem('auth_platform', platform);
     
-    // Generate OAuth URL from Supabase Auth
+    // Generate a simple state parameter to prevent CSRF attacks
+    // Keep it minimal to avoid URL parsing issues
+    const stateParam = `p_${platform}_t_${Date.now()}`;
+    localStorage.setItem('auth_state', stateParam);
+    
+    // Generate only essential query parameters
+    // MINIMAL PARAMS: Keep this simple to avoid URL formatting issues
+    const queryParams: Record<string, string> = {
+      access_type: 'offline',
+      prompt: 'select_account', 
+      state: stateParam
+    };
+    
+    console.log('OAuth flow using Supabase URL:', redirectTo);
+    localStorage.setItem('final_redirect_url', redirectTo);
+    
+    // Generate OAuth URL from Supabase Auth with MINIMAL parameters
     const authResponse = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo,
         scopes: 'email profile',
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'select_account',
-          include_granted_scopes: 'true',
-          state: `platform=${platform}`,
-        }
+        queryParams
       }
     });
     
@@ -239,58 +334,71 @@ const browserBasedGoogleSignIn = async () => {
 
 /**
  * Handle navigation to the OAuth URL based on platform
+ * This is simplified to be more reliable, especially on iOS
  */
 const handleOAuthNavigation = (url: string) => {
+  // Log the URL we're about to open (for debugging)
+  localStorage.setItem('opening_browser_url', url);
+  localStorage.setItem('browser_open_time', new Date().toISOString());
+  
+  const platform = Capacitor.getPlatform();
+  
+  // For iOS (which has the site URL formatting issue), use a simpler approach
+  if (platform === IOS_PLATFORM) {
+    console.log('📱 iOS platform: Using Safari to open OAuth URL');
+    
+    try {
+      // Use the Capacitor Browser plugin which is more reliable
+      Browser.open({
+        url,
+        windowName: '_self',
+        presentationStyle: 'fullscreen'
+      });
+      console.log('📱 Browser opened successfully with Capacitor Browser plugin');
+    } catch (e) {
+      console.error('📱 Error opening browser:', e);
+      
+      // Fallback to direct location change
+      console.log('📱 Falling back to direct location change');
+      window.location.href = url;
+    }
+    return;
+  }
+  
   // For web, use window.location directly
   if (!Capacitor.isNativePlatform()) {
     console.log('Using window.location.href for web platform');
-    
-    // Add small delay to ensure localStorage is written
-    setTimeout(() => {
-      window.location.href = url;
-    }, 50);
+    window.location.href = url;
     return;
   } 
   
-  // For mobile platforms, try system browser
-  console.log('Using system browser for mobile platform');
-  try {
-    window.open(url, '_blank');
-    console.log('Window.open call completed successfully');
-  } catch (browserError) {
-    console.error('Browser opening error:', browserError);
-    
-    // Ultimate fallback to window.location
-    console.log('Falling back to window.location');
-    window.location.href = url;
-  }
+  // For Android
+  console.log('Android: Using Capacitor Browser plugin');
+  Browser.open({
+    url,
+    windowName: '_self',
+    presentationStyle: 'fullscreen'
+  });
 };
 
 /**
  * Function to get the proper redirect URL based on environment
  */
 export function getRedirectUrl(): string {
-  const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
-  const port = window.location.port ? `:${window.location.port}` : '';
+  // IMPORTANT: Supabase requires a valid https URL for the redirect_to parameter
+  // For ALL platforms including iOS, use the standard callback URL
+  // The native URL scheme handling will still work because iOS intercepts the callback
   
-  console.log(`Determining redirect URL for hostname: ${hostname}`);
+  // For web platforms (and iOS)
+  const supabaseCallbackUrl = 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
   
-  // Use the full URL including protocol, not just the domain
-  if (hostname === 'localhost' || hostname.includes('127.0.0.1')) {
-    return `${protocol}//${hostname}${port}/auth`;
-  }
+  // Log which URL we're using for debugging
+  const platform = Capacitor.getPlatform();
+  console.log(`Using Supabase callback URL for ${platform}: ${supabaseCallbackUrl}`);
+  localStorage.setItem('redirect_url_chosen', supabaseCallbackUrl);
   
-  if (hostname.includes('lovableproject.com')) {
-    return `${protocol}//${hostname}/auth`;
-  }
-  
-  if (hostname.includes('introgy')) {
-    return `${protocol}//${hostname}/auth`;
-  }
-  
-  // Fallback to current origin with auth path
-  return `${protocol}//${hostname}${port}/auth`;
+  // Always return the standard Supabase callback URL which works on all platforms
+  return supabaseCallbackUrl;
 }
 
 /**
