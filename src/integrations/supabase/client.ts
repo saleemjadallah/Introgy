@@ -6,24 +6,32 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://gnvlzzqtmxrfvkdydxet.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdudmx6enF0bXhyZnZrZHlkeGV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzNTM0OTcsImV4cCI6MjA1NjkyOTQ5N30.N4ALQNrQ6UMtbWsdYo_GI581WP4LzCgGpTj8IKwJHDo";
 
-// The site URL must match what's configured in the Supabase dashboard EXACTLY
-// Remove any trailing slashes to prevent the 'site url is improperly formatted' error
-const SITE_URL = "https://introgy.ai";
+// Site URL must match what's configured in Supabase
+const SITE_URL = "https://gnvlzzqtmxrfvkdydxet.supabase.co";
 
-// This is the URL that Supabase will redirect to after authentication
-// For web platforms, this must be a FULL URL that's registered in your Supabase dashboard
-// Never use relative paths like '/auth/callback' - always use the full URL
-// For web authentication with Google, we MUST use the Supabase callback URL directly
+// Redirect URL must match what's configured in both Supabase and Google Console
 const REDIRECT_URL = "https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback";
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-// Create client with proper auth configuration
+// Type declaration for window to add our debug function
+declare global {
+  interface Window {
+    checkSupabaseAuth?: () => any;
+    SUPABASE_SITE_URL?: string;
+    SUPABASE_REDIRECT_URL?: string;
+  }
+}
+
+// CRITICAL: Store these values in the window object for runtime access
+// This ensures these values are available globally and can be inspected in browser console
+window.SUPABASE_SITE_URL = SITE_URL;
+window.SUPABASE_REDIRECT_URL = REDIRECT_URL;
+
+// Create the Supabase client with basic configuration
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    // Note: The site URL and redirectTo are configured per request, not here
-    // See the signInWithGoogle function for how redirectTo is properly used
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
@@ -36,5 +44,23 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   }
 });
 
+// Create a global debugging function to check auth configuration
+window.checkSupabaseAuth = () => {
+  console.log('Current Supabase Auth Configuration:');
+  console.log('SITE_URL:', SITE_URL);
+  console.log('REDIRECT_URL:', REDIRECT_URL);
+  console.log('Auth Config:', (supabase.auth as any).config);
+  
+  // Log to localStorage for persistence
+  localStorage.setItem('supabase_debug_site_url', SITE_URL);
+  localStorage.setItem('supabase_debug_redirect_url', REDIRECT_URL);
+  
+  return {
+    siteUrl: SITE_URL,
+    redirectUrl: REDIRECT_URL,
+    authConfig: (supabase.auth as any).config
+  };
+};
+
 // Export constants for use in other files
-export { SUPABASE_URL, SITE_URL, REDIRECT_URL };
+export { SUPABASE_URL, SITE_URL, REDIRECT_URL, SUPABASE_PUBLISHABLE_KEY };

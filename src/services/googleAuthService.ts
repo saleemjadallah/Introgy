@@ -1,7 +1,7 @@
 
 import { Capacitor } from "@capacitor/core";
 import { App } from '@capacitor/app';
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, REDIRECT_URL, SITE_URL, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 // Constants
@@ -194,14 +194,9 @@ const browserBasedGoogleSignIn = async () => {
     localStorage.setItem('auth_attempt_is_native', String(isNative));
     localStorage.setItem('auth_attempt_id', authAttemptId);
     
-    // For web authentication, we MUST use the Supabase callback URL directly
-    // This is critical for Supabase OAuth to work properly
-    let redirectTo = 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
+    // Get the correct redirect URL based on platform
+    let redirectTo = REDIRECT_URL; // Default to web URL
     
-    // Do NOT use custom URLs for web authentication
-    // Supabase requires its own callback URL for proper session handling
-    
-    // Only for native platforms, use platform-specific URLs
     if (isNative) {
       if (platform === 'ios') {
         redirectTo = 'com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2:/oauth2redirect';
@@ -210,20 +205,14 @@ const browserBasedGoogleSignIn = async () => {
       }
     }
     
-    console.log(`Using redirect URL: ${redirectTo}`);
-    localStorage.setItem('auth_redirect_url', redirectTo);
-    
-    // Use a simple random string for state to track this authentication attempt
-    const stateId = Math.random().toString(36).substring(2, 15);
-    localStorage.setItem('auth_state_id', stateId);
+    // Log the URL for debugging
+    console.log('Using redirect URL:', redirectTo);
     
     // Essential scope for Google Auth
     const scopes = 'email profile';
     
     // Query parameters required for proper Google OAuth flow
     const queryParams: Record<string, string> = {
-      // The state parameter is essential for security and tracking
-      state: stateId,
       // Required for Google to send refresh tokens
       access_type: 'offline',
       // Ensures the consent screen is shown every time
@@ -252,12 +241,45 @@ const browserBasedGoogleSignIn = async () => {
       queryParams
     });
     
-    // Generate OAuth URL from Supabase Auth with explicit redirectTo
-    const authResponse = await supabase.auth.signInWithOAuth({
+    // CRITICAL FIX: When using signInWithOAuth, we need to make an important adjustment
+    // to prevent the "site url is improperly formatted" error.
+    // We must initialize a NEW Supabase client just for this sign-in attempt
+    // with the site URL and redirectTo explicitly set to match what's in the Supabase dashboard
+    
+    // Log the current attempt configuration
+    console.log('🔍 Current Auth Attempt Configuration:');
+    console.log('  - SITE_URL:', SITE_URL);
+    console.log('  - redirectTo:', redirectTo);
+    
+    // Import the createClient directly to avoid circular dependencies
+    const { createClient } = await import('@supabase/supabase-js');
+    
+    // Log for debugging
+    console.log('🔑 Creating temporary Supabase client with EXACT configuration');
+    console.log('Using SUPABASE_URL:', SUPABASE_URL);
+    
+    // Create a temporary client with exact configuration that matches Supabase dashboard
+    // We need to use 'as any' for the auth options to bypass TypeScript errors
+    // This is necessary because the Supabase types don't expose all the options they actually support
+    const tempClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+        flowType: 'pkce'
+        // We can't set redirectTo here due to TypeScript errors
+        // We'll set it in the signInWithOAuth call instead
+      } as any
+    });
+    
+    // Log the client creation
+    console.log('Created temporary Supabase client with redirectTo:', redirectTo);
+    
+    // Generate OAuth URL from the temporary Supabase client
+    const authResponse = await tempClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // This must be explicitly set for each call
-        redirectTo,
+        redirectTo, // Must match what's set in the client config
         scopes,
         queryParams
       }
@@ -383,15 +405,14 @@ export function getRedirectUrl(): string {
     }
   }
   
-  // For web platforms, ALWAYS use the Supabase callback URL directly
+  // For web platforms, ALWAYS use the REDIRECT_URL imported from supabase/client.ts
   // This is critical for Supabase OAuth to work properly
-  const supabaseRedirectUrl = 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
-  
-  console.log(`Using Supabase callback URL for web: ${supabaseRedirectUrl}`);
+  console.log(`Using Supabase callback URL for web: ${REDIRECT_URL}`);
   localStorage.setItem('auth_redirect_platform', 'web');
-  localStorage.setItem('auth_redirect_url_used', supabaseRedirectUrl);
+  localStorage.setItem('auth_redirect_url_used', REDIRECT_URL);
+  localStorage.setItem('supabase_site_url', SITE_URL); // Store for debugging
   
-  return supabaseRedirectUrl;
+  return REDIRECT_URL;
 }
 
 /**

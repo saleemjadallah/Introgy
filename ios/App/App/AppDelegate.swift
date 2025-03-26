@@ -199,26 +199,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 if let accessToken = tokenParams["access_token"] ?? tokenParams["id_token"] {
                     print("📱 Successfully extracted auth tokens from URL")
                     
-                    // Store tokens in JavaScript localStorage for recovery in case of redirect errors
-                    // This allows the AuthCallback component to recover the session if needed
-                    if let accessToken = tokenParams["access_token"] {
-                        print("📱 Storing access_token in localStorage for recovery")
-                        storeInLocalStorage(key: "ios_access_token", value: accessToken)
+                    // Log tokens for debugging (redacted for security)
+                    if tokenParams["access_token"] != nil {
+                        logAuthEvent("Received access_token")
                     }
-                    
-                    if let idToken = tokenParams["id_token"] {
-                        print("📱 Storing id_token in localStorage for recovery")
-                        storeInLocalStorage(key: "ios_id_token", value: idToken)
+                    if tokenParams["id_token"] != nil {
+                        logAuthEvent("Received id_token")
                     }
-                    
-                    if let refreshToken = tokenParams["refresh_token"] {
-                        print("📱 Storing refresh_token in localStorage for recovery")
-                        storeInLocalStorage(key: "ios_refresh_token", value: refreshToken)
+                    if tokenParams["refresh_token"] != nil {
+                        logAuthEvent("Received refresh_token")
                     }
-                    
-                    // Store timestamp for debugging
-                    let timestamp = Date().ISO8601Format()
-                    storeInLocalStorage(key: "ios_token_timestamp", value: timestamp)
                     
                     // Build a proper callback URL with all available parameters
                     var callbackParams = [String]()
@@ -259,25 +249,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
     }
     
-    // Helper function to store values in JavaScript localStorage via Capacitor
-    private func storeInLocalStorage(key: String, value: String) {
-        // Create a JavaScript snippet to store the value
-        let jsCode = "localStorage.setItem('\(key)', '\(value)');"
-        
-        // Execute the JavaScript in the WebView via Capacitor
-        DispatchQueue.main.async {
-            if let rootViewController = UIApplication.shared.windows.first?.rootViewController as? CAPBridgeViewController {
-                rootViewController.webView?.evaluateJavaScript(jsCode) { (result, error) in
-                    if let error = error {
-                        print("❌ Error storing in localStorage: \(error.localizedDescription)")
-                    } else {
-                        print("✅ Successfully stored \(key) in localStorage")
-                    }
-                }
-            } else {
-                print("❌ Could not access WebView to store in localStorage")
-            }
-        }
+    // Helper function to log auth-related events for debugging
+    private func logAuthEvent(_ message: String) {
+        print("🔐 Auth Event: \(message)")
     }
     
     private func extractParameter(from urlString: String, param: String) -> String? {

@@ -50,14 +50,26 @@ export default function AuthCallback() {
           isSiteUrlError
         }));
         
-        // This processes the auth response
-        const { data, error } = await supabase.auth.getSession();
+        // Let Supabase process the OAuth response
+        // This will automatically exchange the OAuth code for a session
+        const { data: authData, error: authError } = await supabase.auth.getSession();
         
-        // Handle any errors
-        if (error) {
-          console.error('Auth callback error:', error);
-          setError(error.message);
-          toast.error(`Authentication failed: ${error.message}`);
+        // Handle any auth errors
+        if (authError) {
+          console.error('Auth error:', authError);
+          setError(authError.message);
+          toast.error(`Authentication failed: ${authError.message}`);
+          return;
+        }
+        
+        // Double-check that we have a valid session
+        const { data, error: sessionError } = await supabase.auth.refreshSession();
+        
+        // Handle any session errors
+        if (sessionError) {
+          console.error('Session refresh error:', sessionError);
+          setError(sessionError.message);
+          toast.error(`Authentication failed: ${sessionError.message}`);
           return;
         }
         
@@ -65,16 +77,10 @@ export default function AuthCallback() {
           console.log("Authentication successful, session established");
           toast.success("Signed in successfully");
           
-          // Store session info for debugging
-          localStorage.setItem('auth_success_time', new Date().toISOString());
-          localStorage.setItem('auth_user_id', data.session.user.id);
-          
-          // Redirect to your app's home or dashboard
-          setTimeout(() => {
-            navigate('/profile');
-          }, 1000);
+          // Redirect to profile page immediately
+          navigate('/profile');
         } else {
-          console.warn("No session data found in callback");
+          console.warn("No session data found after token exchange");
           setError("No session data found");
           toast.error("Authentication failed: No session data found");
         }
