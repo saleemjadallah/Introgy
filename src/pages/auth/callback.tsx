@@ -15,16 +15,20 @@ export default function AuthCallback() {
         const currentUrl = window.location.href;
         console.log("Auth callback received at URL:", currentUrl);
         
-        // Parse URL components for debugging
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        // Parse URL hash parameters
+        const urlParams = new URLSearchParams(window.location.hash.substring(1));
         const queryParams = new URLSearchParams(window.location.search);
         
-        // Check for site URL formatting error in URL parameters
-        const urlError = hashParams.get('error') || queryParams.get('error');
+        // Extract tokens from hash parameters
+        const accessToken = urlParams.get('access_token');
+        const refreshToken = urlParams.get('refresh_token');
+        
+        // Check for errors in both hash and query parameters
+        const urlError = urlParams.get('error') || queryParams.get('error');
         const urlErrorDescription = 
-          hashParams.get('error_description') || 
+          urlParams.get('error_description') || 
           queryParams.get('error_description') || 
-          hashParams.get('message') || 
+          urlParams.get('message') || 
           queryParams.get('message');
           
         // Check specifically for site URL formatting error
@@ -45,31 +49,32 @@ export default function AuthCallback() {
           pathname: window.location.pathname,
           search: window.location.search,
           hash: window.location.hash,
-          hashParams: Object.fromEntries(hashParams.entries()),
+          hashParams: Object.fromEntries(urlParams.entries()),
           queryParams: Object.fromEntries(queryParams.entries()),
+          tokens: {
+            hasAccessToken: !!accessToken,
+            hasRefreshToken: !!refreshToken
+          },
           isSiteUrlError
         }));
         
-        // Let Supabase process the OAuth response
-        // This will automatically exchange the OAuth code for a session
-        const { data: authData, error: authError } = await supabase.auth.getSession();
+        // Log tokens for debugging
+        console.log('Received tokens:', { 
+          hasAccessToken: !!accessToken,
+          hasRefreshToken: !!refreshToken
+        });
+        
+        // Set the session with the received tokens
+        const { data, error } = await supabase.auth.setSession({
+          access_token: accessToken || '',
+          refresh_token: refreshToken || ''
+        });
         
         // Handle any auth errors
-        if (authError) {
-          console.error('Auth error:', authError);
-          setError(authError.message);
-          toast.error(`Authentication failed: ${authError.message}`);
-          return;
-        }
-        
-        // Double-check that we have a valid session
-        const { data, error: sessionError } = await supabase.auth.refreshSession();
-        
-        // Handle any session errors
-        if (sessionError) {
-          console.error('Session refresh error:', sessionError);
-          setError(sessionError.message);
-          toast.error(`Authentication failed: ${sessionError.message}`);
+        if (error) {
+          console.error('Auth error:', error);
+          setError(error.message);
+          toast.error(`Authentication failed: ${error.message}`);
           return;
         }
         

@@ -194,8 +194,8 @@ const browserBasedGoogleSignIn = async () => {
     localStorage.setItem('auth_attempt_is_native', String(isNative));
     localStorage.setItem('auth_attempt_id', authAttemptId);
     
-    // Get the correct redirect URL based on platform
-    let redirectTo = REDIRECT_URL; // Default to web URL
+    // Use platform-specific redirect URLs
+    let redirectTo = REDIRECT_URL; // Default to Supabase URL
     
     if (isNative) {
       if (platform === 'ios') {
