@@ -7,8 +7,20 @@
   command = "npm run build"
 
 # Redirects and headers
+
+# Specific redirects for auth callbacks
 [[redirects]]
-  # For single page applications, ensure routes are handled by index.html
+  from = "/auth/callback/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/auth/v1/callback/*"
+  to = "/index.html"
+  status = 200
+
+# General SPA redirect (should be after more specific redirects)
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

@@ -2,15 +2,21 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.introgy.app',
+  appId: 'ai.introgy.app',
   appName: 'Introgy',
   webDir: 'dist',
   server: {
-    url: 'https://introgy.ai',
-    androidScheme: 'https',
+    // Comment out the remote URL to use local build instead
+    // url: 'https://introgy.ai',
+    androidScheme: 'ai.introgy.app',
+    iosScheme: 'introgy',
     cleartext: true
   },
   plugins: {
+    Browser: {
+      toolbarColor: "#121212",
+      presentationStyle: "fullscreen"
+    },
     SplashScreen: {
       launchShowDuration: 3000,
       launchAutoHide: true,
@@ -42,9 +48,13 @@ const config: CapacitorConfig = {
     },
     App: {
       appName: "Introgy",
-      appVersion: "1.0.0"
+      appVersion: "1.0.0",
+      appUrlOpen: {
+        scheme: "com.introgy.app"
+      }
     },
     GoogleAuth: {
+      // Enhanced configuration for GoogleAuth plugin
       scopes: [
         'profile',
         'email',
@@ -62,7 +72,7 @@ const config: CapacitorConfig = {
     contentInset: "always",
     scrollEnabled: true,
     scheme: "introgy",
-    backgroundColor: "#121212"
+    backgroundColor: "#e8f5e9"
   },
   android: {
     backgroundColor: "#121212",

@@ -1,0 +1,2 @@
+/auth/callback/*  /index.html  200
+/auth/v1/callback/*  /index.html  200

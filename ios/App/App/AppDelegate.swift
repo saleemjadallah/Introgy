@@ -18,14 +18,63 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let apiKey = "appl_wHXBFRFAOUUpWRqauPXyZEUElmq"
         Purchases.configure(withAPIKey: apiKey)
         
-        // Configure Google Sign-In using our service
-        GoogleAuthService.shared.configure()
+        // The correct way to ensure plugins are registered with Capacitor
+        // We'll set this up when creating the bridge view controller later
+        print("📱 Will register GoogleAuthPlugin with Capacitor bridge")
         
-        // Run verification to help with debugging
+        // Configure Google Sign-In using our service
+        #if canImport(Services)
+        // This would be the imported module path
+        let authService = Services.GoogleAuthService.shared
+        #else
+        // This is the direct class reference in the same module
+        let authService = GoogleAuthService.shared
+        #endif
+        
+        // First, verify the GoogleAuthConfig has the correct values
+        print("📱 Using GoogleAuthConfig with CLIENT_ID: \(GoogleAuthConfig.clientID)")
+        print("📱 Using redirect URI: \(GoogleAuthConfig.redirectURI)")
+        
+        // Verify and load GoogleService-Info.plist as a backup
+        if let googleServiceInfoPath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
+           let googleServiceInfo = NSDictionary(contentsOfFile: googleServiceInfoPath) {
+            let clientID = googleServiceInfo["CLIENT_ID"] as? String
+            print("📱 Found GoogleService-Info.plist with CLIENT_ID: \(clientID ?? "not found")")
+            
+            // Verify the client IDs match for debugging purposes
+            if clientID != GoogleAuthConfig.clientID {
+                print("⚠️ Warning: CLIENT_ID in GoogleService-Info.plist (\(clientID ?? "nil")) doesn't match GoogleAuthConfig.clientID (\(GoogleAuthConfig.clientID))")
+            } else {
+                print("✅ CLIENT_ID in GoogleService-Info.plist matches GoogleAuthConfig.clientID")
+            }
+        } else {
+            print("⚠️ Could not load GoogleService-Info.plist, but we have GoogleAuthConfig as a fallback")
+        }
+        
+        // Configure both auth implementations for consistency
+        authService.configure()
+        
+        // Also initialize the GoogleSignInHandler
+        GoogleSignInHandler.shared.configure()
+        
+        // Use GoogleAuthVerifier to verify setup
         GoogleAuthVerifier.verifySetup()
         
-        // Initialize Capacitor web view
+        // Initialize Capacitor web view with our plugin
         let viewController = CAPBridgeViewController.init()
+        
+        // The plugins should be registered automatically through the plugin.m file
+        // Verify plugin registration with additional diagnostics
+        print("📱 Verifying Capacitor plugin registration.")
+        
+        // Note: With the current Capacitor version, we can't directly inspect the plugin registry
+        // from outside the bridge. So we'll just log messages for debugging purposes.
+        print("📱 GoogleAuth plugin should be registered through GoogleAuthPluginDefinition.m")
+        
+        // Log key configuration information for Google Sign-In
+        print("📱 Google Sign-In configured with client ID: \(GoogleAuthConfig.clientID)")
+        print("📱 Using redirect URI: \(GoogleAuthConfig.redirectURI)")
+        
         let navController = UINavigationController(rootViewController: viewController)
         navController.navigationBar.isHidden = true
         
@@ -58,42 +107,203 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        // Log the URL for debugging
+        // Log the URL for debugging with detailed components
         print("📱 AppDelegate: Received URL: \(url.absoluteString)")
+        print("📱 URL scheme: \(url.scheme ?? "none")")
+        print("📱 URL host: \(url.host ?? "none")")
+        print("📱 URL path: \(url.path)")
+        if let query = url.query {
+            print("📱 URL query: \(query)")
+        }
         
-        // Handle Google Sign-In callbacks first - this is the critical part for Google authentication
-        if GoogleAuthService.shared.handleURL(url) {
-            print("📱 URL handled by Google Sign-In")
+        // Special handling for Google authentication URL with our specific scheme
+        if url.scheme == "com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2" {
+            print("📱 Detected Google authentication URL with our specific scheme")
+            
+            // Try with GoogleSignInHandler first (new implementation)
+            if GoogleSignInHandler.shared.handleURL(url: url) {
+                print("📱 URL successfully handled by GoogleSignInHandler")
+                return true
+            }
+            
+            // Then try with GoogleAuthService (legacy implementation)
+            if GoogleAuthService.shared.handleURL(url) {
+                print("📱 URL successfully handled by GoogleAuthService")
+                return true
+            }
+            
+            // If neither handler processed it but it's our Google URL scheme,
+            // notify Capacitor directly
+            NotificationCenter.default.post(
+                name: NSNotification.Name("CAPNotificationOpenURL"),
+                object: nil,
+                userInfo: ["url": url]
+            )
             return true
         }
         
-        // Special handling for Supabase auth URLs with unusual formats
+        // General check for OAuth-related URLs
         let urlString = url.absoluteString
-        if urlString.contains("access_token=") && urlString.contains("refresh_token=") {
-            print("📱 Detected Supabase auth callback URL")
+        let isOAuthUrl = urlString.contains("oauth") || 
+                        urlString.contains("auth") || 
+                        urlString.contains("google") || 
+                        urlString.contains("token=") || 
+                        urlString.contains("code=")
+        
+        if isOAuthUrl {
+            print("📱 Detected potential OAuth URL")
             
-            // Extract parameters from URL
-            if let accessToken = extractParameter(from: urlString, param: "access_token"),
-               let refreshToken = extractParameter(from: urlString, param: "refresh_token"),
-               let expiresIn = extractParameter(from: urlString, param: "expires_in") {
+            // Try with GoogleSignInHandler first (new implementation)
+            if GoogleSignInHandler.shared.handleURL(url: url) {
+                print("📱 URL successfully handled by GoogleSignInHandler")
+                return true
+            }
+            
+            // Then try with GoogleAuthService (legacy implementation)
+            if GoogleAuthService.shared.handleURL(url) {
+                print("📱 URL successfully handled by GoogleAuthService")
+                return true
+            }
+            
+            // Special handling for Supabase auth URLs with unusual formats
+            if urlString.contains("access_token=") || urlString.contains("id_token=") || urlString.contains("error=") {
+                print("📱 Detected auth callback URL with tokens or errors")
                 
-                print("📱 Successfully extracted auth tokens from URL")
+                var tokenParams: [String: String] = [:]
                 
-                // Build a proper callback URL
-                let callbackUrl = "introgy://auth/callback?access_token=\(accessToken)&refresh_token=\(refreshToken)&expires_in=\(expiresIn)"
+                // Extract common OAuth parameters
+                for param in ["access_token", "refresh_token", "expires_in", "token_type", "id_token", "error", "error_description", "state"] {
+                    if let value = extractParameter(from: urlString, param: param) {
+                        tokenParams[param] = value
+                        print("📱 Found parameter: \(param) = \(value)")
+                    }
+                }
                 
-                if let properUrl = URL(string: callbackUrl) {
-                    // Let Capacitor handle this properly formatted URL
-                    return ApplicationDelegateProxy.shared.application(app, open: properUrl, options: options)
+                // Check for error parameters specifically
+                if let error = tokenParams["error"] {
+                    print("❌ Auth error detected: \(error)")
+                    if let errorDesc = tokenParams["error_description"] {
+                        print("❌ Error description: \(errorDesc)")
+                    }
+                    
+                    // Log the error for debugging
+                    let errorInfo = ["error": error, "error_description": tokenParams["error_description"] ?? ""]
+                    NotificationCenter.default.post(
+                        name: Notification.Name("GoogleSignInError"),
+                        object: nil,
+                        userInfo: errorInfo
+                    )
+                }
+                
+                // Check if we have any tokens to process
+                if let accessToken = tokenParams["access_token"] ?? tokenParams["id_token"] {
+                    print("📱 Successfully extracted auth tokens from URL")
+                    
+                    // Store tokens in JavaScript localStorage for recovery in case of redirect errors
+                    // This allows the AuthCallback component to recover the session if needed
+                    if let accessToken = tokenParams["access_token"] {
+                        print("📱 Storing access_token in localStorage for recovery")
+                        storeInLocalStorage(key: "ios_access_token", value: accessToken)
+                    }
+                    
+                    if let idToken = tokenParams["id_token"] {
+                        print("📱 Storing id_token in localStorage for recovery")
+                        storeInLocalStorage(key: "ios_id_token", value: idToken)
+                    }
+                    
+                    if let refreshToken = tokenParams["refresh_token"] {
+                        print("📱 Storing refresh_token in localStorage for recovery")
+                        storeInLocalStorage(key: "ios_refresh_token", value: refreshToken)
+                    }
+                    
+                    // Store timestamp for debugging
+                    let timestamp = Date().ISO8601Format()
+                    storeInLocalStorage(key: "ios_token_timestamp", value: timestamp)
+                    
+                    // Build a proper callback URL with all available parameters
+                    var callbackParams = [String]()
+                    for (key, value) in tokenParams {
+                        callbackParams.append("\(key)=\(value)")
+                    }
+                    
+                    let callbackUrl = "introgy://auth/callback?\(callbackParams.joined(separator: "&"))"
+                    print("📱 Constructed callback URL: \(callbackUrl)")
+                    
+                    if let properUrl = URL(string: callbackUrl) {
+                        // Let Capacitor handle this properly formatted URL
+                        return ApplicationDelegateProxy.shared.application(app, open: properUrl, options: options)
+                    } else {
+                        print("❌ Failed to create URL from: \(callbackUrl)")
+                        
+                        // Even if we can't create the URL, we've stored the tokens for recovery
+                        // So we can still redirect to the callback page manually
+                        if let appUrl = URL(string: "introgy://auth/callback?recovery=true") {
+                            print("📱 Redirecting to recovery URL")
+                            return ApplicationDelegateProxy.shared.application(app, open: appUrl, options: options)
+                        }
+                    }
                 }
             }
+            
+            // If we've gotten this far, it's an OAuth URL that we don't know how to handle
+            // directly, but we should still notify the JS layer
+            print("📱 OAuth URL not handled natively, notifying Capacitor")
+            NotificationCenter.default.post(
+                name: NSNotification.Name("CAPNotificationOpenURL"),
+                object: nil,
+                userInfo: ["url": url]
+            )
         }
         
         // Then let Capacitor handle the rest
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
     }
     
+    // Helper function to store values in JavaScript localStorage via Capacitor
+    private func storeInLocalStorage(key: String, value: String) {
+        // Create a JavaScript snippet to store the value
+        let jsCode = "localStorage.setItem('\(key)', '\(value)');"
+        
+        // Execute the JavaScript in the WebView via Capacitor
+        DispatchQueue.main.async {
+            if let rootViewController = UIApplication.shared.windows.first?.rootViewController as? CAPBridgeViewController {
+                rootViewController.webView?.evaluateJavaScript(jsCode) { (result, error) in
+                    if let error = error {
+                        print("❌ Error storing in localStorage: \(error.localizedDescription)")
+                    } else {
+                        print("✅ Successfully stored \(key) in localStorage")
+                    }
+                }
+            } else {
+                print("❌ Could not access WebView to store in localStorage")
+            }
+        }
+    }
+    
     private func extractParameter(from urlString: String, param: String) -> String? {
+        // First try to extract from URL components if possible
+        if let url = URL(string: urlString), let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            if let queryItems = components.queryItems {
+                if let value = queryItems.first(where: { $0.name == param })?.value {
+                    print("📱 Extracted parameter using URLComponents: \(param) = \(value)")
+                    return value
+                }
+            }
+            
+            // Also check fragment for SPA-style parameters
+            if let fragment = components.fragment {
+                let fragmentParams = fragment.components(separatedBy: "&")
+                for fragmentParam in fragmentParams {
+                    let parts = fragmentParam.components(separatedBy: "=")
+                    if parts.count == 2 && parts[0] == param {
+                        print("📱 Extracted parameter from fragment: \(param) = \(parts[1])")
+                        return parts[1]
+                    }
+                }
+            }
+        }
+        
+        // Fallback to manual string parsing
         guard let range = urlString.range(of: "\(param)=") else {
             return nil
         }
@@ -102,9 +312,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let remaining = urlString[start...]
         
         if let end = remaining.range(of: "&")?.lowerBound {
-            return String(remaining[..<end])
+            let value = String(remaining[..<end])
+            print("📱 Extracted parameter using string parsing: \(param) = \(value)")
+            return value
         } else {
-            return String(remaining)
+            let value = String(remaining)
+            print("📱 Extracted parameter using string parsing (end of string): \(param) = \(value)")
+            return value
         }
     }
 

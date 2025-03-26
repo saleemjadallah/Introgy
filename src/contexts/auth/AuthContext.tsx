@@ -20,40 +20,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const setInitialSession = async () => {
       try {
+        // Set a timeout to ensure loading state doesn't get stuck indefinitely
+        const timeoutId = setTimeout(() => {
+          console.log("Auth check timeout - resetting loading state");
+          setIsLoading(false);
+        }, 5000);
+        
         const { data: { session } } = await authService.getSession();
+        
+        // Clear the timeout since we got a response
+        clearTimeout(timeoutId);
         
         if (session) {
           console.log("Found active Supabase session");
           setSession(session);
           setUser(session.user);
+          setIsLoading(false);
         } else if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios') {
           console.log("Checking for native Google Sign-In state");
-          const googleState = await checkGoogleSignInState();
-          
-          if (googleState.isSignedIn && 'idToken' in googleState && googleState.idToken) {
-            console.log("Found active Google Sign-In state, signing in with Supabase");
-            try {
-              const { data, error } = await supabase.auth.signInWithIdToken({
-                provider: 'google',
-                token: googleState.idToken
-              });
-              
-              if (error) {
-                console.error("Error signing in with Google ID token:", error);
-              } else if (data.session) {
-                console.log("Successfully signed in with restored Google session");
-                setSession(data.session);
-                setUser(data.session.user);
-                toast.success("Signed in automatically");
+          try {
+            const googleState = await checkGoogleSignInState();
+            
+            if (googleState.isSignedIn && 'idToken' in googleState && googleState.idToken) {
+              console.log("Found active Google Sign-In state, signing in with Supabase");
+              try {
+                const { data, error } = await supabase.auth.signInWithIdToken({
+                  provider: 'google',
+                  token: googleState.idToken
+                });
+                
+                if (error) {
+                  console.error("Error signing in with Google ID token:", error);
+                } else if (data.session) {
+                  console.log("Successfully signed in with restored Google session");
+                  setSession(data.session);
+                  setUser(data.session.user);
+                  toast.success("Signed in automatically");
+                }
+              } catch (tokenError) {
+                console.error("Error exchanging Google token with Supabase:", tokenError);
               }
-            } catch (tokenError) {
-              console.error("Error exchanging Google token with Supabase:", tokenError);
             }
+          } catch (googleError) {
+            console.error("Error checking Google Sign-In state:", googleError);
+          } finally {
+            // Always reset loading state when native auth check completes
+            setIsLoading(false);
           }
+        } else {
+          // No session and not on iOS, just reset loading
+          setIsLoading(false);
         }
       } catch (error) {
         console.error("Error getting session:", error);
-      } finally {
         setIsLoading(false);
       }
     };

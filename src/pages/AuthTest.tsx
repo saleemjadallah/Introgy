@@ -149,12 +149,6 @@ const AuthTest = () => {
               >
                 {isLoading ? 'Signing In...' : 'Test Google Sign-In'}
               </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/auth/debug')}
-              >
-                Debug Page
-              </Button>
             </div>
             <Button 
               variant="destructive" 

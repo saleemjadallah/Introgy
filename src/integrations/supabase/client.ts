@@ -2,10 +2,39 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
+// Initialize the client properly with exact URLs
 const SUPABASE_URL = "https://gnvlzzqtmxrfvkdydxet.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdudmx6enF0bXhyZnZrZHlkeGV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzNTM0OTcsImV4cCI6MjA1NjkyOTQ5N30.N4ALQNrQ6UMtbWsdYo_GI581WP4LzCgGpTj8IKwJHDo";
+
+// The site URL must match what's configured in the Supabase dashboard EXACTLY
+// Remove any trailing slashes to prevent the 'site url is improperly formatted' error
+const SITE_URL = "https://introgy.ai";
+
+// This is the URL that Supabase will redirect to after authentication
+// For web platforms, this must be a FULL URL that's registered in your Supabase dashboard
+// Never use relative paths like '/auth/callback' - always use the full URL
+// For web authentication with Google, we MUST use the Supabase callback URL directly
+const REDIRECT_URL = "https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback";
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+// Create client with proper auth configuration
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    // Note: The site URL and redirectTo are configured per request, not here
+    // See the signInWithGoogle function for how redirectTo is properly used
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce'
+  },
+  global: {
+    headers: {
+      'x-application-name': 'introgy-app'
+    }
+  }
+});
+
+// Export constants for use in other files
+export { SUPABASE_URL, SITE_URL, REDIRECT_URL };

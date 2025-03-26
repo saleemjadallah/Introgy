@@ -1,0 +1,389 @@
+
+import Foundation
+import Capacitor
+import UIKit
+import GoogleSignIn
+
+@objc(GoogleAuthPlugin)
+public class GoogleAuthPlugin: CAPPlugin {
+    
+    // We don't need the GoogleAuthService reference anymore
+    // as we're using GIDSignIn directly
+    
+    override public func load() {
+        // Plugin is loaded - we don't need to configure GIDSignIn here
+        // GoogleAuthService.shared.configure() is already called in AppDelegate
+        print("📱 GoogleAuthPlugin loaded")
+    }
+    
+    // Store the sign-in button as a property so it doesn't get deallocated
+    private var googleSignInButton: GIDSignInButton? = nil
+    
+    @objc func showSignInButton(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            // Get the view controller for presenting the sign-in UI
+            guard let viewController = self.bridge?.viewController else {
+                call.reject("Unable to access view controller")
+                return
+            }
+            
+            // Position the button within the white card container
+            // We'll use fixed positioning based on the screenshot
+            
+            // Create and configure Google Sign-In button
+            let signInButton = GIDSignInButton()
+            signInButton.style = .wide
+            signInButton.colorScheme = .light
+            
+            // Make button clearly visible and sized to match the verification code button
+            signInButton.frame.size = CGSize(width: 280, height: 48) 
+            
+            // Add a distinctive border so it's more visible for testing
+            signInButton.layer.borderWidth = 1.0
+            signInButton.layer.borderColor = UIColor.blue.cgColor
+            
+            // Add the button to the view hierarchy
+            signInButton.translatesAutoresizingMaskIntoConstraints = false
+            viewController.view.addSubview(signInButton)
+            
+            // Center the button in the card - find approximate position for the "OR CONTINUE WITH" text
+            // The auth container is shown in the screenshot as a white card taking about 85% of screen height
+            // We want to position near the text "OR CONTINUE WITH", around 70% down the white card
+            let screenHeight = viewController.view.frame.height
+            let adjustedHeight = screenHeight - (self.keyboardHeight > 0 ? self.keyboardHeight : 0)
+            
+            // Based on the screenshot, the button should appear between the "OR CONTINUE WITH" text
+            // and the terms of service text at the bottom of the white card
+            // Try a significantly different vertical position to ensure it appears within the white card
+            // Use an absolute position value based on the screenshot's layout
+            // Looking at the screenshot, the white card appears to have the "OR CONTINUE WITH" text at around 60-65% of screen height
+            let buttonY = (screenHeight * 0.65) + 20 // Position just below the "OR CONTINUE WITH" text
+            
+            NSLayoutConstraint.activate([
+                signInButton.centerXAnchor.constraint(equalTo: viewController.view.centerXAnchor),
+                signInButton.topAnchor.constraint(equalTo: viewController.view.topAnchor, constant: buttonY),
+                signInButton.widthAnchor.constraint(equalToConstant: 240),  // Match width to the verification code button
+                signInButton.heightAnchor.constraint(equalToConstant: 44)   // Standard height for touch targets
+            ])
+            
+            // Ensure button is clearly visible
+            signInButton.layer.zPosition = 1000
+            
+            // Make button very prominent so we can see if it appears at all
+            signInButton.layer.shadowColor = UIColor.black.cgColor
+            signInButton.layer.shadowOffset = CGSize(width: 0, height: 3)
+            signInButton.layer.shadowRadius = 5
+            signInButton.layer.shadowOpacity = 0.3
+            
+            // Add a background color to make it easier to spot during testing
+            signInButton.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 1.0, alpha: 1.0)
+            
+            // Add tap gesture to handle sign-in
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleSignInButtonTap))
+            signInButton.addGestureRecognizer(tapGesture)
+            signInButton.isUserInteractionEnabled = true
+            
+            // Store the button so it doesn't get deallocated
+            self.googleSignInButton = signInButton
+            
+            // Store the call for reference when the sign-in completes
+            self.savedCall = call
+            call.resolve()
+            
+            // Setup keyboard notifications to adjust button position when keyboard shows/hides
+            NotificationCenter.default.addObserver(self, 
+                                               selector: #selector(self.keyboardWillShow), 
+                                               name: UIResponder.keyboardWillShowNotification, 
+                                               object: nil)
+            NotificationCenter.default.addObserver(self, 
+                                               selector: #selector(self.keyboardWillHide), 
+                                               name: UIResponder.keyboardWillHideNotification, 
+                                               object: nil)
+        }
+    }
+    
+    // Track keyboard height to adjust button position
+    private var keyboardHeight: CGFloat = 0
+    
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRectangle = keyboardFrame.cgRectValue
+            keyboardHeight = keyboardRectangle.height
+            
+            // Reposition button if needed
+            if let button = googleSignInButton, let viewController = self.bridge?.viewController {
+                let visibleHeight = viewController.view.frame.height - keyboardHeight
+                let targetPosition = visibleHeight * 0.55 // Move up a bit when keyboard is showing
+                
+                button.frame.origin.y = targetPosition
+            }
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        keyboardHeight = 0
+        
+        // Reposition button if needed
+        if let button = googleSignInButton, let viewController = self.bridge?.viewController {
+            let visibleHeight = viewController.view.frame.height
+            let targetPosition = visibleHeight * 0.65 // Back to regular position
+            
+            button.frame.origin.y = targetPosition
+        }
+    }
+    
+    // Property to store the plugin call for resolving after sign-in completes
+    private var savedCall: CAPPluginCall? = nil
+    
+    @objc private func handleSignInButtonTap() {
+        // Use a simple function call instead of async dispatch since we're already on main thread
+        self.performSignIn()
+    }
+    
+    private func performSignIn() {
+        guard let viewController = self.bridge?.viewController else { return }
+        
+        // Start the sign-in process using GIDSignIn directly
+        GIDSignIn.sharedInstance.signIn(withPresenting: viewController, hint: nil, additionalScopes: nil, completion: { signInResult, error in
+                if let error = error {
+                    self.savedCall?.reject(error.localizedDescription, nil, error)
+                    return
+                }
+                })
+                guard let signInResult = signInResult else {
+                    self.savedCall?.reject("No sign-in result")
+                    return
+                }
+                })
+                let user = signInResult.user
+                let accessToken = user.accessToken.tokenString
+                
+                guard let idToken = user.idToken?.tokenString else {
+                    self.savedCall?.reject("Failed to get ID token")
+                    return
+                }
+                })
+                var response: [String: Any] = [
+                    "accessToken": accessToken,
+                    "idToken": idToken,
+                    "success": true
+                ]
+                
+                if let profile = user.profile {
+                    response["displayName"] = profile.name ?? ""
+                    response["email"] = profile.email ?? ""
+                    // The userID is on the user object, not on the profile
+                    response["userID"] = user.userID
+                }
+                })
+                self.savedCall?.resolve(response)
+            })
+    }
+    
+    @objc func signIn(_ call: CAPPluginCall) {
+        // Store call for later use
+        self.performSignIn(call: call)
+    }
+    
+    private func performSignIn(call: CAPPluginCall) {
+        guard let viewController = self.bridge?.viewController else {
+            call.reject("Could not find a view controller to present sign-in UI")
+            return
+        }
+        
+        print("📱 Starting Google Sign-In on iOS with viewController: \(viewController)")
+        
+        // Configure Google Sign In - ensure it's using our custom URL scheme
+        let configuration = GIDConfiguration(clientID: GoogleAuthConfig.clientID)
+        
+        // Use GIDSignIn with custom configuration
+        GIDSignIn.sharedInstance.signIn(configuration: configuration, presentingViewController: viewController, completion: { signInResult, error in
+                if let error = error {
+                    print("📱 Google Sign-In error: \(error.localizedDescription)")
+                    call.reject(error.localizedDescription, nil, error)
+                    return
+                }
+                })
+                guard let result = signInResult else {
+                    print("📱 No result returned from Google Sign-In")
+                    call.reject("No result returned from Google Sign-In")
+                    return
+                }
+                })
+                print("📱 Google Sign-In successful, processing tokens")
+                
+                // Handle tokens properly
+                var idTokenString = ""
+                
+                // Handle idToken (which is optional)
+                if let idToken = result.user.idToken {
+                    idTokenString = idToken.tokenString
+                    print("📱 Got ID token (length: \(idTokenString.count))")
+                } else {
+                    print("📱 No ID token available")
+                }
+                })
+                // Get accessToken string directly
+                let accessTokenString = result.user.accessToken.tokenString
+                print("📱 Got access token (length: \(accessTokenString.count))")
+                
+                let response: [String: Any] = [
+                    "idToken": idTokenString,
+                    "accessToken": accessTokenString,
+                    "user": [
+                        "displayName": result.user.profile?.name ?? "",
+                        "email": result.user.profile?.email ?? "",
+                        "id": result.user.userID ?? ""
+                    ]
+                ]
+                
+                print("📱 Resolving Google Sign-In with tokens")
+                call.resolve(response)
+            }
+    }
+    
+    @objc func signInWithSupabase(_ call: CAPPluginCall) {
+        // Store call for later use
+        self.performSignInWithSupabase(call: call)
+    }
+    
+    private func performSignInWithSupabase(call: CAPPluginCall) {
+        guard let viewController = self.bridge?.viewController else {
+            call.reject("Could not find a view controller to present sign-in UI")
+            return
+        }
+        
+        print("📱 Starting Google Sign-In with Supabase flow")
+        
+        // Configure Google Sign In with client ID from config
+        let configuration = GIDConfiguration(clientID: GoogleAuthConfig.clientID)
+        
+        // Use GIDSignIn with our configuration
+        GIDSignIn.sharedInstance.signIn(configuration: configuration, presentingViewController: viewController, completion: { signInResult, error in
+                if let error = error {
+                    print("📱 Google Sign-In error: \(error.localizedDescription)")
+                    call.reject(error.localizedDescription, nil, error)
+                    return
+                }
+                })
+                guard let result = signInResult else {
+                    print("📱 No result returned from Google Sign-In")
+                    call.reject("No result returned from Google Sign-In")
+                    return
+                }
+                })
+                guard let idToken = result.user.idToken?.tokenString else {
+                    print("📱 No ID token returned from Google Sign-In")
+                    call.reject("Failed to get ID token from Google Sign-In")
+                    return
+                }
+                })
+                let accessToken = result.user.accessToken.tokenString
+                
+                print("📱 Successfully obtained Google Sign-In tokens")
+                print("📱 ID token length: \(idToken.count), Access token length: \(accessToken.count)")
+                
+                // Create response with tokens that TypeScript layer will use with Supabase
+                let response: [String: Any] = [
+                    "idToken": idToken,
+                    "accessToken": accessToken,
+                    "email": result.user.profile?.email ?? "",
+                    "displayName": result.user.profile?.name ?? "",
+                    "userId": result.user.userID ?? ""
+                ]
+                
+                print("📱 Resolving plugin call with Google sign-in data")
+                call.resolve(response)
+            }
+    }
+    
+    @objc func signOut(_ call: CAPPluginCall) {
+        // Call GIDSignIn directly
+        GIDSignIn.sharedInstance.signOut()
+        call.resolve(["success": true])
+    }
+    
+    @objc func disconnect(_ call: CAPPluginCall) {
+        // Call GIDSignIn directly
+        GIDSignIn.sharedInstance.disconnect { error in
+            if let error = error {
+                call.reject(error.localizedDescription, nil, error)
+            } else {
+                call.resolve(["success": true])
+            }
+        }
+    }
+    
+    @objc func isSignedIn(_ call: CAPPluginCall) {
+        let isSignedIn = GIDSignIn.sharedInstance.hasPreviousSignIn()
+        call.resolve(["isSignedIn": isSignedIn])
+    }
+    
+    @objc func getCurrentUser(_ call: CAPPluginCall) {
+        if !GIDSignIn.sharedInstance.hasPreviousSignIn() {
+            call.resolve(["isSignedIn": false])
+            return
+        }
+        
+        guard let currentUser = GIDSignIn.sharedInstance.currentUser else {
+            call.resolve(["isSignedIn": false])
+            return
+        }
+        
+        var response: [String: Any] = ["isSignedIn": true]
+        
+        if let idToken = currentUser.idToken?.tokenString {
+            response["idToken"] = idToken
+        }
+        
+        // Access accessToken directly since it's non-optional in this context
+        response["accessToken"] = currentUser.accessToken.tokenString
+        
+        // Add profile information
+        if let profile = currentUser.profile {
+            // Handle profile properties directly without conditional binding
+            // These properties are actually non-optional Strings in the newer SDK
+            response["displayName"] = profile.name ?? ""
+            response["email"] = profile.email ?? ""
+            response["givenName"] = profile.givenName ?? ""
+            response["familyName"] = profile.familyName ?? ""
+            
+            // Add userID from the user object, not from profile
+            response["userID"] = currentUser.userID
+            
+            // Only use conditional binding for truly optional properties
+            if let profilePictureURL = profile.imageURL(withDimension: 96)?.absoluteString {
+                response["photoUrl"] = profilePictureURL
+            }
+        }
+        
+        call.resolve(response)
+    }
+    
+    @objc func refresh(_ call: CAPPluginCall) {
+        guard let currentUser = GIDSignIn.sharedInstance.currentUser else {
+            call.reject("No user signed in")
+            return
+        }
+        
+        currentUser.refreshTokensIfNeeded { user, error in
+            if let error = error {
+                call.reject(error.localizedDescription, nil, error)
+                return
+            }
+            
+            guard let user = user,
+                  let idToken = user.idToken?.tokenString else {
+                call.reject("Failed to refresh tokens")
+                return
+            }
+            
+            // Access accessToken directly since it's non-optional in this context
+            let accessToken = user.accessToken.tokenString
+            call.resolve([
+                "idToken": idToken,
+                "accessToken": accessToken
+            ])
+        }
+    }
+}

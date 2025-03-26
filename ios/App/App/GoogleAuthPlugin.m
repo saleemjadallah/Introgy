@@ -10,4 +10,5 @@ CAP_PLUGIN(GoogleAuthPlugin, "GoogleAuth",
            CAP_PLUGIN_METHOD(isSignedIn, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getCurrentUser, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(refresh, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(showSignInButton, CAPPluginReturnPromise);
 )

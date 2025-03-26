@@ -8,8 +8,40 @@ import {
   GoogleAuthPlugin
 } from "./googleAuthService";
 
-// For backward compatibility - export the GoogleAuth plugin that was registered
-export const GoogleAuth: GoogleAuthPlugin = registerPlugin<GoogleAuthPlugin>('GoogleAuth');
+// IMPORTANT: Only register the plugin once to avoid conflicts
+// This was causing issues with the native Google Sign-In
+const PLUGIN_NAME = 'GoogleAuth';
+
+// Always force register the plugin to ensure it's available
+export const GoogleAuth: GoogleAuthPlugin = registerPlugin<GoogleAuthPlugin>(PLUGIN_NAME);
+
+// Store plugin availability in localStorage for debugging
+localStorage.setItem('googleauth_plugin_registered', 'true');
+localStorage.setItem('googleauth_plugin_registration_time', new Date().toISOString());
+
+// Debug the plugin registration
+console.log(`📱 GoogleAuth plugin registration status:`, {
+  isAvailable: !!GoogleAuth,
+  methods: GoogleAuth ? Object.keys(GoogleAuth) : 'none',
+  platform: Capacitor.getPlatform()
+});
+
+// Store detailed debug info
+localStorage.setItem('googleauth_plugin_available', String(!!GoogleAuth));
+localStorage.setItem('googleauth_plugin_methods', GoogleAuth ? JSON.stringify(Object.keys(GoogleAuth)) : 'none');
+localStorage.setItem('googleauth_plugin_platform', Capacitor.getPlatform());
+
+// Force initialization of plugin by calling a simple method if available
+if (GoogleAuth && typeof GoogleAuth.isSignedIn === 'function') {
+  // This will help verify the plugin is working
+  GoogleAuth.isSignedIn().then(result => {
+    console.log(`📱 GoogleAuth.isSignedIn() result:`, result);
+    localStorage.setItem('googleauth_plugin_test_result', JSON.stringify(result));
+  }).catch(error => {
+    console.error(`📱 GoogleAuth.isSignedIn() error:`, error);
+    localStorage.setItem('googleauth_plugin_test_error', JSON.stringify(error));
+  });
+}
 
 // Use appropriate Google Sign-In method based on platform
 export const nativeGoogleSignIn = async () => {

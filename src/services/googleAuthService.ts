@@ -1,6 +1,5 @@
 
 import { Capacitor } from "@capacitor/core";
-import { Browser } from '@capacitor/browser';
 import { App } from '@capacitor/app';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -37,105 +36,12 @@ export interface GoogleAuthPlugin {
 // Plugin instance
 export let GoogleAuth: GoogleAuthPlugin | null = null;
 
-// Initialize deep link handler for native platforms
-if (Capacitor.isNativePlatform()) {
-  console.log('Setting up app URL open listener for deep links');
-  
-  App.addListener('appUrlOpen', async ({ url }) => {
-    console.log('Deep link received:', url);
-    localStorage.setItem('deep_link_received', url);
-    localStorage.setItem('deep_link_time', new Date().toISOString());
-    
-    // Check if this is our auth callback URL
-    if (url.includes('auth/v1/callback')) {
-      console.log('Auth callback URL detected');
-      
-      try {
-        // Handle both hash and query parameter formats
-        const hasFragment = url.includes('#');
-        const hasQuery = url.includes('?');
-        
-        let params: URLSearchParams;
-        if (hasFragment) {
-          // Extract the fragment
-          const fragment = url.split('#')[1];
-          params = new URLSearchParams(fragment);
-        } else if (hasQuery) {
-          // Extract query parameters
-          const query = url.split('?')[1];
-          params = new URLSearchParams(query);
-        } else {
-          console.error('No parameters found in callback URL');
-          return;
-        }
-        
-        // Extract tokens
-        const accessToken = params.get('access_token');
-        const refreshToken = params.get('refresh_token');
-        
-        if (accessToken && refreshToken) {
-          console.log('Tokens extracted successfully from URL');
-          localStorage.setItem('auth_tokens_found', 'true');
-          
-          // Set the session in Supabase
-          const { data, error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken
-          });
-          
-          if (error) {
-            console.error('Session error:', error);
-            localStorage.setItem('session_error', JSON.stringify(error));
-          } else {
-            console.log('User authenticated successfully via deep link');
-            localStorage.setItem('auth_success', 'true');
-            localStorage.setItem('user_email', data.user?.email || 'unknown');
-            
-            // Navigate or dispatch event to update UI
-            window.dispatchEvent(new CustomEvent('auth:success', { 
-              detail: { user: data.user } 
-            }));
-          }
-        } else {
-          console.error('Access token or refresh token missing in callback');
-          localStorage.setItem('tokens_missing', 'true');
-        }
-      } catch (err) {
-        console.error('Error processing auth callback:', err);
-        localStorage.setItem('auth_callback_error', JSON.stringify(err));
-      }
-    }
-  });
-  
-  console.log('Deep link handler set up successfully');
-}
-
 /**
  * Initializes the Google Auth plugin if available
  * @returns Boolean indicating if plugin was successfully initialized
  */
 export const initGoogleAuthPlugin = (): boolean => {
   try {
-    // Force register the plugin if on iOS to ensure it's available
-    if (Capacitor.getPlatform() === IOS_PLATFORM) {
-      console.log("📱 iOS platform detected, ensuring GoogleAuth plugin is properly registered");
-      
-      // Direct access to plugins
-      GoogleAuth = (Capacitor as any).Plugins[PLUGIN_NAME];
-      
-      // Log the plugin availability for debugging
-      console.log("GoogleAuth plugin availability check:", {
-        isAvailableByAPI: Capacitor.isPluginAvailable(PLUGIN_NAME),
-        isAvailableByDirect: !!(Capacitor as any).Plugins[PLUGIN_NAME],
-        plugins: Object.keys((Capacitor as any).Plugins || {}).join(", ")
-      });
-      
-      // On iOS, we'll always return true and use the plugin if available
-      // or fall back to the web flow if not
-      return true;
-    }
-    
-    // For other platforms, use standard detection
     if (Capacitor.isPluginAvailable(PLUGIN_NAME)) {
       GoogleAuth = (Capacitor as any).Plugins[PLUGIN_NAME];
       console.log("GoogleAuth plugin initialized");
@@ -215,7 +121,7 @@ export const setupGoogleSignInListener = (callback: (userData: GoogleAuthUser) =
 
 /**
  * Main function to sign in with Google
- * Uses browser-based flow on all platforms for maximum reliability
+ * Uses native flow on iOS, browser-based flow elsewhere
  */
 export const googleSignIn = async () => {
   try {
@@ -225,19 +131,32 @@ export const googleSignIn = async () => {
     const platform = Capacitor.getPlatform();
     console.log(`Starting Google Sign-In process on ${platform} platform`);
     
-    // Use a more reliable approach based on your error message
-    console.log('🌐 Using simplified browser-based OAuth flow for all platforms');
-    localStorage.setItem('auth_approach', 'simplified_browser_based_oauth');
+    // If on iOS, use native Google Sign-In
+    if (platform === IOS_PLATFORM && GoogleAuth) {
+      console.log('📱 iOS platform detected, using native GoogleAuth plugin');
+      
+      try {
+        // Use the native plugin to get the tokens
+        const { idToken, accessToken } = await GoogleAuth.signInWithSupabase();
+        
+        if (!idToken) {
+          throw new Error('No ID token returned from Google Sign-In');
+        }
+        
+        // Sign in with Supabase using the token
+        const result = await signInWithGoogleIdToken(idToken, accessToken);
+        
+        console.log('Successfully signed in with Google on iOS');
+        return result;
+      } catch (error) {
+        console.error('Error with native iOS Google sign-in:', error);
+        toast.error('Sign-in failed');
+        throw error;
+      }
+    }
     
-    // Important: Clear any previous auth state that could be interfering
-    localStorage.removeItem('auth_provider');
-    localStorage.removeItem('auth_state');
-    localStorage.removeItem('auth_redirect_url');
-    
-    // Log details to help with debugging
-    console.log('🔧 Auth process starting with clean state');
-    
-    // Use simplified browser-based sign-in to avoid URL formatting issues
+    // For non-iOS platforms, use browser-based flow
+    console.log('🌐 Using browser-based OAuth flow');
     return await browserBasedGoogleSignIn();
   } catch (error) {
     console.error("Error during Google sign-in:", error);
@@ -265,57 +184,125 @@ const browserBasedGoogleSignIn = async () => {
   try {
     // Get current platform
     const platform = Capacitor.getPlatform();
-    console.log(`Setting up browser-based Google sign-in on platform: ${platform}`);
+    const isNative = Capacitor.isNativePlatform();
+    console.log(`Setting up browser-based Google sign-in on platform: ${platform}, isNative: ${isNative}`);
     
-    // IMPORTANT: Always use the Supabase callback URL for all platforms
-    // This is what works and is expected by Supabase
-    const redirectTo = 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
-    console.log("Using Supabase callback URL:", redirectTo);
+    // Create a simple ID for this auth attempt for tracking
+    const authAttemptId = Math.random().toString(36).substring(2, 15);
+    localStorage.setItem('auth_timestamp', new Date().toISOString());
+    localStorage.setItem('auth_attempt_platform', platform);
+    localStorage.setItem('auth_attempt_is_native', String(isNative));
+    localStorage.setItem('auth_attempt_id', authAttemptId);
     
-    // Store debug info with timestamp for troubleshooting
-    const timestamp = new Date().toISOString();
+    // For web authentication, we MUST use the Supabase callback URL directly
+    // This is critical for Supabase OAuth to work properly
+    let redirectTo = 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
+    
+    // Do NOT use custom URLs for web authentication
+    // Supabase requires its own callback URL for proper session handling
+    
+    // Only for native platforms, use platform-specific URLs
+    if (isNative) {
+      if (platform === 'ios') {
+        redirectTo = 'com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2:/oauth2redirect';
+      } else if (platform === 'android') {
+        redirectTo = 'com.introgy.app:/oauth2redirect';
+      }
+    }
+    
+    console.log(`Using redirect URL: ${redirectTo}`);
     localStorage.setItem('auth_redirect_url', redirectTo);
-    localStorage.setItem('auth_timestamp', timestamp);
-    localStorage.setItem('auth_platform', platform);
     
-    // Generate a simple state parameter to prevent CSRF attacks
-    // Keep it minimal to avoid URL parsing issues
-    const stateParam = `p_${platform}_t_${Date.now()}`;
-    localStorage.setItem('auth_state', stateParam);
+    // Use a simple random string for state to track this authentication attempt
+    const stateId = Math.random().toString(36).substring(2, 15);
+    localStorage.setItem('auth_state_id', stateId);
     
-    // Generate only essential query parameters
-    // MINIMAL PARAMS: Keep this simple to avoid URL formatting issues
+    // Essential scope for Google Auth
+    const scopes = 'email profile';
+    
+    // Query parameters required for proper Google OAuth flow
     const queryParams: Record<string, string> = {
+      // The state parameter is essential for security and tracking
+      state: stateId,
+      // Required for Google to send refresh tokens
       access_type: 'offline',
-      prompt: 'select_account', 
-      state: stateParam
+      // Ensures the consent screen is shown every time
+      prompt: 'consent'
     };
     
-    console.log('OAuth flow using Supabase URL:', redirectTo);
-    localStorage.setItem('final_redirect_url', redirectTo);
+    // Log the complete OAuth configuration for debugging
+    console.log('Complete OAuth configuration:', {
+      provider: 'google',
+      redirectTo,
+      scopes,
+      queryParams,
+      timestamp: new Date().toISOString()
+    });
+    localStorage.setItem('auth_oauth_config', JSON.stringify({
+      redirectTo,
+      scopes,
+      queryParams,
+      timestamp: new Date().toISOString()
+    }));
     
-    // Generate OAuth URL from Supabase Auth with MINIMAL parameters
+    console.log('Calling Supabase OAuth with:', { 
+      provider: 'google',
+      redirectTo,
+      scopes,
+      queryParams
+    });
+    
+    // Generate OAuth URL from Supabase Auth with explicit redirectTo
     const authResponse = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
+        // This must be explicitly set for each call
         redirectTo,
-        scopes: 'email profile',
+        scopes,
         queryParams
       }
     });
     
     if (authResponse.error) {
       console.error("Error starting Google OAuth flow:", authResponse.error);
+      // Store error details for debugging
+      localStorage.setItem('auth_error', JSON.stringify({
+        message: authResponse.error.message,
+        name: authResponse.error.name,
+        timestamp: new Date().toISOString()
+      }));
       throw authResponse.error;
     }
     
     if (!authResponse.data?.url) {
       console.error("No OAuth URL returned from Supabase");
+      localStorage.setItem('auth_error', 'No OAuth URL returned');
       throw new Error("Failed to get authentication URL");
     }
     
     console.log(`Received OAuth URL from Supabase: ${authResponse.data.url}`);
     localStorage.setItem('oauth_url', authResponse.data.url);
+    
+    // Parse and log URL components for debugging
+    try {
+      const urlObj = new URL(authResponse.data.url);
+      console.log(`URL protocol: ${urlObj.protocol}`);
+      console.log(`URL host: ${urlObj.host}`);
+      console.log(`URL pathname: ${urlObj.pathname}`);
+      
+      // Log specific parameters
+      const searchParams = new URLSearchParams(urlObj.search);
+      const redirectUriParam = searchParams.get('redirect_uri');
+      console.log(`redirect_uri param: ${redirectUriParam}`);
+      
+      // Store these for debugging
+      localStorage.setItem('auth_generated_url_host', urlObj.host);
+      localStorage.setItem('auth_generated_url_path', urlObj.pathname);
+      localStorage.setItem('auth_generated_redirect_uri', redirectUriParam || 'not found');
+    } catch (e) {
+      console.error('Error parsing OAuth URL:', e);
+      localStorage.setItem('auth_url_parse_error', e.message);
+    }
     
     // Store auth provider info
     localStorage.setItem('auth_provider', 'google');
@@ -334,71 +321,77 @@ const browserBasedGoogleSignIn = async () => {
 
 /**
  * Handle navigation to the OAuth URL based on platform
- * This is simplified to be more reliable, especially on iOS
  */
 const handleOAuthNavigation = (url: string) => {
-  // Log the URL we're about to open (for debugging)
-  localStorage.setItem('opening_browser_url', url);
-  localStorage.setItem('browser_open_time', new Date().toISOString());
-  
-  const platform = Capacitor.getPlatform();
-  
-  // For iOS (which has the site URL formatting issue), use a simpler approach
-  if (platform === IOS_PLATFORM) {
-    console.log('📱 iOS platform: Using Safari to open OAuth URL');
-    
-    try {
-      // Use the Capacitor Browser plugin which is more reliable
-      Browser.open({
-        url,
-        windowName: '_self',
-        presentationStyle: 'fullscreen'
-      });
-      console.log('📱 Browser opened successfully with Capacitor Browser plugin');
-    } catch (e) {
-      console.error('📱 Error opening browser:', e);
-      
-      // Fallback to direct location change
-      console.log('📱 Falling back to direct location change');
-      window.location.href = url;
-    }
-    return;
-  }
-  
   // For web, use window.location directly
   if (!Capacitor.isNativePlatform()) {
     console.log('Using window.location.href for web platform');
-    window.location.href = url;
+    
+    // Add small delay to ensure localStorage is written
+    setTimeout(() => {
+      window.location.href = url;
+    }, 50);
     return;
   } 
   
-  // For Android
-  console.log('Android: Using Capacitor Browser plugin');
-  Browser.open({
-    url,
-    windowName: '_self',
-    presentationStyle: 'fullscreen'
-  });
+  // For mobile platforms, try system browser
+  console.log('Using system browser for mobile platform');
+  try {
+    window.open(url, '_blank');
+    console.log('Window.open call completed successfully');
+  } catch (browserError) {
+    console.error('Browser opening error:', browserError);
+    
+    // Ultimate fallback to window.location
+    console.log('Falling back to window.location');
+    window.location.href = url;
+  }
 };
 
 /**
- * Function to get the proper redirect URL based on environment
+ * Function to get the proper redirect URL based on environment and platform
  */
 export function getRedirectUrl(): string {
-  // IMPORTANT: Supabase requires a valid https URL for the redirect_to parameter
-  // For ALL platforms including iOS, use the standard callback URL
-  // The native URL scheme handling will still work because iOS intercepts the callback
-  
-  // For web platforms (and iOS)
-  const supabaseCallbackUrl = 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
-  
-  // Log which URL we're using for debugging
   const platform = Capacitor.getPlatform();
-  console.log(`Using Supabase callback URL for ${platform}: ${supabaseCallbackUrl}`);
-  localStorage.setItem('redirect_url_chosen', supabaseCallbackUrl);
+  const isNative = Capacitor.isNativePlatform();
   
-  // Always return the standard Supabase callback URL which works on all platforms
-  return supabaseCallbackUrl;
+  console.log(`Determining redirect URL for platform: ${platform}, isNative: ${isNative}`);
+  
+  // Store diagnostic information
+  localStorage.setItem('auth_redirect_timestamp', new Date().toISOString());
+  
+  // Platform-specific redirect URLs
+  if (isNative) {
+    if (platform === 'ios') {
+      // iOS requires the reverse client ID from the GoogleService-Info.plist
+      // This MUST match EXACTLY what's in Google OAuth console
+      const iosRedirectUrl = 'com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2:/oauth2redirect';
+      
+      console.log(`Using iOS native redirect URL: ${iosRedirectUrl}`);
+      localStorage.setItem('auth_redirect_platform', 'ios_native');
+      localStorage.setItem('auth_redirect_url_used', iosRedirectUrl);
+      return iosRedirectUrl;
+    }
+    
+    if (platform === 'android') {
+      // Android uses the package name in the URL scheme
+      const androidRedirectUrl = 'com.introgy.app:/oauth2redirect';
+      console.log(`Using Android redirect URL: ${androidRedirectUrl}`);
+      localStorage.setItem('auth_redirect_platform', 'android_native');
+      localStorage.setItem('auth_redirect_url_used', androidRedirectUrl);
+      return androidRedirectUrl;
+    }
+  }
+  
+  // For web platforms, ALWAYS use the Supabase callback URL directly
+  // This is critical for Supabase OAuth to work properly
+  const supabaseRedirectUrl = 'https://gnvlzzqtmxrfvkdydxet.supabase.co/auth/v1/callback';
+  
+  console.log(`Using Supabase callback URL for web: ${supabaseRedirectUrl}`);
+  localStorage.setItem('auth_redirect_platform', 'web');
+  localStorage.setItem('auth_redirect_url_used', supabaseRedirectUrl);
+  
+  return supabaseRedirectUrl;
 }
 
 /**

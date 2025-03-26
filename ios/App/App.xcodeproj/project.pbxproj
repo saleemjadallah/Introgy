@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,12 +15,20 @@
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		54F655D6A11935B1B3177BD2 /* Pods_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C410B66BD226AEF57E09E2 /* Pods_App.framework */; };
 		821787672D8C3C4100682D1C /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 821787662D8C3C4100682D1C /* StoreKit.framework */; };
+		824009D22D906852008C47FD /* GoogleAuthVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824009D12D906852008C47FD /* GoogleAuthVerifier.swift */; };
+		824009D62D906B6A008C47FD /* GoogleSignInHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824009D52D906B6A008C47FD /* GoogleSignInHandler.swift */; };
+		824009DE2D906BCF008C47FD /* debug_google_auth.sh in Resources */ = {isa = PBXBuildFile; fileRef = 824009DD2D906BCF008C47FD /* debug_google_auth.sh */; };
+		824009E02D906C3F008C47FD /* GoogleAuthPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 824009DF2D906C3F008C47FD /* GoogleAuthPlugin.m */; };
+		824009E22D906C44008C47FD /* plugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 824009E12D906C44008C47FD /* plugin.m */; };
+		824009EA2D907C5B008C47FD /* GoogleAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824009E92D907C5B008C47FD /* GoogleAuthService.swift */; };
+		824009EC2D907FF6008C47FD /* GoogleAuthPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824009EB2D907FF6008C47FD /* GoogleAuthPlugin.swift */; };
+		824009EE2D908004008C47FD /* GoogleAuthConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824009ED2D908004008C47FD /* GoogleAuthConfig.swift */; };
+		824009F02D908026008C47FD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 824009EF2D908026008C47FD /* GoogleService-Info.plist */; };
 		826145382D82BF2700302092 /* ReceiptParser in Frameworks */ = {isa = PBXBuildFile; productRef = 826145372D82BF2700302092 /* ReceiptParser */; };
 		8262806B2D8593A000C725EA /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8262806A2D8593A000C725EA /* Storyboard.storyboard */; };
 		82C4B3B42D8560BB00551E04 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 82C4B3B32D8560BB00551E04 /* RevenueCat */; };
 		82CA1DE62D85EAA1009BF7B8 /* Introgy.mobileprovision in Resources */ = {isa = PBXBuildFile; fileRef = 82CA1DE52D85EAA1009BF7B8 /* Introgy.mobileprovision */; };
 		82CC24622D8D7258002AAE0D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CC24612D8D7258002AAE0D /* AppDelegate.swift */; };
-		82CC24662D8E7CD4002AAE0D /* client_308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com.plist in Resources */ = {isa = PBXBuildFile; fileRef = 82CC24652D8E7CD4002AAE0D /* client_308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com.plist */; };
 		82E285512D82A9D3004233C8 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 82E285502D82A9D3004233C8 /* RevenueCatUI */; };
 /* End PBXBuildFile section */
 
@@ -37,10 +45,18 @@
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
 		821787662D8C3C4100682D1C /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		821787942D8C659600682D1C /* App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "App-Bridging-Header.h"; sourceTree = "<group>"; };
+		824009D12D906852008C47FD /* GoogleAuthVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GoogleAuthVerifier.swift; path = Utils/GoogleAuthVerifier.swift; sourceTree = "<group>"; };
+		824009D52D906B6A008C47FD /* GoogleSignInHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GoogleSignInHandler.swift; path = Handlers/GoogleSignInHandler.swift; sourceTree = "<group>"; };
+		824009DD2D906BCF008C47FD /* debug_google_auth.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = debug_google_auth.sh; sourceTree = SOURCE_ROOT; };
+		824009DF2D906C3F008C47FD /* GoogleAuthPlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GoogleAuthPlugin.m; sourceTree = "<group>"; };
+		824009E12D906C44008C47FD /* plugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = plugin.m; sourceTree = "<group>"; };
+		824009E92D907C5B008C47FD /* GoogleAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GoogleAuthService.swift; path = Services/GoogleAuthService.swift; sourceTree = "<group>"; };
+		824009EB2D907FF6008C47FD /* GoogleAuthPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleAuthPlugin.swift; sourceTree = "<group>"; };
+		824009ED2D908004008C47FD /* GoogleAuthConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleAuthConfig.swift; sourceTree = "<group>"; };
+		824009EF2D908026008C47FD /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8262806A2D8593A000C725EA /* Storyboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
 		82CA1DE52D85EAA1009BF7B8 /* Introgy.mobileprovision */ = {isa = PBXFileReference; lastKnownFileType = text; path = Introgy.mobileprovision; sourceTree = "<group>"; };
 		82CC24612D8D7258002AAE0D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		82CC24652D8E7CD4002AAE0D /* client_308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "client_308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com.plist"; sourceTree = "<group>"; };
 		A5245858E31A13CDC93C4A15 /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -90,16 +106,24 @@
 		504EC3061FED79650016851F /* App */ = {
 			isa = PBXGroup;
 			children = (
-				82CC24652D8E7CD4002AAE0D /* client_308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com.plist */,
 				82CC24612D8D7258002AAE0D /* AppDelegate.swift */,
+				824009D12D906852008C47FD /* GoogleAuthVerifier.swift */,
+				824009D52D906B6A008C47FD /* GoogleSignInHandler.swift */,
+				824009EB2D907FF6008C47FD /* GoogleAuthPlugin.swift */,
+				824009E92D907C5B008C47FD /* GoogleAuthService.swift */,
+				824009ED2D908004008C47FD /* GoogleAuthConfig.swift */,
+				824009DF2D906C3F008C47FD /* GoogleAuthPlugin.m */,
+				824009E12D906C44008C47FD /* plugin.m */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				8262806A2D8593A000C725EA /* Storyboard.storyboard */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
+				824009EF2D908026008C47FD /* GoogleService-Info.plist */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				82CA1DE52D85EAA1009BF7B8 /* Introgy.mobileprovision */,
+				824009DD2D906BCF008C47FD /* debug_google_auth.sh */,
 				50B271D01FEDC1A000F3C39B /* public */,
 				821787942D8C659600682D1C /* App-Bridging-Header.h */,
 			);
@@ -167,7 +191,7 @@
 				};
 			};
 			buildConfigurationList = 504EC2FF1FED79650016851F /* Build configuration list for PBXProject "App" */;
-			compatibilityVersion = "Xcode 12.0";
+			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -198,7 +222,8 @@
 				504EC30F1FED79650016851F /* Assets.xcassets in Resources */,
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
-				82CC24662D8E7CD4002AAE0D /* client_308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com.plist in Resources */,
+				824009DE2D906BCF008C47FD /* debug_google_auth.sh in Resources */,
+				824009F02D908026008C47FD /* GoogleService-Info.plist in Resources */,
 				8262806B2D8593A000C725EA /* Storyboard.storyboard in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
 			);
@@ -289,7 +314,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				824009EC2D907FF6008C47FD /* GoogleAuthPlugin.swift in Sources */,
+				824009D22D906852008C47FD /* GoogleAuthVerifier.swift in Sources */,
 				82CC24622D8D7258002AAE0D /* AppDelegate.swift in Sources */,
+				824009EA2D907C5B008C47FD /* GoogleAuthService.swift in Sources */,
+				824009E22D906C44008C47FD /* plugin.m in Sources */,
+				824009E02D906C3F008C47FD /* GoogleAuthPlugin.m in Sources */,
+				824009EE2D908004008C47FD /* GoogleAuthConfig.swift in Sources */,
+				824009D62D906B6A008C47FD /* GoogleSignInHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
