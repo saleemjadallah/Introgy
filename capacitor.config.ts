@@ -66,7 +66,6 @@ const config: CapacitorConfig = {
     },
     
     GoogleAuth: {
-      // Enhanced configuration for GoogleAuth plugin
       scopes: [
         'profile',
         'email',
@@ -78,7 +77,8 @@ const config: CapacitorConfig = {
       webClientId: '308656966304-ouvq7u7q9sms8rujjtqpevaqr120vdge.apps.googleusercontent.com',
       androidClientId: '308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com',
       clientId: '308656966304-ouvq7u7q9sms8rujjtqpevaqr120vdge.apps.googleusercontent.com',
-      redirectUrl: 'ai.introgy.app://auth/callback'
+      redirectUrl: 'ai.introgy.app://auth/callback',
+      iosPath: '/auth/callback'
     }
   },
   ios: {

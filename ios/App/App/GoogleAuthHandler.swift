@@ -28,7 +28,7 @@ import Capacitor
             return
         }
         
-        let redirectURL = "\(reversedClientID):/oauth2redirect"
+        let redirectURL = "ai.introgy.app://auth/callback"
         print("📱 Using redirect URL: \(redirectURL)")
         
         // Store for debugging and reference
