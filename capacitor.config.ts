@@ -14,11 +14,13 @@ const config: CapacitorConfig = {
   },
   plugins: {
     App: {
+      appName: "Introgy",
+      appVersion: "1.0.0",
       appUrlOpen: {
-        // Include all possible URL schemes
         schemes: [
-          'introgy',  // Your app's custom scheme
-          'ai.introgy.app'  // Your bundle ID as a scheme
+          'introgy',
+          'ai.introgy.app',
+          'com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2'
         ]
       }
     },
@@ -62,17 +64,7 @@ const config: CapacitorConfig = {
       },
       observerMode: true
     },
-    App: {
-      appName: "Introgy",
-      appVersion: "1.0.0",
-      appUrlOpen: {
-        // Register BOTH URL schemes for deep linking
-        schemes: [
-          'introgy', // App's custom scheme
-          'com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2' // Google's scheme
-        ]
-      }
-    },
+    
     GoogleAuth: {
       // Enhanced configuration for GoogleAuth plugin
       scopes: [
