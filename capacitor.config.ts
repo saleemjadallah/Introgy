@@ -77,7 +77,8 @@ const config: CapacitorConfig = {
       iosClientId: '308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com',
       webClientId: '308656966304-ouvq7u7q9sms8rujjtqpevaqr120vdge.apps.googleusercontent.com',
       androidClientId: '308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2.apps.googleusercontent.com',
-      clientId: '308656966304-ouvq7u7q9sms8rujjtqpevaqr120vdge.apps.googleusercontent.com'
+      clientId: '308656966304-ouvq7u7q9sms8rujjtqpevaqr120vdge.apps.googleusercontent.com',
+      redirectUrl: 'ai.introgy.app://auth/callback'
     }
   },
   ios: {
