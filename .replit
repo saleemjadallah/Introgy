@@ -1,0 +1,8 @@
+modules = ["swift-5.8", "nodejs-20", "bash", "ruby-3.2"]
+run = "npm run dev"
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "npm run dev"]
