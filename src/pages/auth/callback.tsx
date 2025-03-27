@@ -64,30 +64,62 @@ export default function AuthCallback() {
           hasRefreshToken: !!refreshToken
         });
         
-        // Set the session with the received tokens
-        const { data, error } = await supabase.auth.setSession({
-          access_token: accessToken || '',
-          refresh_token: refreshToken || ''
-        });
+        // Check if we're on iOS native platform
+        const isIOS = window.Capacitor?.getPlatform() === 'ios';
         
-        // Handle any auth errors
-        if (error) {
-          console.error('Auth error:', error);
-          setError(error.message);
-          toast.error(`Authentication failed: ${error.message}`);
+        if (isIOS) {
+          // For iOS, we'll let the native handler manage the tokens
+          console.log('iOS platform detected, tokens will be handled by native flow');
+          navigate('/profile');
           return;
         }
-        
-        if (data?.session) {
-          console.log("Authentication successful, session established");
-          toast.success("Signed in successfully");
+
+        // For web platform, handle the tokens here
+        if (!accessToken) {
+          console.error('No access token found in URL');
+          setError('No access token found');
+          toast.error('Authentication failed: No access token found');
+          return;
+        }
+
+        try {
+          // Set the session with the received tokens
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || ''
+          });
           
-          // Redirect to profile page immediately
-          navigate('/profile');
-        } else {
-          console.warn("No session data found after token exchange");
-          setError("No session data found");
-          toast.error("Authentication failed: No session data found");
+          // Handle any auth errors
+          if (error) {
+            console.error('Auth error:', error);
+            setError(error.message);
+            toast.error(`Authentication failed: ${error.message}`);
+            return;
+          }
+          
+          if (data?.session) {
+            console.log("Authentication successful, session established");
+            
+            // Force a session refresh to ensure we have the latest state
+            const { data: refreshData } = await supabase.auth.getSession();
+            if (refreshData.session) {
+              console.log('Session refreshed successfully');
+              window.dispatchEvent(new CustomEvent('supabase.auth.signIn', { 
+                detail: { session: refreshData.session } 
+              }));
+            }
+            
+            toast.success("Signed in successfully");
+            navigate('/profile');
+          } else {
+            console.warn("No session data found after token exchange");
+            setError("No session data found");
+            toast.error("Authentication failed: No session data found");
+          }
+        } catch (e) {
+          console.error('Exception during session setup:', e);
+          setError(e instanceof Error ? e.message : 'Unknown error');
+          toast.error('Authentication failed: Unexpected error');
         }
       } catch (err) {
         console.error("Error in auth callback:", err);

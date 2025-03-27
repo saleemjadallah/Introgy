@@ -26,32 +26,33 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2</string>
+			<string>$(REVERSED_CLIENT_ID)</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2</string>
+				<string>$(REVERSED_CLIENT_ID)</string>
 			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>dev.introgy</string>
+			<string>ai.introgy.app</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>introgy</string>
+				<string>ai.introgy.app</string>
 			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>app.introgy</string>
+			<string>introgy</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>introgy</string>
 			</array>
 		</dict>
+
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
@@ -124,5 +125,22 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>WKAppBoundDomains</key>
+	<array>
+		<string>accounts.google.com</string>
+		<string>gnvlzzqtmxrfvkdydxet.supabase.co</string>
+		<string>auth.supabase.co</string>
+		<string>introgy.ai</string>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>ai.introgy.app</string>
+		<string>introgy</string>
+	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

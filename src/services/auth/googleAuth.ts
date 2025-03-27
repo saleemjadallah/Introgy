@@ -1,5 +1,7 @@
 import { supabase, REDIRECT_URL } from "@/integrations/supabase/client";
-import { Capacitor } from "@capacitor/core";
+import { Capacitor, PluginListenerHandle } from "@capacitor/core";
+import { Browser } from '@capacitor/browser';
+import { App } from '@capacitor/app';
 
 /**
  * Sign in with Google using the recommended pattern
@@ -26,20 +28,10 @@ export async function signInWithGoogle() {
     localStorage.setItem('auth_redirect_base', redirectTo);
     
     if (isNative) {
-      if (platform === 'ios') {
-        // For iOS, use the custom URL scheme that matches what's in Info.plist
-        // This format is critical - it must match EXACTLY what's in Info.plist
-        // Do not add trailing slashes or extra characters
-        redirectTo = 'com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2:/oauth2redirect';
-        localStorage.setItem('auth_redirect_ios', redirectTo);
-        console.log('Using iOS redirect URL:', redirectTo);
-      } else if (platform === 'android') {
-        // For Android, use the custom URL scheme that matches what's in AndroidManifest.xml
-        // This format is critical - it must match EXACTLY what's in your intent filters
-        redirectTo = 'com.introgy.app:/oauth2redirect';
-        localStorage.setItem('auth_redirect_android', redirectTo);
-        console.log('Using Android redirect URL:', redirectTo);
-      }
+      // For native platforms, use the URL configured in Google Cloud Console
+      redirectTo = 'https://introgy.ai/auth/callback';
+      localStorage.setItem('auth_redirect_native', redirectTo);
+      console.log(`Using native redirect URL for ${platform}:`, redirectTo);
     }
     
     console.log(`Using redirect URL: ${redirectTo}`);
@@ -53,12 +45,18 @@ export async function signInWithGoogle() {
         redirectTo,
         // Essential scopes for Google Auth
         scopes: 'email profile',
+        // Skip browser redirect on native platforms
+        skipBrowserRedirect: Capacitor.isNativePlatform(),
         // Query parameters required for proper Google OAuth flow
         queryParams: {
           // Required for Google to send refresh tokens
           access_type: 'offline',
-          // Ensures the consent screen is shown every time
-          prompt: 'consent'
+          // Use 'none' to skip consent screens if already granted
+          prompt: 'none',
+          // Include granted scopes to avoid re-prompting
+          include_granted_scopes: 'true',
+          // Login hint if we have the user's email
+          ...(localStorage.getItem('user_email') ? { login_hint: localStorage.getItem('user_email') } : {})
         }
       }
     });
@@ -85,17 +83,76 @@ export async function signInWithGoogle() {
     // For web platforms, redirect to the OAuth URL
     if (!isNative) {
       window.location.href = data.url;
+      return data;
+    }
+    
+    // Parse the URL to examine its components
+    const url = new URL(data.url);
+    console.log('URL protocol:', url.protocol);
+    console.log('URL host:', url.host);
+    console.log('URL pathname:', url.pathname);
+    
+    // Check for redirect_uri parameter which might be causing issues
+    const params = new URLSearchParams(url.search);
+    console.log('redirect_uri param:', params.get('redirect_uri'));
+    
+    // For iOS, use a more aggressive approach to prevent external browser
+    if (platform === 'ios') {
+      console.log('Using force in-app browser approach for iOS');
+      
+      // Force use of internal Browser plugin and prevent external browser
+      try {
+        // First, ensure any existing browser is closed
+        await Browser.close();
+        
+        // Add listeners to detect browser closed events
+        const handleBrowserClosed = () => {
+          console.log('Browser was closed');
+          document.removeEventListener('browserClosed', handleBrowserClosed);
+        };
+        
+        // Listen for custom events from native side
+        document.addEventListener('browserClosed', handleBrowserClosed);
+        
+        // Add listener for auth completion
+        const handleAuthComplete = (event: CustomEvent) => {
+          console.log('Received auth completion event:', event.detail);
+          document.removeEventListener('supabase.auth.signIn', handleAuthComplete as EventListener);
+        };
+        window.addEventListener('supabase.auth.signIn', handleAuthComplete as EventListener);
+        
+        // Crucial: Force the in-app browser by explicitly setting presentation params
+        console.log('Opening auth URL with forced in-app browser:', data.url);
+        await Browser.open({ 
+          url: data.url,
+          presentationStyle: 'fullscreen',
+          toolbarColor: '#121212',
+          // These options help force in-app browser
+          windowName: '_self'
+        });
+      } catch (e) {
+        console.error('Error using Browser plugin:', e);
+        // Even with error, don't fall back to window.open as that would use external browser
+        
+        // Try a different approach with our custom event
+        const forceInAppBrowsingEvent = new CustomEvent('forceInAppBrowsing', {
+          detail: { url: data.url }
+        });
+        document.dispatchEvent(forceInAppBrowsingEvent);
+        console.log('Dispatched forceInAppBrowsing event as fallback');
+      }
     } else {
-      // For native platforms, open the URL in the system browser
-      // This should be handled by your native implementation
-      // Use proper type casting for Capacitor plugins
-      if (Capacitor.isPluginAvailable('Browser')) {
-        // Use proper type casting to access Capacitor plugins
-        const Browser = (Capacitor as any).Plugins.Browser;
-        await Browser.open({ url: data.url });
-      } else {
-        // Fallback to window.open for Capacitor web
-        window.open(data.url, '_blank');
+      // For other platforms, use the browser plugin
+      try {
+        await Browser.open({ 
+          url: data.url,
+          presentationStyle: 'fullscreen',
+          windowName: '_self'  
+        });
+      } catch (e) {
+        console.warn('Browser plugin failed:', e);
+        // For non-iOS platforms, fallback to window.open may be necessary
+        window.open(data.url, '_self');  // Use _self instead of _blank
       }
     }
     

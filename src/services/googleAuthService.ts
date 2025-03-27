@@ -1,6 +1,7 @@
 
 import { Capacitor } from "@capacitor/core";
 import { App } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
 import { supabase, REDIRECT_URL, SITE_URL, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -194,19 +195,14 @@ const browserBasedGoogleSignIn = async () => {
     localStorage.setItem('auth_attempt_is_native', String(isNative));
     localStorage.setItem('auth_attempt_id', authAttemptId);
     
-    // Use platform-specific redirect URLs
-    let redirectTo = REDIRECT_URL; // Default to Supabase URL
-    
-    if (isNative) {
-      if (platform === 'ios') {
-        redirectTo = 'com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2:/oauth2redirect';
-      } else if (platform === 'android') {
-        redirectTo = 'com.introgy.app:/oauth2redirect';
-      }
-    }
+    // Critical fix: Use this exact redirect URL format
+    let redirectTo = isNative
+      ? 'introgy://auth.supabase.co/callback'  // For native platforms
+      : 'https://introgy.ai/auth/callback';    // For web
     
     // Log the URL for debugging
     console.log('Using redirect URL:', redirectTo);
+    localStorage.setItem('auth_redirect_url_used', redirectTo);
     
     // Essential scope for Google Auth
     const scopes = 'email profile';
@@ -215,8 +211,12 @@ const browserBasedGoogleSignIn = async () => {
     const queryParams: Record<string, string> = {
       // Required for Google to send refresh tokens
       access_type: 'offline',
-      // Ensures the consent screen is shown every time
-      prompt: 'consent'
+      // Use 'none' to skip consent screens if already granted
+      prompt: 'none',
+      // Include granted scopes to avoid re-prompting
+      include_granted_scopes: 'true',
+      // Login hint if we have the user's email
+      ...(localStorage.getItem('user_email') ? { login_hint: localStorage.getItem('user_email')! } : {})
     };
     
     // Log the complete OAuth configuration for debugging
@@ -241,42 +241,16 @@ const browserBasedGoogleSignIn = async () => {
       queryParams
     });
     
-    // CRITICAL FIX: When using signInWithOAuth, we need to make an important adjustment
-    // to prevent the "site url is improperly formatted" error.
-    // We must initialize a NEW Supabase client just for this sign-in attempt
-    // with the site URL and redirectTo explicitly set to match what's in the Supabase dashboard
-    
-    // Log the current attempt configuration
-    console.log('🔍 Current Auth Attempt Configuration:');
-    console.log('  - SITE_URL:', SITE_URL);
-    console.log('  - redirectTo:', redirectTo);
-    
-    // Import the createClient directly to avoid circular dependencies
-    const { createClient } = await import('@supabase/supabase-js');
-    
-    // Log for debugging
-    console.log('🔑 Creating temporary Supabase client with EXACT configuration');
-    console.log('Using SUPABASE_URL:', SUPABASE_URL);
-    
-    // Create a temporary client with exact configuration that matches Supabase dashboard
-    // We need to use 'as any' for the auth options to bypass TypeScript errors
-    // This is necessary because the Supabase types don't expose all the options they actually support
-    const tempClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true,
-        flowType: 'pkce'
-        // We can't set redirectTo here due to TypeScript errors
-        // We'll set it in the signInWithOAuth call instead
-      } as any
+    // Log the current configuration
+    console.log('🔍 Auth Configuration:', {
+      SITE_URL,
+      redirectTo,
+      scopes,
+      queryParams
     });
     
-    // Log the client creation
-    console.log('Created temporary Supabase client with redirectTo:', redirectTo);
-    
-    // Generate OAuth URL from the temporary Supabase client
-    const authResponse = await tempClient.auth.signInWithOAuth({
+    // Use the main Supabase client for authentication
+    const authResponse = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo, // Must match what's set in the client config
@@ -344,7 +318,7 @@ const browserBasedGoogleSignIn = async () => {
 /**
  * Handle navigation to the OAuth URL based on platform
  */
-const handleOAuthNavigation = (url: string) => {
+const handleOAuthNavigation = async (url: string) => {
   // For web, use window.location directly
   if (!Capacitor.isNativePlatform()) {
     console.log('Using window.location.href for web platform');
@@ -356,17 +330,95 @@ const handleOAuthNavigation = (url: string) => {
     return;
   } 
   
-  // For mobile platforms, try system browser
-  console.log('Using system browser for mobile platform');
-  try {
-    window.open(url, '_blank');
-    console.log('Window.open call completed successfully');
-  } catch (browserError) {
-    console.error('Browser opening error:', browserError);
+  // For iOS, use a super aggressive approach to prevent external browser
+  if (Capacitor.getPlatform() === 'ios') {
+    console.log('Using super aggressive approach for iOS to prevent external browser');
     
-    // Ultimate fallback to window.location
-    console.log('Falling back to window.location');
-    window.location.href = url;
+    // Log details for debugging
+    localStorage.setItem('auth_browser_open_method', 'ios_super_aggressive_approach');
+    localStorage.setItem('auth_browser_open_url', url);
+    localStorage.setItem('auth_browser_open_time', new Date().toISOString());
+    
+    try {
+      // First, try to use the native Google Sign-In if available
+      if (GoogleAuth) {
+        console.log('Attempting to use native GoogleAuth plugin');
+        const result = await GoogleAuth.signInWithSupabase();
+        console.log('Native GoogleAuth result:', result);
+        return;
+      }
+      
+      // Force close any existing browsers first
+      try {
+        await Browser.close();
+        console.log('Closed any existing browsers');
+      } catch (e) {
+        console.log('No browsers to close or error closing:', e);
+      }
+      
+      // CRITICAL: Use Browser.open which will be intercepted by our native code
+      // This is the key part that ensures our Swift patch will handle the URL
+      console.log('Opening auth URL with Browser plugin (will be intercepted):', url);
+      
+      // We need to add a listener BEFORE opening the browser
+      let listenerHandler: any = null;
+      Browser.addListener('browserFinished', () => {
+        console.log('Browser finished event received, checking auth state');
+        // Remove the listener to prevent memory leaks
+        if (listenerHandler) {
+          listenerHandler.remove();
+        }
+      }).then(handler => {
+        listenerHandler = handler;
+      });
+      
+      // Open with Browser plugin - this call will be intercepted by our Swift patch
+      await Browser.open({ 
+        url,
+        // Don't set any presentation options as they might interfere with our patch
+      });
+      
+      console.log('Browser.open call completed successfully');
+    } catch (error) {
+      console.error('iOS auth error:', error);
+      localStorage.setItem('ios_auth_error', JSON.stringify(error));
+      toast.error('Authentication failed. Please try again.');
+    }
+    return;
+  }
+  
+  // For other native platforms, use the Capacitor Browser plugin
+  console.log('Using Capacitor Browser plugin for native platform');
+  try {
+    // Log that we're using the Browser plugin
+    console.log('Opening auth URL with Browser plugin:', url);
+    localStorage.setItem('auth_browser_open_method', 'capacitor_browser_plugin');
+    localStorage.setItem('auth_browser_open_url', url);
+    localStorage.setItem('auth_browser_open_time', new Date().toISOString());
+    
+    // Open the URL in the in-app browser with specific options to prevent external browser
+    await Browser.open({ 
+      url, 
+      presentationStyle: 'fullscreen',
+      toolbarColor: '#121212',
+      windowName: '_self' // Force same window
+    });
+    
+    console.log('Browser.open call completed successfully');
+    
+    // Set up a listener for when the browser is closed
+    Browser.addListener('browserFinished', () => {
+      console.log('Browser finished, checking auth state');
+      // We could trigger a session check here if needed
+    });
+    
+  } catch (browserError) {
+    console.error('Capacitor Browser opening error:', browserError);
+    localStorage.setItem('auth_browser_error', JSON.stringify(browserError));
+    
+    // Never fall back to system browser, regardless of platform
+    console.log('Browser plugin failed, but NOT falling back to system browser');
+    toast.error('Unable to open authentication browser. Please try again.');
   }
 };
 
@@ -382,37 +434,27 @@ export function getRedirectUrl(): string {
   // Store diagnostic information
   localStorage.setItem('auth_redirect_timestamp', new Date().toISOString());
   
-  // Platform-specific redirect URLs
+  // Critical fix: Use the exact URL format accepted by Google
+  let redirectUrl;
+  
   if (isNative) {
-    if (platform === 'ios') {
-      // iOS requires the reverse client ID from the GoogleService-Info.plist
-      // This MUST match EXACTLY what's in Google OAuth console
-      const iosRedirectUrl = 'com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2:/oauth2redirect';
-      
-      console.log(`Using iOS native redirect URL: ${iosRedirectUrl}`);
-      localStorage.setItem('auth_redirect_platform', 'ios_native');
-      localStorage.setItem('auth_redirect_url_used', iosRedirectUrl);
-      return iosRedirectUrl;
-    }
-    
-    if (platform === 'android') {
-      // Android uses the package name in the URL scheme
-      const androidRedirectUrl = 'com.introgy.app:/oauth2redirect';
-      console.log(`Using Android redirect URL: ${androidRedirectUrl}`);
-      localStorage.setItem('auth_redirect_platform', 'android_native');
-      localStorage.setItem('auth_redirect_url_used', androidRedirectUrl);
-      return androidRedirectUrl;
-    }
+    // For native platforms, use the HTTPS URL that's registered in Google Cloud Console
+    // IMPORTANT: This must match exactly what's in Google Cloud Console
+    redirectUrl = 'https://introgy.ai/auth/callback';
+    console.log(`Using native redirect URL for ${platform}: ${redirectUrl}`);
+    localStorage.setItem('auth_redirect_platform', `${platform}_native`);
+  } else {
+    // For web, use the same URL configured in Google Cloud Console
+    redirectUrl = 'https://introgy.ai/auth/callback';
+    console.log(`Using web redirect URL: ${redirectUrl}`);
+    localStorage.setItem('auth_redirect_platform', 'web');
   }
   
-  // For web platforms, ALWAYS use the REDIRECT_URL imported from supabase/client.ts
-  // This is critical for Supabase OAuth to work properly
-  console.log(`Using Supabase callback URL for web: ${REDIRECT_URL}`);
-  localStorage.setItem('auth_redirect_platform', 'web');
-  localStorage.setItem('auth_redirect_url_used', REDIRECT_URL);
+  // Store the final URL for debugging
+  localStorage.setItem('auth_redirect_url_used', redirectUrl);
   localStorage.setItem('supabase_site_url', SITE_URL); // Store for debugging
   
-  return REDIRECT_URL;
+  return redirectUrl;
 }
 
 /**

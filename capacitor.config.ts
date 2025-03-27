@@ -13,9 +13,25 @@ const config: CapacitorConfig = {
     cleartext: true
   },
   plugins: {
+    App: {
+      appUrlOpen: {
+        // Include all possible URL schemes
+        schemes: [
+          'introgy',  // Your app's custom scheme
+          'ai.introgy.app'  // Your bundle ID as a scheme
+        ]
+      }
+    },
     Browser: {
       toolbarColor: "#121212",
-      presentationStyle: "fullscreen"
+      presentationStyle: "fullscreen",
+      // Forces in-app browser for all URLs
+      browserOpenInOverlay: true,
+      openByDefault: false,
+      // Ensure URLs use in-app browser
+      enableCustomInAppBrowser: true,
+      // Disable external browser completely for this app
+      allowExternalUrlRedirection: false
     },
     SplashScreen: {
       launchShowDuration: 3000,
@@ -50,7 +66,11 @@ const config: CapacitorConfig = {
       appName: "Introgy",
       appVersion: "1.0.0",
       appUrlOpen: {
-        scheme: "com.introgy.app"
+        // Register BOTH URL schemes for deep linking
+        schemes: [
+          'introgy', // App's custom scheme
+          'com.googleusercontent.apps.308656966304-0ubb5ad2qcfig4086jp3g3rv7q1kt5m2' // Google's scheme
+        ]
       }
     },
     GoogleAuth: {
