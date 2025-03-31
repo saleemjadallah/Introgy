@@ -86,22 +86,22 @@ export const PremiumProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return true;
   };
   
-  const upgradeToPremium = async (planType: 'monthly' | 'yearly' = 'monthly') => {
+  const upgradeToPremium = async (planType: 'monthly' | 'yearly' = 'monthly'): Promise<void> => {
     // Just simulate success
     toast.success(`Successfully upgraded to ${planType} plan!`);
-    return true;
+    return Promise.resolve();
   };
   
-  const handlePurchase = async (productId: string) => {
+  const handlePurchase = async (productId: string): Promise<void> => {
     // Simulate successful purchase
     toast.success("Premium features activated!");
-    return true;
+    return Promise.resolve();
   };
   
-  const restorePurchases = async () => {
+  const restorePurchases = async (): Promise<void> => {
     // Simulate successful restoration
     toast.success("All purchases restored!");
-    return true;
+    return Promise.resolve();
   };
   
   return (
