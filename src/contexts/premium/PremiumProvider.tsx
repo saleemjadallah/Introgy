@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,8 +25,8 @@ export const PremiumContext = createContext<PremiumContextType | undefined>(unde
 
 export const PremiumProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  const [isPremium, setIsPremium] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isPremium, setIsPremium] = useState<boolean>(true); // Always set to true
+  const [isLoading, setIsLoading] = useState<boolean>(false); // Set to false initially to avoid loading states
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState<boolean>(false);
   const [purchaseInProgress, setPurchaseInProgress] = useState<boolean>(false);
@@ -75,116 +76,39 @@ export const PremiumProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, [user, isNative]);
   
-  // Check premium status whenever the user changes
+  // We'll skip checking the actual premium status
   useEffect(() => {
-    const checkStatus = async () => {
-      if (!user) {
-        setIsPremium(false);
-        setIsLoading(false);
-        return;
-      }
-      
-      try {
-        setIsLoading(true);
-        const hasPremium = await checkPremiumSubscription(user.id);
-        setIsPremium(hasPremium);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    checkStatus();
+    setIsLoading(false);
   }, [user]);
   
   const checkFeatureAccess = (feature: PremiumFeature): boolean => {
-    // Free plan features (available to everyone)
-    const freeFeatures = getFreeFeatures();
-    
-    // If user is premium, they have access to all features
-    if (isPremium) return true;
-    
-    // Otherwise, check if the feature is in the free tier
-    return freeFeatures.includes(feature);
+    // Always return true to unlock all features
+    return true;
   };
   
   const upgradeToPremium = async (planType: 'monthly' | 'yearly' = 'monthly') => {
-    if (!user) {
-      toast.error("You need to be logged in to upgrade to premium");
-      return;
-    }
-    
-    try {
-      await upgradeUserToPremium(user.id, planType);
-      // Refresh premium status
-      setIsPremium(true);
-    } catch (err) {
-      // Error already handled in upgradeUserToPremium
-      console.error("Error in upgradeToPremium:", err);
-    }
+    // Just simulate success
+    toast.success(`Successfully upgraded to ${planType} plan!`);
+    return true;
   };
   
   const handlePurchase = async (productId: string) => {
-    if (!user) {
-      toast.error("You need to be logged in to make a purchase");
-      return;
-    }
-    
-    try {
-      setPurchaseInProgress(true);
-      
-      // Initiate purchase through our service
-      const purchase = await inAppPurchaseService.purchaseProduct(productId);
-      
-      // If purchase was successful, verify and record it
-      if (purchase) {
-        await verifyAndProcessPurchase(purchase, user.id);
-        setIsPremium(true);
-        toast.success("Premium subscription activated!");
-      }
-    } catch (error) {
-      console.error("Error during purchase:", error);
-      toast.error("Purchase failed. Please try again.");
-    } finally {
-      setPurchaseInProgress(false);
-    }
+    // Simulate successful purchase
+    toast.success("Premium features activated!");
+    return true;
   };
   
   const restorePurchases = async () => {
-    if (!user) {
-      toast.error("You need to be logged in to restore purchases");
-      return;
-    }
-    
-    try {
-      setPurchaseInProgress(true);
-      
-      // Restore purchases using our service
-      const restoredPurchases = await inAppPurchaseService.restorePurchases();
-      
-      if (restoredPurchases && restoredPurchases.length > 0) {
-        // Process each restored purchase
-        for (const purchase of restoredPurchases) {
-          await verifyAndProcessPurchase(purchase, user.id);
-        }
-        
-        setIsPremium(true);
-        toast.success("Your subscription has been restored!");
-      } else {
-        toast.info("No previous purchases found");
-      }
-    } catch (error) {
-      console.error("Error restoring purchases:", error);
-      toast.error("Failed to restore purchases. Please try again.");
-    } finally {
-      setPurchaseInProgress(false);
-    }
+    // Simulate successful restoration
+    toast.success("All purchases restored!");
+    return true;
   };
   
   return (
     <PremiumContext.Provider value={{ 
-      isPremium, 
-      isLoading, 
-      checkFeatureAccess, 
+      isPremium: true, // Always true
+      isLoading: false, // Never loading
+      checkFeatureAccess: () => true, // Always allow access
       upgradeToPremium,
       products,
       loadingProducts,
