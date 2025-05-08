@@ -11,8 +11,10 @@ interface PremiumFeatureGuardProps {
 
 export const PremiumFeatureGuard: React.FC<PremiumFeatureGuardProps> = ({ 
   feature, 
-  children
+  children,
+  title,
+  description
 }) => {
-  // Simply render children without any blocking
+  // For the explanatory website, just render children without any blocking
   return <>{children}</>;
 };

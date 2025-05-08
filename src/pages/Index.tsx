@@ -1,143 +1,250 @@
 
-import { Battery, Brain, Users, LineChart } from "lucide-react";
+import React from "react";
+import { motion } from "framer-motion";
+import { Battery, Brain, Users, LineChart, Download, Star, Check } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Progress } from "@/components/ui/progress";
-import { useSocialBattery } from "@/hooks/useSocialBattery";
-import { getBatteryColor } from "@/hooks/social-battery/batteryUtils";
 import { AnimatedCard } from "@/components/animations/AnimatedCard";
 import { AnimatedButton } from "@/components/animations/AnimatedButton";
-import { AnimatedProgress } from "@/components/animations/AnimatedProgress";
-import { motion } from "framer-motion";
+import { AnimatedTransition } from "@/components/animations/AnimatedTransition";
 
 const Index = () => {
-  // Use the social battery hook instead of mock data
-  const { batteryLevel } = useSocialBattery();
-
-  // Time-based greeting
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  };
-
   return (
     <motion.div 
-      className="space-y-4 md:space-y-6 mx-auto w-full max-w-full px-1 sm:px-2 md:px-4"
+      className="space-y-6 md:space-y-10 mx-auto w-full max-w-7xl px-4 py-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
-      <motion.div 
-        className="space-y-2"
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 30 }}
-      >
-        <h2 className="text-3xl font-bold tracking-tight">{getGreeting()}</h2>
-        <p className="text-muted-foreground">Welcome to your personal space for managing social energy.</p>
-      </motion.div>
+      {/* Hero Section */}
+      <AnimatedTransition type="slide" transitionKey="hero">
+        <div className="text-center space-y-4 py-8 md:py-12">
+          <motion.h1 
+            className="text-4xl md:text-6xl font-bold"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          >
+            Introgy
+          </motion.h1>
+          <motion.p 
+            className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+          >
+            The app designed for introverts to manage social energy and build meaningful connections
+          </motion.p>
+          
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            <Button size="lg" id="download-app" className="mt-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-6 text-lg">
+              <Download className="mr-2 h-5 w-5" /> Download for iOS
+            </Button>
+          </motion.div>
+        </div>
+      </AnimatedTransition>
 
-      {/* Social battery summary */}
-      <AnimatedCard className="battery-container-gradient w-full overflow-hidden shadow-lg border border-white/40">
-        <CardHeader className="pb-2 px-4 pt-4 md:px-6 md:pt-6">
-          <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-            <Battery className="h-5 w-5 text-sage" />
-            Social Battery
-          </CardTitle>
-          <CardDescription>Your current social energy level</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Current Level</span>
-              <span className="text-sm font-medium">{batteryLevel}%</span>
-            </div>
-            <AnimatedProgress
-              value={batteryLevel}
-              className="my-1"
-              barClassName="battery-indicator-gradient"
-              showWaveEffect={true}
-              pulseOnChange={true}
-              celebrateOnMax={true}
-              height={8}
+      {/* App Screenshot or Preview */}
+      <AnimatedTransition type="fade" transitionKey="screenshot">
+        <div className="flex justify-center py-4 md:py-8">
+          <div className="relative w-64 md:w-80 h-auto">
+            <img 
+              src="/lovable-uploads/d9785a5a-955e-49b3-8f3d-1e6c30a6f63d.png" 
+              alt="Introgy App Preview" 
+              className="w-full h-auto rounded-2xl shadow-2xl"
             />
-            <div className="pt-4 flex justify-center">
-              <Link to="/social-battery" className="w-[80%]">
-                <AnimatedButton variant="outline" size="sm" fullWidth={true}>Update Battery</AnimatedButton>
-              </Link>
+            <div className="absolute -right-4 -top-4 bg-amber-400 text-amber-900 rounded-full px-3 py-1 font-bold text-sm transform rotate-12">
+              New!
             </div>
           </div>
-        </CardContent>
-      </AnimatedCard>
+        </div>
+      </AnimatedTransition>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 w-full">
-        {/* Feature cards */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, type: "spring" }}
-        >
-          <Link to="/social-navigation" className="block w-full">
-            <AnimatedCard className="h-full navigation-container-gradient w-full overflow-hidden shadow-lg border border-white/40">
-              <CardHeader className="px-4 pt-4 pb-2 md:px-6 md:pt-6">
-                <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-                  <Users className="h-5 w-5 text-periwinkle" />
-                  Social Navigation
-                </CardTitle>
-                <CardDescription>Tools for navigating social situations</CardDescription>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 md:px-6 md:pb-6">
-                <p className="text-sm">Prepare for events, practice conversations, and get real-time support.</p>
+      {/* Key Features */}
+      <section className="py-8 md:py-12">
+        <h2 className="text-3xl font-bold text-center mb-8">Key Features</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          <AnimatedCard className="h-full battery-container-gradient w-full overflow-hidden shadow-lg border border-white/40">
+            <CardHeader className="pb-2 px-4 pt-4 md:px-6 md:pt-6">
+              <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                <Battery className="h-5 w-5 text-sage" />
+                Social Battery
+              </CardTitle>
+              <CardDescription>Track and manage your social energy levels</CardDescription>
+            </CardHeader>
+            <CardContent className="px-4 pb-6 md:px-6">
+              <p className="text-sm md:text-base">
+                Monitor your energy levels throughout the day, understand what drains you, and get personalized 
+                recommendations to help maintain a healthy balance.
+              </p>
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span className="text-sm">Visualize your energy levels</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span className="text-sm">Get recharge recommendations</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span className="text-sm">Set boundaries with confidence</span>
+                </div>
+              </div>
+            </CardContent>
+          </AnimatedCard>
+
+          <AnimatedCard className="h-full navigation-container-gradient w-full overflow-hidden shadow-lg border border-white/40">
+            <CardHeader className="pb-2 px-4 pt-4 md:px-6 md:pt-6">
+              <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                <Users className="h-5 w-5 text-periwinkle" />
+                Social Navigation
+              </CardTitle>
+              <CardDescription>Tools for navigating social situations</CardDescription>
+            </CardHeader>
+            <CardContent className="px-4 pb-6 md:px-6">
+              <p className="text-sm md:text-base">
+                Prepare for social events with guided exercises, practice conversations, and access real-time 
+                support during challenging social situations.
+              </p>
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span className="text-sm">Conversation practice tools</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span className="text-sm">Event preparation guides</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span className="text-sm">Real-time anxiety management</span>
+                </div>
+              </div>
+            </CardContent>
+          </AnimatedCard>
+
+          <AnimatedCard className="h-full connection-container-gradient w-full overflow-hidden shadow-lg border border-white/40">
+            <CardHeader className="pb-2 px-4 pt-4 md:px-6 md:pt-6">
+              <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                <Brain className="h-5 w-5 text-mauve" />
+                Connection Builder
+              </CardTitle>
+              <CardDescription>Create meaningful relationships</CardDescription>
+            </CardHeader>
+            <CardContent className="px-4 pb-6 md:px-6">
+              <p className="text-sm md:text-base">
+                Find compatible connections based on your personality and preferences, 
+                and maintain relationships with less effort through our intuitive tools.
+              </p>
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span className="text-sm">Compatibility matching</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span className="text-sm">Communication preference profiles</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span className="text-sm">Low-effort relationship maintenance</span>
+                </div>
+              </div>
+            </CardContent>
+          </AnimatedCard>
+
+          <AnimatedCard className="h-full wellbeing-container-gradient w-full overflow-hidden shadow-lg border border-white/40">
+            <CardHeader className="pb-2 px-4 pt-4 md:px-6 md:pt-6">
+              <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                <LineChart className="h-5 w-5 text-blueteal" />
+                Wellbeing Center
+              </CardTitle>
+              <CardDescription>Resources for introvert wellness</CardDescription>
+            </CardHeader>
+            <CardContent className="px-4 pb-6 md:px-6">
+              <p className="text-sm md:text-base">
+                Access mindfulness exercises, educational content, and community wisdom 
+                tailored specifically for introverts' unique needs.
+              </p>
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span className="text-sm">Introvert-focused meditation</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span className="text-sm">Educational resources</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span className="text-sm">Community-shared experiences</span>
+                </div>
+              </div>
+            </CardContent>
+          </AnimatedCard>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-8 md:py-12">
+        <h2 className="text-3xl font-bold text-center mb-8">What Users Are Saying</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              quote: "Introgy has completely changed how I approach social situations. I feel more in control of my energy now.",
+              name: "Sarah T.",
+              rating: 5
+            },
+            {
+              quote: "As someone who's always struggled with social anxiety, this app has been a game-changer for me.",
+              name: "Michael R.",
+              rating: 5
+            },
+            {
+              quote: "The communication profiles feature helped me explain my needs to family and friends in a way they finally understand.",
+              name: "Jamie L.",
+              rating: 4
+            }
+          ].map((testimonial, i) => (
+            <AnimatedCard key={i} className="bg-white/50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
+              <CardContent className="pt-6">
+                <div className="flex mb-2">
+                  {Array(testimonial.rating).fill(0).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 text-amber-400 fill-amber-400" />
+                  ))}
+                </div>
+                <p className="italic text-slate-700 dark:text-slate-300">"{testimonial.quote}"</p>
+                <p className="mt-4 text-sm font-medium">— {testimonial.name}</p>
               </CardContent>
             </AnimatedCard>
-          </Link>
-        </motion.div>
+          ))}
+        </div>
+      </section>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3, type: "spring" }}
-        >
-          <Link to="/connection-builder" className="block w-full">
-            <AnimatedCard className="h-full connection-container-gradient w-full overflow-hidden shadow-lg border border-white/40">
-              <CardHeader className="px-4 pt-4 pb-2 md:px-6 md:pt-6">
-                <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-                  <Brain className="h-5 w-5 text-mauve" />
-                  Connection Builder
-                </CardTitle>
-                <CardDescription>Create meaningful relationships</CardDescription>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 md:px-6 md:pb-6">
-                <p className="text-sm">Find compatible connections and maintain relationships with less effort.</p>
-              </CardContent>
-            </AnimatedCard>
-          </Link>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4, type: "spring" }}
-        >
-          <Link to="/wellbeing" className="block w-full">
-            <AnimatedCard className="h-full wellbeing-container-gradient w-full overflow-hidden shadow-lg border border-white/40">
-              <CardHeader className="px-4 pt-4 pb-2 md:px-6 md:pt-6">
-                <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-                  <LineChart className="h-5 w-5 text-blueteal" />
-                  Wellbeing Center
-                </CardTitle>
-                <CardDescription>Resources for introvert wellness</CardDescription>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 md:px-6 md:pb-6">
-                <p className="text-sm">Mindfulness exercises, educational content, and community wisdom.</p>
-              </CardContent>
-            </AnimatedCard>
-          </Link>
-        </motion.div>
-      </div>
+      {/* Download CTA */}
+      <section className="py-8 md:py-16 text-center">
+        <AnimatedTransition type="scaleFade" transitionKey="download-cta">
+          <div className="bg-gradient-to-r from-purple-900/80 to-indigo-900/80 text-white p-8 md:p-12 rounded-3xl">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to manage your social energy?</h2>
+            <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
+              Download Introgy today and take control of your social well-being with tools designed specifically for introverts.
+            </p>
+            <AnimatedButton 
+              size="lg" 
+              className="bg-white text-purple-900 hover:bg-slate-100 px-8 py-6 text-lg"
+            >
+              <Download className="mr-2 h-5 w-5" /> Download for iOS
+            </AnimatedButton>
+            <p className="mt-4 text-sm text-white/80">Available on the App Store. Android version coming soon.</p>
+          </div>
+        </AnimatedTransition>
+      </section>
     </motion.div>
   );
 };
