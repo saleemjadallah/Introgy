@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import SocialBatteryShowcase from "./pages/SocialBatteryShowcase";
 import SocialNavigation from "./pages/SocialNavigation";
+import ConnectionBuilderShowcase from "./pages/ConnectionBuilderShowcase";
 import Home from "./pages/Home";
 import WellbeingShowcase from "./pages/WellbeingShowcase";
 
