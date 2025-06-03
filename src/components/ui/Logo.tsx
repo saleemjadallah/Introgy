@@ -5,7 +5,7 @@ export const Logo = () => {
   return (
     <div className="flex items-center justify-center">
       <img 
-        src="/lovable-uploads/d9785a5a-955e-49b3-8f3d-1e6c30a6f63d.png" 
+        src="/lovable-uploads/8920aa33-42da-472b-9b5b-aabadf33ef29.png" 
         alt="Introgy Logo" 
         className="h-28"
         style={{ objectFit: 'contain' }}
