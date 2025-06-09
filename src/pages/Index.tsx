@@ -41,10 +41,12 @@ const Index = () => {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.6 }}
+            className="flex flex-col items-center"
           >
             <Button size="lg" id="download-app" className="mt-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-6 text-lg">
               <Download className="mr-2 h-5 w-5" /> Download for iOS
             </Button>
+            <p className="text-sm text-muted-foreground mt-2">Coming soon</p>
           </motion.div>
         </div>
       </AnimatedTransition>
@@ -235,13 +237,15 @@ const Index = () => {
             <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
               Download Introgy today and take control of your social well-being with tools designed specifically for introverts.
             </p>
-            <AnimatedButton 
-              size="lg" 
-              className="bg-white text-purple-900 hover:bg-slate-100 px-8 py-6 text-lg"
-            >
-              <Download className="mr-2 h-5 w-5" /> Download for iOS
-            </AnimatedButton>
-            <p className="mt-4 text-sm text-white/80">Available on the App Store. Android version coming soon.</p>
+            <div className="flex flex-col items-center">
+              <AnimatedButton 
+                size="lg" 
+                className="bg-white text-purple-900 hover:bg-slate-100 px-8 py-6 text-lg"
+              >
+                <Download className="mr-2 h-5 w-5" /> Download for iOS
+              </AnimatedButton>
+              <p className="mt-4 text-sm text-white/80">Available on the App Store. Android version coming soon.</p>
+            </div>
           </div>
         </AnimatedTransition>
       </section>
