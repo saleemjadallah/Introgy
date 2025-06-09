@@ -1,4 +1,3 @@
-
 import React from "react";
 import { motion } from "framer-motion";
 import { Battery, Brain, Users, LineChart, Download, Star, Check } from "lucide-react";
@@ -54,15 +53,12 @@ const Index = () => {
       {/* App Screenshot or Preview */}
       <AnimatedTransition type="fade" transitionKey="screenshot">
         <div className="flex justify-center py-4 md:py-8">
-          <div className="relative w-64 md:w-80 h-auto">
+          <div className="relative w-full max-w-4xl">
             <img 
-              src="/lovable-uploads/d9785a5a-955e-49b3-8f3d-1e6c30a6f63d.png" 
-              alt="Introgy App Preview" 
+              src="/lovable-uploads/9a061ed0-0536-43f4-96a2-f95a14d5242f.png" 
+              alt="Introgy - Recharge. Reflect. Thrive." 
               className="w-full h-auto rounded-2xl shadow-2xl"
             />
-            <div className="absolute -right-4 -top-4 bg-amber-400 text-amber-900 rounded-full px-3 py-1 font-bold text-sm transform rotate-12">
-              New!
-            </div>
           </div>
         </div>
       </AnimatedTransition>
