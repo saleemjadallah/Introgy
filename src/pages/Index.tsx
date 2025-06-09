@@ -1,14 +1,17 @@
+
 import React from "react";
 import { motion } from "framer-motion";
 import { Battery, Brain, Users, LineChart, Download, Star, Check } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AnimatedCard } from "@/components/animations/AnimatedCard";
 import { AnimatedButton } from "@/components/animations/AnimatedButton";
 import { AnimatedTransition } from "@/components/animations/AnimatedTransition";
 
 const Index = () => {
+  const navigate = useNavigate();
+
   return (
     <motion.div 
       className="space-y-6 md:space-y-10 mx-auto w-full max-w-7xl px-4 py-6"
@@ -67,7 +70,10 @@ const Index = () => {
       <section className="py-8 md:py-12">
         <h2 className="text-3xl font-bold text-center mb-8">Key Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          <AnimatedCard className="h-full battery-container-gradient w-full overflow-hidden shadow-lg border border-white/40">
+          <AnimatedCard 
+            className="h-full battery-container-gradient w-full overflow-hidden shadow-lg border border-white/40 cursor-pointer"
+            onClick={() => navigate('/social-battery')}
+          >
             <CardHeader className="pb-2 px-4 pt-4 md:px-6 md:pt-6">
               <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
                 <Battery className="h-5 w-5 text-sage" />
@@ -97,7 +103,10 @@ const Index = () => {
             </CardContent>
           </AnimatedCard>
 
-          <AnimatedCard className="h-full navigation-container-gradient w-full overflow-hidden shadow-lg border border-white/40">
+          <AnimatedCard 
+            className="h-full navigation-container-gradient w-full overflow-hidden shadow-lg border border-white/40 cursor-pointer"
+            onClick={() => navigate('/social-navigation')}
+          >
             <CardHeader className="pb-2 px-4 pt-4 md:px-6 md:pt-6">
               <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
                 <Users className="h-5 w-5 text-periwinkle" />
@@ -127,7 +136,10 @@ const Index = () => {
             </CardContent>
           </AnimatedCard>
 
-          <AnimatedCard className="h-full connection-container-gradient w-full overflow-hidden shadow-lg border border-white/40">
+          <AnimatedCard 
+            className="h-full connection-container-gradient w-full overflow-hidden shadow-lg border border-white/40 cursor-pointer"
+            onClick={() => navigate('/connection-builder')}
+          >
             <CardHeader className="pb-2 px-4 pt-4 md:px-6 md:pt-6">
               <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
                 <Brain className="h-5 w-5 text-mauve" />
@@ -157,7 +169,10 @@ const Index = () => {
             </CardContent>
           </AnimatedCard>
 
-          <AnimatedCard className="h-full wellbeing-container-gradient w-full overflow-hidden shadow-lg border border-white/40">
+          <AnimatedCard 
+            className="h-full wellbeing-container-gradient w-full overflow-hidden shadow-lg border border-white/40 cursor-pointer"
+            onClick={() => navigate('/wellbeing')}
+          >
             <CardHeader className="pb-2 px-4 pt-4 md:px-6 md:pt-6">
               <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
                 <LineChart className="h-5 w-5 text-blueteal" />
