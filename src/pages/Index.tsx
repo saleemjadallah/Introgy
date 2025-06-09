@@ -207,19 +207,19 @@ const Index = () => {
       {/* Download CTA */}
       <section className="py-8 md:py-16 text-center">
         <AnimatedTransition type="scaleFade" transitionKey="download-cta">
-          <div className="bg-gradient-to-r from-slate-800 to-slate-900 text-white p-8 md:p-12 rounded-3xl border border-slate-700">
+          <div className="bg-gradient-to-r from-purple-600/90 to-indigo-600/90 text-white p-8 md:p-12 rounded-3xl border border-purple-400/30">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Ready to manage your social energy?</h2>
-            <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto text-slate-200">
+            <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto text-purple-100">
               Join our waiting list and be the first to experience Introgy when we launch. Get early access to tools designed specifically for introverts.
             </p>
             <div className="flex flex-col items-center">
               <AnimatedButton 
                 size="lg" 
-                className="bg-white text-slate-900 hover:bg-slate-100 px-8 py-6 text-lg font-semibold"
+                className="bg-white text-purple-700 hover:bg-purple-50 px-8 py-6 text-lg font-semibold"
               >
                 <Download className="mr-2 h-5 w-5" /> Join the Waiting List
               </AnimatedButton>
-              <p className="mt-4 text-sm text-slate-300">Coming soon to iOS. Android version in development.</p>
+              <p className="mt-4 text-sm text-purple-200">Coming soon to iOS. Android version in development.</p>
             </div>
           </div>
         </AnimatedTransition>
