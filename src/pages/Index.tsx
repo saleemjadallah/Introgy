@@ -46,9 +46,9 @@ const Index = () => {
             className="flex flex-col items-center"
           >
             <Button size="lg" id="download-app" className="mt-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-6 text-lg">
-              <Download className="mr-2 h-5 w-5" /> Download for iOS
+              <Download className="mr-2 h-5 w-5" /> Coming Soon - Get Notified
             </Button>
-            <p className="text-sm text-muted-foreground mt-2">Coming soon</p>
+            <p className="text-sm text-muted-foreground mt-2">Be the first to know when we launch</p>
           </motion.div>
         </div>
       </AnimatedTransition>
@@ -207,19 +207,19 @@ const Index = () => {
       {/* Download CTA */}
       <section className="py-8 md:py-16 text-center">
         <AnimatedTransition type="scaleFade" transitionKey="download-cta">
-          <div className="bg-gradient-to-r from-purple-900/80 to-indigo-900/80 text-white p-8 md:p-12 rounded-3xl">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to manage your social energy?</h2>
-            <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
-              Download Introgy today and take control of your social well-being with tools designed specifically for introverts.
+          <div className="bg-gradient-to-r from-slate-800 to-slate-900 text-white p-8 md:p-12 rounded-3xl border border-slate-700">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Ready to manage your social energy?</h2>
+            <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto text-slate-200">
+              Join our waiting list and be the first to experience Introgy when we launch. Get early access to tools designed specifically for introverts.
             </p>
             <div className="flex flex-col items-center">
               <AnimatedButton 
                 size="lg" 
-                className="bg-white text-purple-900 hover:bg-slate-100 px-8 py-6 text-lg"
+                className="bg-white text-slate-900 hover:bg-slate-100 px-8 py-6 text-lg font-semibold"
               >
-                <Download className="mr-2 h-5 w-5" /> Download for iOS
+                <Download className="mr-2 h-5 w-5" /> Join the Waiting List
               </AnimatedButton>
-              <p className="mt-4 text-sm text-white/80">Available on the App Store. Android version coming soon.</p>
+              <p className="mt-4 text-sm text-slate-300">Coming soon to iOS. Android version in development.</p>
             </div>
           </div>
         </AnimatedTransition>
