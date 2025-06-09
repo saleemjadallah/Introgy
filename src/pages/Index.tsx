@@ -204,42 +204,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-8 md:py-12">
-        <h2 className="text-3xl font-bold text-center mb-8">What Users Are Saying</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              quote: "Introgy has completely changed how I approach social situations. I feel more in control of my energy now.",
-              name: "Sarah T.",
-              rating: 5
-            },
-            {
-              quote: "As someone who's always struggled with social anxiety, this app has been a game-changer for me.",
-              name: "Michael R.",
-              rating: 5
-            },
-            {
-              quote: "The communication profiles feature helped me explain my needs to family and friends in a way they finally understand.",
-              name: "Jamie L.",
-              rating: 4
-            }
-          ].map((testimonial, i) => (
-            <AnimatedCard key={i} className="bg-white/50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
-              <CardContent className="pt-6">
-                <div className="flex mb-2">
-                  {Array(testimonial.rating).fill(0).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 text-amber-400 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="italic text-slate-700 dark:text-slate-300">"{testimonial.quote}"</p>
-                <p className="mt-4 text-sm font-medium">— {testimonial.name}</p>
-              </CardContent>
-            </AnimatedCard>
-          ))}
-        </div>
-      </section>
-
       {/* Download CTA */}
       <section className="py-8 md:py-16 text-center">
         <AnimatedTransition type="scaleFade" transitionKey="download-cta">
