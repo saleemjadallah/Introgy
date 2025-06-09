@@ -6,8 +6,7 @@ import {
   Users, UserRound,
   Brain, Sparkles, 
   LineChart, BarChart3, 
-  Home, HomeIcon, 
-  User 
+  Home, HomeIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -84,7 +83,6 @@ const Layout = () => {
             <NavItem to="/social-navigation" icon={Users} label="Social Navigation" />
             <NavItem to="/connection-builder" icon={Brain} label="Connection Builder" />
             <NavItem to="/wellbeing" icon={LineChart} label="Wellbeing" />
-            <NavItem to="/profile" icon={User} label="My Profile" />
           </div>
         </nav>
 

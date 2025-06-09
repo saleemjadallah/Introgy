@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import React, { Suspense } from "react";
 import Layout from "@/components/Layout";
@@ -73,9 +72,10 @@ function App() {
                   <Route path="social-navigation" element={<SocialNavigation />} />
                   <Route path="connection-builder" element={<ConnectionBuilder />} />
                   <Route path="wellbeing" element={<Wellbeing />} />
-                  <Route path="profile" element={<Profile />} />
                   <Route path="faq" element={<FAQ />} />
                 </Route>
+                {/* Keep Profile route accessible via direct URL for auth dropdown links */}
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/debug/supabase" element={<SupabaseDebugPage />} />
                 <Route path="/privacy" element={<Privacy />} />
