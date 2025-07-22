@@ -14,7 +14,7 @@ const ComingSoonFeatures = () => {
             More Features in the App
           </CardTitle>
           <CardDescription>
-            Download the Introgy app to access all premium features, including:
+            Get notified when the Introgy app launches to access all premium features, including:
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">

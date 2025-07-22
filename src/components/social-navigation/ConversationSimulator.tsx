@@ -72,7 +72,7 @@ const ConversationSimulator = () => {
             className="bg-purple-600 hover:bg-purple-700"
           >
             <Download className="h-4 w-4 mr-2" />
-            Download Full App to Practice Conversations
+            iOS App Coming Soon - Practice Conversations
           </Button>
         </div>
       </CardContent>

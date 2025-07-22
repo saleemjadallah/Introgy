@@ -79,7 +79,7 @@ const SocialStrategies = () => {
                 className="px-0 h-auto py-1 text-sky-600 dark:text-sky-400"
                 onClick={() => window.location.href = "#download-app"}
               >
-                Get the app to access all strategies →
+                iOS app coming soon - Get all strategies →
               </Button>
             </div>
           </div>
