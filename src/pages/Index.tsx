@@ -46,9 +46,11 @@ const Index = () => {
             transition={{ delay: 0.6 }}
             className="flex flex-col items-center"
           >
-            <Button size="lg" id="download-app" className="mt-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-6 text-lg">
-              <Download className="mr-2 h-5 w-5" /> Coming Soon - Get Notified
-            </Button>
+            <WaitingListForm>
+              <Button size="lg" id="download-app" className="mt-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-6 text-lg">
+                <Download className="mr-2 h-5 w-5" /> Coming Soon - Get Notified
+              </Button>
+            </WaitingListForm>
             <p className="text-sm text-muted-foreground mt-2">Be the first to know when we launch</p>
           </motion.div>
         </div>
