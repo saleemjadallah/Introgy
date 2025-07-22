@@ -117,18 +117,12 @@ const SocialBattery = () => {
                 </div>
               </div>
               
-              <div className="space-y-3">
-                <WaitingListForm>
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">
-                    <Download className="mr-2 h-4 w-4" />
-                    Join the Waiting List
-                  </Button>
-                </WaitingListForm>
-                
-                <Button onClick={showDemoToast} variant="outline" className="w-full">
-                  Try in the Introgy App
+              <WaitingListForm>
+                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">
+                  <Download className="mr-2 h-4 w-4" />
+                  Join the Waiting List
                 </Button>
-              </div>
+              </WaitingListForm>
             </CardContent>
           </Card>
         </TabsContent>
