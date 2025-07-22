@@ -55,12 +55,12 @@ const Wellbeing = () => {
             </div>
             <div className="flex justify-center">
               <div className="rounded-lg bg-white/20 shadow-xl p-4 border border-white/30 w-full max-w-xs">
-                <div className="aspect-[9/16] rounded-md bg-gradient-to-br from-sky-100/90 to-blue-50 flex items-center justify-center">
-                  <div className="text-center p-6">
-                    <MountainSnow className="h-16 w-16 mx-auto text-blueteal opacity-90 mb-4" />
-                    <h4 className="text-lg font-medium mb-2">Introgy App</h4>
-                    <p className="text-sm text-gray-600">Wellbeing tools designed for introverts</p>
-                  </div>
+                <div className="aspect-square rounded-md overflow-hidden">
+                  <img 
+                    src="/lovable-uploads/81141092-5acb-4fc9-a60d-187d6f3532f0.png" 
+                    alt="Introgy - Inner Power, Outward Presence" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
             </div>
