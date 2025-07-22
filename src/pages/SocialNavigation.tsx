@@ -163,7 +163,7 @@ const SocialNavigation = () => {
                   className="bg-purple-600 hover:bg-purple-700"
                 >
                   <Download className="h-4 w-4 mr-2" />
-                  Download Full App
+                  iOS App Coming Soon
                 </Button>
               </div>
             </TabsContent>
