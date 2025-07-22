@@ -41,7 +41,7 @@ const Wellbeing = () => {
                   size="lg"
                 >
                   <Download className="h-5 w-5 mr-2" />
-                  Download iOS App
+                  iOS App Coming Soon
                 </Button>
                 <Button 
                   variant="outline" 
@@ -115,7 +115,7 @@ const Wellbeing = () => {
                   className="bg-white/50 hover:bg-white/80 text-blueteal shadow-sm backdrop-blur-sm"
                 >
                   <Download className="h-4 w-4 mr-2" />
-                  Get Access in the App
+                  iOS App Coming Soon
                 </Button>
               </div>
             </CollapsibleContent>
@@ -165,7 +165,7 @@ const Wellbeing = () => {
                   className="bg-white/50 hover:bg-white/80 text-blueteal shadow-sm backdrop-blur-sm"
                 >
                   <Download className="h-4 w-4 mr-2" />
-                  Get Access in the App
+                  iOS App Coming Soon
                 </Button>
               </div>
             </CollapsibleContent>
@@ -215,7 +215,7 @@ const Wellbeing = () => {
                   className="bg-white/50 hover:bg-white/80 text-blueteal shadow-sm backdrop-blur-sm"
                 >
                   <Download className="h-4 w-4 mr-2" />
-                  Get Access in the App
+                  iOS App Coming Soon
                 </Button>
               </div>
             </CollapsibleContent>
@@ -230,14 +230,14 @@ const Wellbeing = () => {
             <div className="text-center space-y-4">
               <h3 className="text-xl md:text-2xl font-bold">Experience the Complete Wellbeing Suite</h3>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Download our iOS app today to access all wellbeing features, personalized to your unique introvert needs.
+                Get notified when our iOS app launches to access all wellbeing features, personalized to your unique introvert needs.
               </p>
               <Button 
                 className="bg-primary hover:bg-primary/90 mt-2" 
                 size="lg"
               >
                 <Download className="h-5 w-5 mr-2" />
-                Download on the App Store
+                iOS App Coming Soon
               </Button>
             </div>
           </CardContent>
