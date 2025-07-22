@@ -5,10 +5,11 @@ import { BatteryStatus } from "@/components/social-battery/BatteryStatus";
 import { BatteryHistory } from "@/components/social-battery/BatteryHistory";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Battery, Activity, ListPlus, Zap, Timer, Brain } from "lucide-react";
+import { Battery, Activity, ListPlus, Zap, Timer, Brain, Download } from "lucide-react";
 import { useSocialBattery } from "@/hooks/useSocialBattery";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { WaitingListForm } from "@/components/WaitingListForm";
 
 const SocialBattery = () => {
   const { batteryLevel, batteryHistory, handleSliderChange } = useSocialBattery();
@@ -116,9 +117,18 @@ const SocialBattery = () => {
                 </div>
               </div>
               
-              <Button onClick={showDemoToast} className="w-full">
-                Try in the Introgy App
-              </Button>
+              <div className="space-y-3">
+                <WaitingListForm>
+                  <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">
+                    <Download className="mr-2 h-4 w-4" />
+                    Join the Waiting List
+                  </Button>
+                </WaitingListForm>
+                
+                <Button onClick={showDemoToast} variant="outline" className="w-full">
+                  Try in the Introgy App
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
