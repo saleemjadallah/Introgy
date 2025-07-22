@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AnimatedCard } from "@/components/animations/AnimatedCard";
 import { AnimatedButton } from "@/components/animations/AnimatedButton";
 import { AnimatedTransition } from "@/components/animations/AnimatedTransition";
+import { WaitingListForm } from "@/components/WaitingListForm";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -213,12 +214,14 @@ const Index = () => {
               Join our waiting list and be the first to experience Introgy when we launch. Get early access to tools designed specifically for introverts.
             </p>
             <div className="flex flex-col items-center">
-              <AnimatedButton 
-                size="lg" 
-                className="bg-purple-600 text-white hover:bg-purple-700 px-8 py-6 text-lg font-semibold shadow-lg"
-              >
-                <Download className="mr-2 h-5 w-5" /> Join the Waiting List
-              </AnimatedButton>
+              <WaitingListForm>
+                <AnimatedButton 
+                  size="lg" 
+                  className="bg-purple-600 text-white hover:bg-purple-700 px-8 py-6 text-lg font-semibold shadow-lg"
+                >
+                  <Download className="mr-2 h-5 w-5" /> Join the Waiting List
+                </AnimatedButton>
+              </WaitingListForm>
               <p className="mt-4 text-sm text-gray-600">Coming soon to iOS. Android version in development.</p>
             </div>
           </div>
