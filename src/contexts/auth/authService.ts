@@ -14,63 +14,9 @@ interface GoogleAuthPluginInterface {
   disconnect(): Promise<{ success: boolean }>;
 }
 
-// Admin phone number that bypasses OTP verification
-const ADMIN_PHONE = '+971507493651';
-const ADMIN_PASSWORD = 'admin123'; // Simple password for admin account
-
 export const phoneOtpSignIn = async (phone: string) => {
   try {
-    // Normalize the phone number for comparison
-    const normalizedPhone = phone.replace(/\s+/g, '');
-    
-    // Check if this is the admin phone number
-    if (normalizedPhone === ADMIN_PHONE) {
-      console.log("Admin phone detected, bypassing OTP verification completely");
-      
-      // For admin phone, we'll try to sign in directly with password
-      try {
-        // First try to sign in with password
-        const { data, error } = await supabase.auth.signInWithPassword({
-          phone: normalizedPhone,
-          password: ADMIN_PASSWORD
-        });
-        
-        if (error) {
-          console.log("Admin sign in failed, creating account:", error);
-          
-          // If sign in fails, try to create the account
-          const signUpResponse = await supabase.auth.signUp({
-            phone: normalizedPhone,
-            password: ADMIN_PASSWORD,
-            options: {
-              data: {
-                display_name: 'Admin User',
-                is_admin: true
-              }
-            }
-          });
-          
-          if (signUpResponse.error) {
-            console.error("Failed to create admin account:", signUpResponse.error);
-          } else {
-            console.log("Admin account created successfully:", signUpResponse.data);
-          }
-        } else {
-          console.log("Admin signed in successfully:", data);
-        }
-      } catch (signInError) {
-        console.error("Error during admin direct sign in:", signInError);
-      }
-      
-      // Set flag for the OTP component to auto-proceed
-      localStorage.setItem('admin_bypass_otp', 'true');
-      localStorage.setItem('admin_phone', normalizedPhone);
-      localStorage.setItem('admin_auto_signin', 'true');
-      
-      return true;
-    }
-    
-    // Normal flow for non-admin phones
+    // Normal flow for all phones
     console.log("Sending OTP to:", phone);
     const { error } = await supabase.auth.signInWithOtp({
       phone,
@@ -91,62 +37,7 @@ export const phoneOtpSignIn = async (phone: string) => {
 
 export const verifyPhoneOtp = async (phone: string, token: string) => {
   try {
-    // Check if this is the admin bypass flow
-    const isAdminBypass = localStorage.getItem('admin_bypass_otp') === 'true';
-    const adminPhone = localStorage.getItem('admin_phone');
-    const isAutoSignIn = localStorage.getItem('admin_auto_signin') === 'true';
-    
-    if (isAdminBypass && phone === adminPhone) {
-      console.log("Admin phone verification bypass activated");
-      
-      // Clear the bypass flags
-      localStorage.removeItem('admin_bypass_otp');
-      localStorage.removeItem('admin_phone');
-      localStorage.removeItem('admin_auto_signin');
-      
-      // If we've already signed in during the phoneOtpSignIn step, just return success
-      if (isAutoSignIn) {
-        console.log("Admin already signed in, skipping verification");
-        toast.success('Admin signed in successfully');
-        return true;
-      }
-      
-      // Otherwise, try to sign in now
-      const { data, error } = await supabase.auth.signInWithPassword({
-        phone,
-        password: ADMIN_PASSWORD
-      });
-      
-      if (error) {
-        console.error("Admin sign in error:", error);
-        
-        // If sign in fails, try to create the account
-        const signUpResponse = await supabase.auth.signUp({
-          phone,
-          password: ADMIN_PASSWORD,
-          options: {
-            data: {
-              display_name: 'Admin User',
-              is_admin: true
-            }
-          }
-        });
-        
-        if (signUpResponse.error) {
-          throw signUpResponse.error;
-        }
-        
-        console.log("Admin account created and signed in:", signUpResponse.data);
-        toast.success('Admin account created and signed in');
-        return true;
-      }
-      
-      console.log("Admin signed in successfully:", data);
-      toast.success('Admin signed in successfully');
-      return true;
-    }
-    
-    // Normal flow for non-admin phones
+    // Normal flow for all phones
     console.log("Verifying OTP:", { phone, token });
     const { error, data } = await supabase.auth.verifyOtp({
       phone,
