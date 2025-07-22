@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { WaitingListForm } from "@/components/WaitingListForm";
 
 const Wellbeing = () => {
   const [activeSection, setActiveSection] = useState<'overview' | 'education' | 'wisdom' | 'mindfulness'>('overview');
@@ -35,14 +36,15 @@ const Wellbeing = () => {
                 The full experience is available in our iOS app.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <Button 
-                  onClick={() => window.location.href = "#download-app"} 
-                  className="bg-blueteal hover:bg-blueteal/90"
-                  size="lg"
-                >
-                  <Download className="h-5 w-5 mr-2" />
-                  iOS App Coming Soon
-                </Button>
+                <WaitingListForm>
+                  <Button 
+                    className="bg-blueteal hover:bg-blueteal/90"
+                    size="lg"
+                  >
+                    <Download className="h-5 w-5 mr-2" />
+                    iOS App Coming Soon
+                  </Button>
+                </WaitingListForm>
                 <Button 
                   variant="outline" 
                   onClick={() => window.location.href = "#features"}
@@ -110,13 +112,14 @@ const Wellbeing = () => {
                 </ul>
               </div>
               <div className="flex justify-center">
-                <Button 
-                  onClick={() => window.location.href = "#download-app"} 
-                  className="bg-white/50 hover:bg-white/80 text-blueteal shadow-sm backdrop-blur-sm"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  iOS App Coming Soon
-                </Button>
+                <WaitingListForm>
+                  <Button 
+                    className="bg-white/50 hover:bg-white/80 text-blueteal shadow-sm backdrop-blur-sm"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    iOS App Coming Soon
+                  </Button>
+                </WaitingListForm>
               </div>
             </CollapsibleContent>
           </Collapsible>
@@ -160,13 +163,14 @@ const Wellbeing = () => {
                 </ul>
               </div>
               <div className="flex justify-center">
-                <Button 
-                  onClick={() => window.location.href = "#download-app"} 
-                  className="bg-white/50 hover:bg-white/80 text-blueteal shadow-sm backdrop-blur-sm"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  iOS App Coming Soon
-                </Button>
+                <WaitingListForm>
+                  <Button 
+                    className="bg-white/50 hover:bg-white/80 text-blueteal shadow-sm backdrop-blur-sm"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    iOS App Coming Soon
+                  </Button>
+                </WaitingListForm>
               </div>
             </CollapsibleContent>
           </Collapsible>
@@ -210,13 +214,14 @@ const Wellbeing = () => {
                 </ul>
               </div>
               <div className="flex justify-center">
-                <Button 
-                  onClick={() => window.location.href = "#download-app"} 
-                  className="bg-white/50 hover:bg-white/80 text-blueteal shadow-sm backdrop-blur-sm"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  iOS App Coming Soon
-                </Button>
+                <WaitingListForm>
+                  <Button 
+                    className="bg-white/50 hover:bg-white/80 text-blueteal shadow-sm backdrop-blur-sm"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    iOS App Coming Soon
+                  </Button>
+                </WaitingListForm>
               </div>
             </CollapsibleContent>
           </Collapsible>
@@ -232,13 +237,15 @@ const Wellbeing = () => {
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 Get notified when our iOS app launches to access all wellbeing features, personalized to your unique introvert needs.
               </p>
-              <Button 
-                className="bg-primary hover:bg-primary/90 mt-2" 
-                size="lg"
-              >
-                <Download className="h-5 w-5 mr-2" />
-                iOS App Coming Soon
-              </Button>
+              <WaitingListForm>
+                <Button 
+                  className="bg-primary hover:bg-primary/90 mt-2" 
+                  size="lg"
+                >
+                  <Download className="h-5 w-5 mr-2" />
+                  iOS App Coming Soon
+                </Button>
+              </WaitingListForm>
             </div>
           </CardContent>
         </Card>

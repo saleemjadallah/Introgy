@@ -10,6 +10,7 @@ import PreparationTab from "@/components/social-navigation/tabs/PreparationTab";
 import ComingSoonFeatures from "@/components/social-navigation/ComingSoonFeatures";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import { WaitingListForm } from "@/components/WaitingListForm";
 
 const SocialNavigation = () => {
   const { 
@@ -157,14 +158,15 @@ const SocialNavigation = () => {
               </div>
               
               <div className="text-center pt-6">
-                <Button 
-                  onClick={() => window.location.href = "#download-app"} 
-                  size="lg"
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  iOS App Coming Soon
-                </Button>
+                <WaitingListForm>
+                  <Button 
+                    size="lg"
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    iOS App Coming Soon
+                  </Button>
+                </WaitingListForm>
               </div>
             </TabsContent>
             

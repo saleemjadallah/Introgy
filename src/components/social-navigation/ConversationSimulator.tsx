@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MessageSquare, Download, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SimulatorDemoUI from "./conversation-simulator/SimulatorDemoUI";
+import { WaitingListForm } from "@/components/WaitingListForm";
 
 const ConversationSimulator = () => {
   const [showMoreInfo, setShowMoreInfo] = useState(false);
@@ -67,13 +68,14 @@ const ConversationSimulator = () => {
         <SimulatorDemoUI />
         
         <div className="text-center pt-3">
-          <Button 
-            onClick={() => window.location.href = "#download-app"} 
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            iOS App Coming Soon - Practice Conversations
-          </Button>
+          <WaitingListForm>
+            <Button 
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              iOS App Coming Soon - Practice Conversations
+            </Button>
+          </WaitingListForm>
         </div>
       </CardContent>
     </Card>

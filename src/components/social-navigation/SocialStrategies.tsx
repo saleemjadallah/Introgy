@@ -5,6 +5,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { BookOpen, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSocialStrategies } from "@/hooks/useSocialStrategies";
+import { WaitingListForm } from "@/components/WaitingListForm";
 
 // Import the new components
 import ScenarioTypeGrid from "./social-strategies/ScenarioTypeGrid";
@@ -74,13 +75,14 @@ const SocialStrategies = () => {
                 In the full app, you'll have access to our complete library of social strategies tailored 
                 to various scenarios like networking events, casual meetups, and work functions.
               </p>
-              <Button 
-                variant="link" 
-                className="px-0 h-auto py-1 text-sky-600 dark:text-sky-400"
-                onClick={() => window.location.href = "#download-app"}
-              >
-                iOS app coming soon - Get all strategies →
-              </Button>
+              <WaitingListForm>
+                <Button 
+                  variant="link" 
+                  className="px-0 h-auto py-1 text-sky-600 dark:text-sky-400"
+                >
+                  iOS app coming soon - Get all strategies →
+                </Button>
+              </WaitingListForm>
             </div>
           </div>
         </div>

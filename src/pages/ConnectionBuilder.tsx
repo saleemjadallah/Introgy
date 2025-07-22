@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, Info } from "lucide-react";
+import { WaitingListForm } from "@/components/WaitingListForm";
 
 const ConnectionBuilder = () => {
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
@@ -84,13 +85,14 @@ const ConnectionBuilder = () => {
             </div>
             
             <div className="text-center pt-3">
-              <Button 
-                onClick={() => window.location.href = "#download-app"} 
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                iOS App Coming Soon
-              </Button>
+              <WaitingListForm>
+                <Button 
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  iOS App Coming Soon
+                </Button>
+              </WaitingListForm>
             </div>
           </div>
         );
@@ -150,13 +152,14 @@ const ConnectionBuilder = () => {
             </div>
             
             <div className="text-center pt-3">
-              <Button 
-                onClick={() => window.location.href = "#download-app"} 
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                iOS App Coming Soon
-              </Button>
+              <WaitingListForm>
+                <Button 
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  iOS App Coming Soon
+                </Button>
+              </WaitingListForm>
             </div>
           </div>
         );
@@ -227,13 +230,14 @@ const ConnectionBuilder = () => {
             </div>
             
             <div className="text-center pt-3">
-              <Button 
-                onClick={() => window.location.href = "#download-app"} 
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                iOS App Coming Soon
-              </Button>
+              <WaitingListForm>
+                <Button 
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  iOS App Coming Soon
+                </Button>
+              </WaitingListForm>
             </div>
           </div>
         );
@@ -291,13 +295,14 @@ const ConnectionBuilder = () => {
             </div>
             
             <div className="text-center pt-3">
-              <Button 
-                onClick={() => window.location.href = "#download-app"} 
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                iOS App Coming Soon
-              </Button>
+              <WaitingListForm>
+                <Button 
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  iOS App Coming Soon
+                </Button>
+              </WaitingListForm>
             </div>
           </div>
         );
@@ -339,13 +344,14 @@ const ConnectionBuilder = () => {
               </p>
               
               <div className="text-center">
-                <Button 
-                  onClick={() => window.location.href = "#download-app"} 
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  iOS App Coming Soon
-                </Button>
+                <WaitingListForm>
+                  <Button 
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    iOS App Coming Soon
+                  </Button>
+                </WaitingListForm>
               </div>
             </CardContent>
           </Card>
