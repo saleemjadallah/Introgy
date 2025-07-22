@@ -3,8 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const HelpFaqSection = () => {
+  const { toast } = useToast();
   const faqItems = [
     {
       question: "What is a Social Battery and how does tracking work?",
@@ -53,7 +55,13 @@ const HelpFaqSection = () => {
           <p className="text-sm text-muted-foreground mb-3">
             Can't find what you're looking for?
           </p>
-          <Button variant="outline">Contact Support</Button>
+          <Button variant="outline" onClick={() => {
+            navigator.clipboard.writeText("support@introgy.ai");
+            toast({
+              title: "Email copied!",
+              description: "support@introgy.ai has been copied to your clipboard.",
+            });
+          }}>Contact Support</Button>
         </div>
       </CardContent>
     </Card>
