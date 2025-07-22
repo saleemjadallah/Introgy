@@ -3,10 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 const HelpFaqSection = () => {
-  const { toast } = useToast();
   const faqItems = [
     {
       question: "What is a Social Battery and how does tracking work?",
@@ -57,8 +56,7 @@ const HelpFaqSection = () => {
           </p>
           <Button variant="outline" onClick={() => {
             navigator.clipboard.writeText("support@introgy.ai");
-            toast({
-              title: "Email copied!",
+            toast.success("Email copied!", {
               description: "support@introgy.ai has been copied to your clipboard.",
             });
           }}>Contact Support</Button>

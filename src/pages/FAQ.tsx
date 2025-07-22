@@ -4,11 +4,10 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Search, ArrowRight } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 const FAQ = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { toast } = useToast();
   
   // FAQ categories and items
   const faqCategories = [
@@ -188,8 +187,7 @@ const FAQ = () => {
         </p>
         <Button onClick={() => {
           navigator.clipboard.writeText("support@introgy.ai");
-          toast({
-            title: "Email copied!",
+          toast.success("Email copied!", {
             description: "support@introgy.ai has been copied to your clipboard.",
           });
         }}>
