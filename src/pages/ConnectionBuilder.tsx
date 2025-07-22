@@ -89,7 +89,7 @@ const ConnectionBuilder = () => {
                 className="bg-purple-600 hover:bg-purple-700"
               >
                 <Download className="h-4 w-4 mr-2" />
-                Download App for Full Access
+                iOS App Coming Soon
               </Button>
             </div>
           </div>
@@ -155,7 +155,7 @@ const ConnectionBuilder = () => {
                 className="bg-purple-600 hover:bg-purple-700"
               >
                 <Download className="h-4 w-4 mr-2" />
-                Download App for Full Access
+                iOS App Coming Soon
               </Button>
             </div>
           </div>
@@ -232,7 +232,7 @@ const ConnectionBuilder = () => {
                 className="bg-purple-600 hover:bg-purple-700"
               >
                 <Download className="h-4 w-4 mr-2" />
-                Download App for Full Access
+                iOS App Coming Soon
               </Button>
             </div>
           </div>
@@ -296,7 +296,7 @@ const ConnectionBuilder = () => {
                 className="bg-purple-600 hover:bg-purple-700"
               >
                 <Download className="h-4 w-4 mr-2" />
-                Download App for Full Access
+                iOS App Coming Soon
               </Button>
             </div>
           </div>
@@ -335,7 +335,7 @@ const ConnectionBuilder = () => {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                This feature is available in the full Introgy app. Download to access all functionality.
+                This feature is available in the full Introgy app. Get notified when the iOS app launches.
               </p>
               
               <div className="text-center">
@@ -344,7 +344,7 @@ const ConnectionBuilder = () => {
                   className="bg-purple-600 hover:bg-purple-700"
                 >
                   <Download className="h-4 w-4 mr-2" />
-                  Download App for Full Access
+                  iOS App Coming Soon
                 </Button>
               </div>
             </CardContent>
